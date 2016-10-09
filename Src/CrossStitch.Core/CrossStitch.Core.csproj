@@ -62,9 +62,9 @@
     <Compile Include="Apps\AppDomainAppAdaptor.cs" />
     <Compile Include="Apps\AppsModule.cs" />
     <Compile Include="Backplane\BackplaneModule.cs" />
-    <Compile Include="Backplane\Events\ClusterCommandEvent.cs" />
     <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
+    <Compile Include="Backplane\NetMqMessageMapper.cs" />
     <Compile Include="BrokeredResponse.cs" />
     <Compile Include="Apps\ClientApplication.cs" />
     <Compile Include="ClientMessageBusProxy.cs" />
@@ -120,6 +120,7 @@
     <Compile Include="Master\ClusterNodeManager.cs" />
     <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Utility\Extensions\EventHandlerExtensions.cs" />
+    <Compile Include="Utility\IMapper.cs" />
     <Compile Include="Utility\PayloadEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>

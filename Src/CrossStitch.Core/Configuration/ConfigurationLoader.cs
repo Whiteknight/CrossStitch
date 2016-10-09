@@ -1,6 +1,5 @@
 ﻿using System.Configuration;
 using System.IO;
-using CrossStitch.Core.Communications;
 using CrossStitch.Core.Master;
 
 namespace CrossStitch.Core.Configuration

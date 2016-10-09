@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Backplane
+namespace CrossStitch.Core.Backplane.Events
 {
     public class ClusterMemberEvent
     {

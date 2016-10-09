@@ -1,7 +1,6 @@
 ﻿using System;
 using CrossStitch.Core;
 using CrossStitch.Core.Backplane;
-using CrossStitch.Core.Communications;
 using CrossStitch.Core.Configuration;
 using CrossStitch.Core.Master;
 using CrossStitch.Core.Master.Events;

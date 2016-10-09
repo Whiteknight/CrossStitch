@@ -1,5 +1,4 @@
 ﻿using System;
-using CrossStitch.Core.Communications;
 using CrossStitch.Core.Messaging;
 using CrossStitch.Core.Networking;
 
@@ -18,10 +17,12 @@ namespace CrossStitch.Core.Backplane
             _backplane = backplane;
             _messageBus = messageBus;
 
-            _backplane.ClusterCommand += (s, e) => _messageBus.Publish(e);
+            // Forward messages from the backplane to the IMessageBus
+            _backplane.MessageReceived += (s, e) => _messageBus.Publish(e);
             _backplane.ClusterMember += (s, e) => _messageBus.Publish(e);
             _backplane.ZoneMember += (s, e) => _messageBus.Publish(e);
 
+            // Forward messages from the IMessageBus to the backplane
             _workerThreadId = _messageBus.StartDedicatedWorkerThread();
             _messageBus.Subscribe<MessageEnvelope>(
                 MessageEnvelope.SendEventName, 

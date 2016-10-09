@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Newtonsoft.Json;
 
 namespace CrossStitch.Core
@@ -8,7 +7,7 @@ namespace CrossStitch.Core
     {
         byte[] Serialize<T>(T data);
         T Deserialize<T>(byte[] bytes);
-        object DeserializeObject(Type type, byte[] bytes);
+        object DeserializeObject(byte[] bytes);
     }
 
     public class JsonSerializer : ISerializer
@@ -34,10 +33,10 @@ namespace CrossStitch.Core
             return JsonConvert.DeserializeObject<T>(json, _settings);
         }
 
-        public object DeserializeObject(Type type, byte[] bytes)
+        public object DeserializeObject(byte[] bytes)
         {
             string json = Encoding.Unicode.GetString(bytes);
-            return JsonConvert.DeserializeObject(json, type, _settings);
+            return JsonConvert.DeserializeObject(json, _settings);
         }
     }
 }

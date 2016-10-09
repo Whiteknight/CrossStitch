@@ -1,11 +1,14 @@
 ﻿using System;
 using CrossStitch.Core.Backplane;
-using CrossStitch.Core.Communications;
 using CrossStitch.Core.Messaging;
 using CrossStitch.Core.Networking;
 
 namespace CrossStitch.Core.Master
 {
+    // The master module maintains detailed lists of status and configuration for nodes in the cluster
+    // It periodically pings nodes to make sure all information is up to date.
+    // It is responsible for sending commands to nodes, and figuring out which commands to send in
+    // response to user requests. For example, scheduling and balancing of app instances.
     public class MasterModule : IModule
     {
         // Module responsible for maintaining cluster state

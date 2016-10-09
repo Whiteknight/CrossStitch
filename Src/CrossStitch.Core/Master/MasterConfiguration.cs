@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CrossStitch.Core.Communications;
+using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Configuration;
 
 namespace CrossStitch.Core.Master

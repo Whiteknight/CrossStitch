@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Communications
+﻿namespace CrossStitch.Core.Backplane
 {
     public class NodeCommunicationInformation
     {

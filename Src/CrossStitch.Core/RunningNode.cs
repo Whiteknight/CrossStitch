@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.Core.Apps;
-using CrossStitch.Core.Communications;
+using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Messaging;
 
 namespace CrossStitch.Core

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using CrossStitch.Core.Communications;
+using CrossStitch.Core.Backplane.Events;
 using CrossStitch.Core.Networking;
 using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;
-using NetMQ;
 using NetMQ.Zyre;
 using NetMQ.Zyre.ZyreEvents;
 
@@ -14,8 +11,8 @@ namespace CrossStitch.Core.Backplane
     public sealed class ZyreBackplane : IClusterBackplane
     {
         private readonly BackplaneConfiguration _config;
-        private readonly ISerializer _serializer;
         private readonly Zyre _zyre;
+        private readonly NetMqMessageMapper _mapper;
         private Guid _uuid;
         private bool _connected;
 
@@ -31,45 +28,25 @@ namespace CrossStitch.Core.Backplane
             _zyre.WhisperEvent += ZyreWhisperEvent;
             _zyre.ShoutEvent += ZyreShoutEvent;
             _config = config;
-            _serializer = serializer;
+            _mapper = new NetMqMessageMapper(serializer);
         }
 
-        public event EventHandler<PayloadEventArgs<ClusterCommandEvent>> ClusterCommand;
+        public event EventHandler<PayloadEventArgs<MessageEnvelope>> MessageReceived;
         public event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
         public event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
 
         private void ZyreShoutEvent(object sender, ZyreEventShout e)
         {
-            string command = e.Content.Pop().ConvertToString();
-            string typeName = e.Content.Pop().ConvertToString();
-            Type type = Type.GetType(typeName);
-            var args = e.Content.Skip(1).Select(f => _serializer.DeserializeObject(type, f.Buffer)).ToArray();
-            ClusterCommand.Raise(this, ClusterCommandEvent.EventName, new ClusterCommandEvent {
-                NodeUuid = e.SenderUuid,
-                NodeName = e.SenderName,
-                Zone = e.GroupName,
-                Command = command,
-                Frames = args
-            });
+            var envelope = _mapper.Map(e.Content);
+            MessageReceived.Raise(this, MessageEnvelope.ReceiveEventName, envelope);
         }
 
         private void ZyreWhisperEvent(object sender, ZyreEventWhisper e)
         {
-            string command = e.Content.Pop().ConvertToString();
-            string typeName = e.Content.Pop().ConvertToString();
-            Type type = Type.GetType(typeName);
-            var args = e.Content.Select(f => _serializer.DeserializeObject(type, f.Buffer)).ToArray();
-            ClusterCommand.Raise(this, ClusterCommandEvent.EventName, new ClusterCommandEvent
-            {
-                NodeUuid = e.SenderUuid,
-                NodeName = e.SenderName,
-                Command = command,
-                Frames = args
-            });
+            var envelope = _mapper.Map(e.Content);
+            MessageReceived.Raise(this, MessageEnvelope.ReceiveEventName, envelope);
         }
 
-        
- 
         private void ZyreLeaveEvent(object sender, ZyreEventLeave e)
         {
             ZoneMember.Raise(this, ZoneMemberEvent.LeavingEvent, new ZoneMemberEvent {
@@ -155,30 +132,7 @@ namespace CrossStitch.Core.Backplane
 
         public void Send(MessageEnvelope envelope)
         {
-            NetMQMessage message = new NetMQMessage();
-            byte[] headerFrame = _serializer.Serialize(envelope.Header);
-            message.Append(headerFrame);
-            if (envelope.Header.PayloadType == MessagePayloadType.CommandString)
-            {
-                foreach (var command in envelope.CommandStrings)
-                {
-                    var bytes = Encoding.Unicode.GetBytes(command);
-                    message.Append(bytes);
-                }
-            }
-            else if (envelope.Header.PayloadType == MessagePayloadType.Object)
-            {
-                foreach (var payload in envelope.PayloadObjects)
-                {
-                    var bytes = _serializer.Serialize(payload);
-                    message.Append(bytes);
-                }
-            }
-            else if (envelope.Header.PayloadType == MessagePayloadType.Raw)
-            {
-                foreach (var payload in envelope.RawFrames)
-                    message.Append(payload);
-            }
+            var message = _mapper.Map(envelope);
 
             // If we have a proxy node ID, send the message there and let the proxy sort out
             // further actions.

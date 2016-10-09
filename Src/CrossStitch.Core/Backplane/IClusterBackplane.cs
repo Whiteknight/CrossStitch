@@ -1,4 +1,5 @@
 ﻿using System;
+using CrossStitch.Core.Backplane.Events;
 using CrossStitch.Core.Networking;
 using CrossStitch.Core.Utility;
 
@@ -6,7 +7,7 @@ namespace CrossStitch.Core.Backplane
 {
     public interface IClusterBackplane : IDisposable
     {
-        event EventHandler<PayloadEventArgs<ClusterCommandEvent>> ClusterCommand;
+        event EventHandler<PayloadEventArgs<MessageEnvelope>> MessageReceived;
         event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
         event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
 

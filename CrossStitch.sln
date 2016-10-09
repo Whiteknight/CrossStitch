@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core", "Src\CrossStitch.Core\CrossStitch.Core.csproj", "{A9A30EDF-7047-4D0F-A756-816EB85D0384}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90BBD862-7C6A-4F2D-B028-4AFA5B52D490}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Master", "Tests\ClusterTest.Master\ClusterTest.Master.csproj", "{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClusterTest", "ClusterTest", "{5A83AEED-DC87-4E40-91A1-93F29F442278}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core.Tests", "src\CrossStitch.Core.Tests\CrossStitch.Core.Tests.csproj", "{B948FD42-51B2-4700-B785-FEBDED260848}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Client", "Tests\ClusterTest.Client\ClusterTest.Client.csproj", "{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MessagingStressTest", "MessagingStressTest", "{04878632-677E-4204-BE67-74082FEEA8F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingStressTest", "Tests\MessagingStressTest\MessagingStressTest.csproj", "{39CF7DEB-49D9-4331-B089-6D9F920E7F42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9A30EDF-7047-4D0F-A756-816EB85D0384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A30EDF-7047-4D0F-A756-816EB85D0384}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A30EDF-7047-4D0F-A756-816EB85D0384}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A30EDF-7047-4D0F-A756-816EB85D0384}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B948FD42-51B2-4700-B785-FEBDED260848}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B948FD42-51B2-4700-B785-FEBDED260848}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B948FD42-51B2-4700-B785-FEBDED260848}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B948FD42-51B2-4700-B785-FEBDED260848}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39CF7DEB-49D9-4331-B089-6D9F920E7F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39CF7DEB-49D9-4331-B089-6D9F920E7F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39CF7DEB-49D9-4331-B089-6D9F920E7F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39CF7DEB-49D9-4331-B089-6D9F920E7F42}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5A83AEED-DC87-4E40-91A1-93F29F442278} = {90BBD862-7C6A-4F2D-B028-4AFA5B52D490}
+		{04878632-677E-4204-BE67-74082FEEA8F5} = {90BBD862-7C6A-4F2D-B028-4AFA5B52D490}
+		{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397} = {5A83AEED-DC87-4E40-91A1-93F29F442278}
+		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06} = {5A83AEED-DC87-4E40-91A1-93F29F442278}
+		{39CF7DEB-49D9-4331-B089-6D9F920E7F42} = {04878632-677E-4204-BE67-74082FEEA8F5}
+	EndGlobalSection
+EndGlobal

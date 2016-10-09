@@ -1,0 +1,10 @@
+﻿{
+    "PingTimeoutMs": 5000,
+    "NodeDetection": "StaticList",
+    "NodeList": [   
+        {
+            "ListenPort": 8081,
+            "Address": "127.0.0.1"
+        }
+    ]
+}

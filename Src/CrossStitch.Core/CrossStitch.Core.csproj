@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A9A30EDF-7047-4D0F-A756-816EB85D0384}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CrossStitch.Core</RootNamespace>
+    <AssemblyName>CrossStitch.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AsyncIO.0.1.26.0\lib\net40\AsyncIO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetMQ, Version=4.0.0.0, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NetMQ.4.0.0-rc5\lib\net40\NetMQ.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetMQ.Zyre, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NetMQ.Zyre.1.0.0-rc1\lib\net40\NetMQ.Zyre.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Apps\AppDomainAppAdaptor.cs" />
+    <Compile Include="Apps\AppsModule.cs" />
+    <Compile Include="Backplane\BackplaneModule.cs" />
+    <Compile Include="Backplane\Events\ClusterCommandEvent.cs" />
+    <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
+    <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
+    <Compile Include="BrokeredResponse.cs" />
+    <Compile Include="Apps\ClientApplication.cs" />
+    <Compile Include="ClientMessageBusProxy.cs" />
+    <Compile Include="Master\ClusterPeerNode.cs" />
+    <Compile Include="Backplane\BackplaneConfiguration.cs" />
+    <Compile Include="Configuration\ConfigurationException.cs" />
+    <Compile Include="Configuration\ConfigurationLoader.cs" />
+    <Compile Include="Backplane\IClusterBackplane.cs" />
+    <Compile Include="ISerializer.cs" />
+    <Compile Include="Master\Events\NodeAddedToClusterEvent.cs" />
+    <Compile Include="Master\Events\NodeRemovedFromCluster.cs" />
+    <Compile Include="Master\IClusterNodeManager.cs" />
+    <Compile Include="Messaging\MessageBusExtensions.cs" />
+    <Compile Include="Messaging\PubSub\AnyThreadPubSubSubscription.cs" />
+    <Compile Include="Messaging\RequestResponse\AnyThreadReqResSubscription.cs" />
+    <Compile Include="Messaging\RequestResponse\DispatchableRequest.cs" />
+    <Compile Include="Messaging\IChannel.cs" />
+    <Compile Include="Messaging\IMessageBus.cs" />
+    <Compile Include="IModule.cs" />
+    <Compile Include="Messaging\PubSub\ImmediatePubSubSubscription.cs" />
+    <Compile Include="Messaging\PubSub\IPubSubChannel.cs" />
+    <Compile Include="Messaging\PubSub\IPubSubSubscription.cs" />
+    <Compile Include="Messaging\RequestResponse\ImmediateReqResSubscription.cs" />
+    <Compile Include="Messaging\RequestResponse\IReqResChannel.cs" />
+    <Compile Include="Messaging\RequestResponse\IReqResSubscription.cs" />
+    <Compile Include="Messaging\Threading\IThreadAction.cs" />
+    <Compile Include="Messaging\LocalMessageBus.cs" />
+    <Compile Include="Messaging\Threading\MessageHandlerThread.cs" />
+    <Compile Include="Messaging\Threading\MessageHandlerThreadContext.cs" />
+    <Compile Include="Messaging\Threading\MessagingWorkerThreadPool.cs" />
+    <Compile Include="Messaging\PubSub\PublishEventThreadAction.cs" />
+    <Compile Include="Messaging\PublishOptions.cs" />
+    <Compile Include="Messaging\Threading\DispatchThreadType.cs" />
+    <Compile Include="Messaging\PubSub\SpecificThreadPubSubSubscription.cs" />
+    <Compile Include="Messaging\RequestResponse\SpecificThreadReqResSubscription.cs" />
+    <Compile Include="Networking\MessageEnvelope.cs" />
+    <Compile Include="Networking\MessageHeader.cs" />
+    <Compile Include="Networking\MessagePayloadType.cs" />
+    <Compile Include="Networking\RawMessage.cs" />
+    <Compile Include="Networking\ReceiverSocket.cs" />
+    <Compile Include="Networking\TargetType.cs" />
+    <Compile Include="NodeConfiguration.cs" />
+    <Compile Include="RunningNode.cs" />
+    <Compile Include="Master\MasterConfiguration.cs" />
+    <Compile Include="Master\MasterModule.cs" />
+    <Compile Include="Backplane\NodeCommunicationInformation.cs" />
+    <Compile Include="Messaging\PubSub\PubSubChannel.cs" />
+    <Compile Include="Messaging\RequestResponse\ReqResChannel.cs" />
+    <Compile Include="Messaging\SubscriptionCollection.cs" />
+    <Compile Include="Messaging\SubscriptionToken.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Backplane\ZyreBackplane.cs" />
+    <Compile Include="Master\ClusterNodeManager.cs" />
+    <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Utility\Extensions\EventHandlerExtensions.cs" />
+    <Compile Include="Utility\PayloadEventArgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

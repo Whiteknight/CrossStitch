@@ -60,7 +60,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Apps\AppDomainAppAdaptor.cs" />
+    <Compile Include="Apps\AppFileSystem.cs" />
     <Compile Include="Apps\AppsModule.cs" />
+    <Compile Include="Apps\AppStartedEventArgs.cs" />
+    <Compile Include="Apps\Events\AppInstanceEvent.cs" />
+    <Compile Include="Apps\IAppAdaptor.cs" />
+    <Compile Include="Apps\InstanceAdaptorFactory.cs" />
+    <Compile Include="Apps\ProcessAppAdaptor.cs" />
     <Compile Include="Backplane\BackplaneModule.cs" />
     <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
@@ -68,6 +74,7 @@
     <Compile Include="BrokeredResponse.cs" />
     <Compile Include="Apps\ClientApplication.cs" />
     <Compile Include="ClientMessageBusProxy.cs" />
+    <Compile Include="Logging\Events\LogEvent.cs" />
     <Compile Include="Master\ClusterPeerNode.cs" />
     <Compile Include="Backplane\BackplaneConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
@@ -100,6 +107,7 @@
     <Compile Include="Messaging\Threading\DispatchThreadType.cs" />
     <Compile Include="Messaging\PubSub\SpecificThreadPubSubSubscription.cs" />
     <Compile Include="Messaging\RequestResponse\SpecificThreadReqResSubscription.cs" />
+    <Compile Include="Monitoring\Events\ObservationEvent.cs" />
     <Compile Include="Networking\MessageEnvelope.cs" />
     <Compile Include="Networking\MessageHeader.cs" />
     <Compile Include="Networking\MessagePayloadType.cs" />
@@ -126,7 +134,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\CrossStitch.App\CrossStitch.App.csproj">
+      <Project>{b03dd321-d3df-47bf-b003-a076ae755196}</Project>
+      <Name>CrossStitch.App</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

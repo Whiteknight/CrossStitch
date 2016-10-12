@@ -2,34 +2,20 @@
 using System.IO;
 using System.Reflection;
 using System.Security.Policy;
+using CrossStitch.App;
 using CrossStitch.Core.Networking;
+using CrossStitch.Core.Utility.Extensions;
 using NetMQ.Sockets;
 
 namespace CrossStitch.Core.Apps
 {
-    public interface IAppAdaptor : IDisposable
-    {
-        void Start();
-        void Stop();
-        event EventHandler<AppStartedEventArgs> AppInitialized;
-    }
-
-    public class AppStartedEventArgs : EventArgs
-    {
-        public AppStartedEventArgs(Guid instanceId)
-        {
-            InstanceId = instanceId;
-        }
-
-        public Guid InstanceId { get; private set; }
-    }
-
     public class AppDomainAppAdaptor : IAppAdaptor
     {
         private readonly ComponentInstance _instance;
         private AppDomain _appDomain;
         private ReceiverSocket _receiver;
         private RequestSocket _clientSocket;
+        private AppBootloader _bootloader;
 
         public AppDomainAppAdaptor(ComponentInstance instance)
         {
@@ -38,7 +24,7 @@ namespace CrossStitch.Core.Apps
 
         public event EventHandler<AppStartedEventArgs> AppInitialized;
 
-        public void Start()
+        public bool Start()
         {
             _receiver = new ReceiverSocket();
             _receiver.MessageReceived += MessageReceived;
@@ -55,18 +41,30 @@ namespace CrossStitch.Core.Apps
             };
 
             var evidence = new Evidence(AppDomain.CurrentDomain.Evidence);
+            string assemblyFullName = Path.Combine(_instance.DirectoryPath, _instance.ExecutableName);
 
             _appDomain = AppDomain.CreateDomain(domainName, evidence, setup);
             _appDomain.SetData("CommunicationPort", _receiver.Port);
-            // TODO: Load more data in here
-            _appDomain.DomainUnload += AppDomainUnload;
-            _appDomain.Load(new AssemblyName(_instance.ExecutableName));
 
+            var proxyType = typeof(AppBootloader);
+            _bootloader = (AppBootloader)_appDomain.CreateInstanceFromAndUnwrap(proxyType.Assembly.Location, proxyType.FullName);
+            _bootloader.StartApp(assemblyFullName, _instance.ApplicationClassName);
+
+            // TODO: Load more data in here
+            //_appDomain.DomainUnload += AppDomainUnload;
+            //_appDomain.Load(new AssemblyName(_instance.ExecutableName));
             
+
+            // TODO: Need to call into the assembly somewhere to start the process.
+
+            AppInitialized.Raise(this, new AppStartedEventArgs(_instance.Id));
+
+            return true;
         }
 
         public void Stop()
         {
+            _bootloader.Stop();
             AppDomain.Unload(_appDomain);
             _receiver.StopListening();
             _receiver.Dispose();
@@ -78,7 +76,7 @@ namespace CrossStitch.Core.Apps
             }
         }
 
-        private void AppDomainUnload(object sender, EventArgs e)
+        private static void AppDomainUnload(object sender, EventArgs e)
         {
             // TODO: Final cleanup here?
         }

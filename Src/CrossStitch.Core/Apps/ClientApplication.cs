@@ -102,6 +102,19 @@ namespace CrossStitch.Core.Apps
         public DateTime Created { get; set; }
     }
 
+    public enum InstanceStateType
+    {
+        Running,
+        Error,
+        Stopped
+    }
+
+    public enum InstanceRunModeType
+    {
+        AppDomain,
+        Process
+    }
+
     public class ComponentInstance
     {
         
@@ -118,6 +131,8 @@ namespace CrossStitch.Core.Apps
         public string ExecutableName { get; set; }
         public string ApplicationClassName { get; set; }
         public Guid VersionId { get; set; }
+        public InstanceStateType State { get; set; }
+        public InstanceRunModeType RunMode { get; set; }
     }
 
     public class InstanceInformation

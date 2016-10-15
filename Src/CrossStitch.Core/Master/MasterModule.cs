@@ -1,7 +1,7 @@
 ﻿using System;
+using CrossStitch.App.Networking;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Messaging;
-using CrossStitch.Core.Networking;
 
 namespace CrossStitch.Core.Master
 {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 using System.Security.Policy;
 using CrossStitch.App;
-using CrossStitch.Core.Networking;
-using CrossStitch.Core.Utility.Extensions;
-using NetMQ.Sockets;
+using CrossStitch.App.Events;
+using CrossStitch.App.Networking;
 
 namespace CrossStitch.Core.Apps
 {
@@ -13,21 +12,24 @@ namespace CrossStitch.Core.Apps
     {
         private readonly ComponentInstance _instance;
         private AppDomain _appDomain;
-        private ReceiverSocket _receiver;
-        private RequestSocket _clientSocket;
+        private ReceiveChannel _receiver;
+        private SendChannel _sender;
         private AppBootloader _bootloader;
+        private readonly NetMqMessageMapper _mapper;
 
         public AppDomainAppAdaptor(ComponentInstance instance)
         {
             _instance = instance;
+            _mapper = new NetMqMessageMapper(new JsonSerializer());
         }
 
         public event EventHandler<AppStartedEventArgs> AppInitialized;
+        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
         public bool Start()
         {
-            _receiver = new ReceiverSocket();
-            _receiver.MessageReceived += MessageReceived;
+            _receiver = new ReceiveChannel(_mapper);
+            _receiver.MessageReceived += AppMessageReceived;
             _receiver.StartListening("127.0.0.1");
 
             string domainName = "Instance_" + _instance.Id.ToString();
@@ -44,22 +46,9 @@ namespace CrossStitch.Core.Apps
             string assemblyFullName = Path.Combine(_instance.DirectoryPath, _instance.ExecutableName);
 
             _appDomain = AppDomain.CreateDomain(domainName, evidence, setup);
-            _appDomain.SetData("CommunicationPort", _receiver.Port);
-
             var proxyType = typeof(AppBootloader);
             _bootloader = (AppBootloader)_appDomain.CreateInstanceFromAndUnwrap(proxyType.Assembly.Location, proxyType.FullName);
-            _bootloader.StartApp(assemblyFullName, _instance.ApplicationClassName);
-
-            // TODO: Load more data in here
-            //_appDomain.DomainUnload += AppDomainUnload;
-            //_appDomain.Load(new AssemblyName(_instance.ExecutableName));
-            
-
-            // TODO: Need to call into the assembly somewhere to start the process.
-
-            AppInitialized.Raise(this, new AppStartedEventArgs(_instance.Id));
-
-            return true;
+            return _bootloader.StartApp(assemblyFullName, _instance.ApplicationClassName, _receiver.Port);
         }
 
         public void Stop()
@@ -69,29 +58,43 @@ namespace CrossStitch.Core.Apps
             _receiver.StopListening();
             _receiver.Dispose();
             _receiver = null;
-            if (_clientSocket != null)
+            _sender.Disconnect();
+        }
+
+        public bool SendMessage(MessageEnvelope envelope)
+        {
+            if (_sender == null)
+                return false;
+            _sender.SendMessage(envelope);
+            return true;
+        }
+
+        private void AppMessageReceived(object sender, MessageReceivedEventArgs eventArgs)
+        {
+            var envelope = eventArgs.Envelope;
+            if (envelope.Header.ToType == TargetType.Local)
+                ReceiveLocalMessage(envelope);
+            else
+                MessageReceived.Raise(this, eventArgs);
+        }
+
+        private void ReceiveLocalMessage(MessageEnvelope envelope)
+        {
+            if (envelope.Header.PayloadType == MessagePayloadType.CommandString)
             {
-                _clientSocket.Dispose();
-                _clientSocket = null;
+                if (envelope.CommandStrings[0] == "App Instance Initialize")
+                {
+                    var values = envelope.CommandStrings
+                        .Skip(1)
+                        .Select(s => s.Split(new[] { '=' }, 2))
+                        .ToDictionary(a => a[0], a => a[1]);
+                    if (_sender != null)
+                        _sender.Dispose();
+                    _sender = new SendChannel(_mapper);
+                    _sender.Connect("tcp://localhost:" + values["ReceivePort"]);
+                    AppInitialized.Raise(this, new AppStartedEventArgs(_instance.Id));
+                }
             }
-        }
-
-        private static void AppDomainUnload(object sender, EventArgs e)
-        {
-            // TODO: Final cleanup here?
-        }
-
-        private void OnAppInitialized()
-        {
-            var handler = AppInitialized;
-            if (handler == null)
-                return;
-            handler(this, new AppStartedEventArgs(_instance.Id));
-        }
-
-        private void MessageReceived(object sender, MessageReceivedEventArgs messageReceivedEventArgs)
-        {
-            throw new NotImplementedException();
         }
 
         public void Dispose()

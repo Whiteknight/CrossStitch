@@ -59,18 +59,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Apps\AppDataStorage.cs" />
     <Compile Include="Apps\AppDomainAppAdaptor.cs" />
     <Compile Include="Apps\AppFileSystem.cs" />
+    <Compile Include="Apps\AppsConfiguration.cs" />
     <Compile Include="Apps\AppsModule.cs" />
     <Compile Include="Apps\AppStartedEventArgs.cs" />
     <Compile Include="Apps\Events\AppInstanceEvent.cs" />
     <Compile Include="Apps\IAppAdaptor.cs" />
+    <Compile Include="Apps\InstanceActionResult.cs" />
     <Compile Include="Apps\InstanceAdaptorFactory.cs" />
+    <Compile Include="Apps\InstanceManager.cs" />
     <Compile Include="Apps\ProcessAppAdaptor.cs" />
     <Compile Include="Backplane\BackplaneModule.cs" />
     <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
-    <Compile Include="Backplane\NetMqMessageMapper.cs" />
     <Compile Include="BrokeredResponse.cs" />
     <Compile Include="Apps\ClientApplication.cs" />
     <Compile Include="ClientMessageBusProxy.cs" />
@@ -80,7 +83,6 @@
     <Compile Include="Configuration\ConfigurationException.cs" />
     <Compile Include="Configuration\ConfigurationLoader.cs" />
     <Compile Include="Backplane\IClusterBackplane.cs" />
-    <Compile Include="ISerializer.cs" />
     <Compile Include="Master\Events\NodeAddedToClusterEvent.cs" />
     <Compile Include="Master\Events\NodeRemovedFromCluster.cs" />
     <Compile Include="Master\IClusterNodeManager.cs" />
@@ -108,12 +110,6 @@
     <Compile Include="Messaging\PubSub\SpecificThreadPubSubSubscription.cs" />
     <Compile Include="Messaging\RequestResponse\SpecificThreadReqResSubscription.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
-    <Compile Include="Networking\MessageEnvelope.cs" />
-    <Compile Include="Networking\MessageHeader.cs" />
-    <Compile Include="Networking\MessagePayloadType.cs" />
-    <Compile Include="Networking\RawMessage.cs" />
-    <Compile Include="Networking\ReceiverSocket.cs" />
-    <Compile Include="Networking\TargetType.cs" />
     <Compile Include="NodeConfiguration.cs" />
     <Compile Include="RunningNode.cs" />
     <Compile Include="Master\MasterConfiguration.cs" />
@@ -127,9 +123,6 @@
     <Compile Include="Backplane\ZyreBackplane.cs" />
     <Compile Include="Master\ClusterNodeManager.cs" />
     <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
-    <Compile Include="Utility\Extensions\EventHandlerExtensions.cs" />
-    <Compile Include="Utility\IMapper.cs" />
-    <Compile Include="Utility\PayloadEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

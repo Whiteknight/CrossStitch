@@ -1,9 +1,10 @@
-﻿namespace CrossStitch.Core.Networking
+﻿namespace CrossStitch.App.Networking
 {
     public enum TargetType
     {
         Node,
         AppInstance,
-        Zone
+        Zone,
+        Local
     }
 }

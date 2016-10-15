@@ -104,6 +104,7 @@ namespace CrossStitch.Core.Apps
 
     public enum InstanceStateType
     {
+        Started,
         Running,
         Error,
         Stopped

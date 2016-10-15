@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CrossStitch.Core.Apps;
 
 namespace AppDomainStart.Server
@@ -16,10 +12,16 @@ namespace AppDomainStart.Server
                 ExecutableName = "AppDomainStart.Client.exe",
                 ApplicationClassName = "MyComponent",
             });
+            adaptor.AppInitialized += AdaptorOnAppInitialized;
             bool started = adaptor.Start();
             Console.WriteLine("Started appDomain: " + started);
             Console.ReadKey();
             adaptor.Stop();
+        }
+
+        private static void AdaptorOnAppInitialized(object sender, AppStartedEventArgs appStartedEventArgs)
+        {
+            Console.WriteLine("Started app:" + appStartedEventArgs.InstanceId);
         }
     }
 }

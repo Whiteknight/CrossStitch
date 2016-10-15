@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Newtonsoft.Json;
 
-namespace CrossStitch.Core
+namespace CrossStitch.App
 {
     public interface ISerializer
     {

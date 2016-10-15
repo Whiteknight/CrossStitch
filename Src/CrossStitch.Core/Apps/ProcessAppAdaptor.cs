@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using CrossStitch.Core.Networking;
+using CrossStitch.App.Events;
+using CrossStitch.App.Networking;
 using CrossStitch.Core.Utility.Extensions;
 using NetMQ.Sockets;
 
@@ -12,7 +13,7 @@ namespace CrossStitch.Core.Apps
         private readonly ComponentInstance _instance;
         private Process _process;
         public event EventHandler<AppStartedEventArgs> AppInitialized;
-        private ReceiverSocket _receiver;
+        private ReceiveChannel _receiver;
         private RequestSocket _clientSocket;
 
         public ProcessAppAdaptor(ComponentInstance instance)
@@ -22,7 +23,7 @@ namespace CrossStitch.Core.Apps
 
         public bool Start()
         {
-            _receiver = new ReceiverSocket();
+            _receiver = new ReceiveChannel();
             _receiver.MessageReceived += MessageReceived;
             _receiver.StartListening("127.0.0.1");
 

@@ -1,4 +1,5 @@
-﻿using CrossStitch.Core.Utility;
+﻿using CrossStitch.App.Events;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Messaging
 {

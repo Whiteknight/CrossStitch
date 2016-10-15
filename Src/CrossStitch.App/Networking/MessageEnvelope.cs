@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CrossStitch.Core.Networking
+namespace CrossStitch.App.Networking
 {
     public class MessageEnvelope
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Utility.Extensions
+namespace CrossStitch.App.Events
 {
     public static class EventHandlerExtensions
     {

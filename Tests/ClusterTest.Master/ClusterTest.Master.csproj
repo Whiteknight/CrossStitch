@@ -57,6 +57,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Src\CrossStitch.App\CrossStitch.App.csproj">
+      <Project>{B03DD321-D3DF-47BF-B003-A076AE755196}</Project>
+      <Name>CrossStitch.App</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Src\CrossStitch.Core\CrossStitch.Core.csproj">
       <Project>{a9a30edf-7047-4d0f-a756-816eb85d0384}</Project>
       <Name>CrossStitch.Core</Name>

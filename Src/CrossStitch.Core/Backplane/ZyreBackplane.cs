@@ -1,6 +1,8 @@
 ﻿using System;
+using CrossStitch.App;
+using CrossStitch.App.Events;
+using CrossStitch.App.Networking;
 using CrossStitch.Core.Backplane.Events;
-using CrossStitch.Core.Networking;
 using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;
 using NetMQ.Zyre;

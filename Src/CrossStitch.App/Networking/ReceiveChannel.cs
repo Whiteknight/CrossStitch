@@ -1,27 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CrossStitch.App.Events;
 using NetMQ;
 using NetMQ.Sockets;
 
-namespace CrossStitch.Core.Networking
+namespace CrossStitch.App.Networking
 {
-    public class MessageReceivedEventArgs : EventArgs
-    {
-        public MessageReceivedEventArgs(List<byte[]> frames)
-        {
-            Frames = frames;
-        }
-
-        public List<byte[]> Frames { get; private set; }
-    }
-    public class ReceiverSocket : IDisposable
+    public class ReceiveChannel : IDisposable
     {
         private ResponseSocket _serverSocket;
         private NetMQPoller _poller;
         public int Port { get; private set; }
+        private readonly NetMqMessageMapper _mapper;
+
+        public ReceiveChannel()
+        {
+            _mapper = new NetMqMessageMapper(new JsonSerializer());
+        }
+
+        public ReceiveChannel(NetMqMessageMapper mapper)
+        {
+            _mapper = mapper;
+        }
 
         public void StartListening(string host = null)
         {
@@ -60,19 +59,12 @@ namespace CrossStitch.Core.Networking
 
         public EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        private void OnMessageReceived(List<byte[]> frames)
-        {
-            var handler = MessageReceived;
-            if (handler != null)
-                handler(this, new MessageReceivedEventArgs(frames));
-        }
-
         private void ServerSocketOnReceiveReady(object sender, NetMQSocketEventArgs netMqSocketEventArgs)
         {
-            List<byte[]> frames = new List<byte[]>();
-            netMqSocketEventArgs.Socket.ReceiveMultipartBytes(ref frames);
-            if (frames.Any())
-                OnMessageReceived(frames);
+            var message = netMqSocketEventArgs.Socket.ReceiveMultipartMessage();
+            var envelope = _mapper.Map(message);
+            MessageReceived.Raise(this, new MessageReceivedEventArgs(envelope));
+            netMqSocketEventArgs.Socket.SendFrame("OK");
         }
 
         public void Dispose()

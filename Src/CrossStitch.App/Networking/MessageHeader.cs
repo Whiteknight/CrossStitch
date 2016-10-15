@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Networking
+namespace CrossStitch.App.Networking
 {
     public class MessageHeader
     {

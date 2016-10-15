@@ -1,10 +1,8 @@
 ﻿using System.Linq;
 using System.Text;
-using CrossStitch.Core.Networking;
-using CrossStitch.Core.Utility;
 using NetMQ;
 
-namespace CrossStitch.Core.Backplane
+namespace CrossStitch.App.Networking
 {
     public class NetMqMessageMapper : IMapper<NetMQMessage, MessageEnvelope>, IMapper<MessageEnvelope, NetMQMessage>
     {

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CrossStitch.Core.Utility
+namespace CrossStitch.App.Events
 {
     public class PayloadEventArgs<TPayload> : EventArgs
     {

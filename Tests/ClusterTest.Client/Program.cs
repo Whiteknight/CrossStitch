@@ -1,11 +1,11 @@
 ﻿using System;
+using CrossStitch.App;
 using CrossStitch.Core;
 using CrossStitch.Core.Backplane;
-using CrossStitch.Core.Configuration;
 using CrossStitch.Core.Master.Events;
 using CrossStitch.Core.Messaging;
 
-namespace StaticNodeDetect.Client
+namespace ClusterTest.Client
 {
     class Program
     {

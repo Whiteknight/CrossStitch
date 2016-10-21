@@ -62,6 +62,7 @@
     <Compile Include="Apps\AppDataStorage.cs" />
     <Compile Include="Apps\AppDomainAppAdaptor.cs" />
     <Compile Include="Apps\AppFileSystem.cs" />
+    <Compile Include="Apps\AppResourceUsage.cs" />
     <Compile Include="Apps\AppsConfiguration.cs" />
     <Compile Include="Apps\AppsModule.cs" />
     <Compile Include="Apps\AppStartedEventArgs.cs" />

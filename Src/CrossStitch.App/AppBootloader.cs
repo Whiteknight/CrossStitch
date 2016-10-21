@@ -1,68 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using CrossStitch.App.Networking;
-using NetMQ;
-using NetMQ.Sockets;
+using CrossStitch.App.Networking.NetMq;
 
 namespace CrossStitch.App
 {
-    public class AppContext : IDisposable
-    {
-        public int CommunicationPort { get; private set; }
-        private RequestSocket _clientSocket;
-        private ReceiveChannel _receiver;
-        private readonly NetMqMessageMapper _mapper;
-
-        public AppContext(int communicationPort)
-        {
-            CommunicationPort = communicationPort;
-            _mapper = new NetMqMessageMapper(new JsonSerializer());
-        }
-
-        internal bool Initialize()
-        {
-            _clientSocket = new RequestSocket();
-            _clientSocket.Connect("tcp://127.0.0.1:" + CommunicationPort);
-            _receiver = new ReceiveChannel();
-            _receiver.MessageReceived += MessageReceived;
-            _receiver.StartListening("127.0.0.1");
-
-            var envelope = new MessageEnvelope {
-                Header = new MessageHeader {
-                    FromType = TargetType.Local,
-                    ToType = TargetType.Local,
-                    PayloadType = MessagePayloadType.CommandString
-                },
-                CommandStrings = new List<string> {
-                    "App Instance Initialize",
-                    "ReceivePort=" + _receiver.Port
-                }
-            };
-            NetMQMessage message = _mapper.Map(envelope);
-            _clientSocket.SendMultipartMessage(message);
-            NetMQMessage response = new NetMQMessage();
-            bool ok = _clientSocket.TryReceiveMultipartMessage(TimeSpan.FromMilliseconds(1000), ref response, 1);
-            return ok;
-        }
-
-        private void MessageReceived(object sender, MessageReceivedEventArgs args)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            _clientSocket.Close();
-            _clientSocket.Dispose();
-            _clientSocket = null;
-            _receiver.StopListening();
-            _receiver.Dispose();
-        }
-    }
-
     public class AppBootloader : MarshalByRefObject
     {
         private string _assemblyFileUri;
@@ -91,7 +35,8 @@ namespace CrossStitch.App
                 if (type == null)
                     return false;
 
-                _context = new AppContext(communicationPort);
+                var network = new NetMqNetwork();
+                _context = new AppContext(network, communicationPort);
                 _appInstance = Activator.CreateInstance(type);
                 var method = _appInstance.GetType().GetMethod("Start", new Type[] { typeof (AppContext) });
                 if (method != null)

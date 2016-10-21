@@ -39,7 +39,7 @@ namespace CrossStitch.Core.Apps
             _process.StartInfo.RedirectStandardError = true;
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
-            _process.StartInfo.EnvironmentVariables["CS:CommunicationPort"] = _receiver.Port.ToString();
+            _process.StartInfo.EnvironmentVariables["CS:_communicationPort"] = _receiver.Port.ToString();
             _process.OutputDataReceived += ProcessOutputDataReceived;
             _process.ErrorDataReceived += ProcessOnErrorDataReceived;
             _process.Start();

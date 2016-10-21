@@ -6,6 +6,7 @@ namespace CrossStitch.Core.Apps
     {
         bool Start();
         void Stop();
+        AppResourceUsage GetResources();
         event EventHandler<AppStartedEventArgs> AppInitialized;
     }
 }

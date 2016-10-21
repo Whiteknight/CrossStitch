@@ -22,6 +22,7 @@ namespace CrossStitch.Core.Apps
                 new AppFileSystem(configuration),
                 new AppDataStorage());
             _instances.AppStarted += InstancesOnAppStarted;
+            // TODO: Subscribe to request for AppResourceUsage
         }
 
         private void InstancesOnAppStarted(object sender, AppStartedEventArgs appStartedEventArgs)

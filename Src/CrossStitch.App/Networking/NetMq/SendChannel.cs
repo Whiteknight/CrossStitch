@@ -2,9 +2,9 @@
 using NetMQ;
 using NetMQ.Sockets;
 
-namespace CrossStitch.App.Networking
+namespace CrossStitch.App.Networking.NetMq
 {
-    public class SendChannel : IDisposable
+    public class SendChannel : ISendChannel
     {
         private readonly NetMqMessageMapper _mapper;
 
@@ -20,20 +20,24 @@ namespace CrossStitch.App.Networking
             _mapper = mapper;
         }
 
-        public bool Connect(string connectionString)
+        public bool Connect(string host, int port)
         {
             _clientSocket = new RequestSocket();
-            _clientSocket.Connect(connectionString);
+            string connection = string.Format("tcp://{0}:{1}", host, port);
+            _clientSocket.Connect(connection);
             return true;
         }
 
         public bool SendMessage(MessageEnvelope envelope)
         {
-            var message = _mapper.Map(envelope);
-            _clientSocket.SendMultipartMessage(message);
-            string response;
-            bool ok = _clientSocket.TryReceiveFrameString(TimeSpan.FromMilliseconds(1000), out response);
-            return ok;
+            lock (this)
+            {
+                var message = _mapper.Map(envelope);
+                _clientSocket.SendMultipartMessage(message);
+                string response;
+                bool ok = _clientSocket.TryReceiveFrameString(TimeSpan.FromMilliseconds(1000), out response);
+                return ok;
+            }
         }
 
         public void Disconnect()

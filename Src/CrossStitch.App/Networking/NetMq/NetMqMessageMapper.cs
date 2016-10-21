@@ -2,7 +2,7 @@
 using System.Text;
 using NetMQ;
 
-namespace CrossStitch.App.Networking
+namespace CrossStitch.App.Networking.NetMq
 {
     public class NetMqMessageMapper : IMapper<NetMQMessage, MessageEnvelope>, IMapper<MessageEnvelope, NetMQMessage>
     {

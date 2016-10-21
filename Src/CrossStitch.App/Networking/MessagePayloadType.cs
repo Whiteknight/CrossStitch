@@ -5,6 +5,8 @@
         None,
         CommandString,
         Object,
-        Raw
+        Raw,
+        SuccessResponse,
+        FailureResponse,
     }
 }

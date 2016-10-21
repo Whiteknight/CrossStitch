@@ -8,7 +8,7 @@ namespace AppDomainStart.Client
     {
         public void Start()
         {
-            var communicationPort = AppDomain.CurrentDomain.GetData("CommunicationPort");
+            var communicationPort = AppDomain.CurrentDomain.GetData("_communicationPort");
             File.WriteAllText("C:/Test/MyComponent.txt", "Started:" + communicationPort);
         }
 

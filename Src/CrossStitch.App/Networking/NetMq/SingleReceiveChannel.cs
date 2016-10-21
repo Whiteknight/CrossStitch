@@ -3,24 +3,26 @@ using CrossStitch.App.Events;
 using NetMQ;
 using NetMQ.Sockets;
 
-namespace CrossStitch.App.Networking
+namespace CrossStitch.App.Networking.NetMq
 {
-    public class ReceiveChannel : IDisposable
+    public class SingleReceiveChannel : IReceiveChannel
     {
         private ResponseSocket _serverSocket;
         private NetMQPoller _poller;
         public int Port { get; private set; }
         private readonly NetMqMessageMapper _mapper;
 
-        public ReceiveChannel()
+        public SingleReceiveChannel()
         {
             _mapper = new NetMqMessageMapper(new JsonSerializer());
         }
 
-        public ReceiveChannel(NetMqMessageMapper mapper)
+        public SingleReceiveChannel(NetMqMessageMapper mapper)
         {
             _mapper = mapper;
         }
+
+        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
         public void StartListening(string host = null)
         {
@@ -57,19 +59,29 @@ namespace CrossStitch.App.Networking
             _serverSocket = null;
         }
 
-        public EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public void Dispose()
+        {
+            StopListening();
+        }
 
         private void ServerSocketOnReceiveReady(object sender, NetMQSocketEventArgs netMqSocketEventArgs)
         {
             var message = netMqSocketEventArgs.Socket.ReceiveMultipartMessage();
-            var envelope = _mapper.Map(message);
-            MessageReceived.Raise(this, new MessageReceivedEventArgs(envelope));
-            netMqSocketEventArgs.Socket.SendFrame("OK");
-        }
-
-        public void Dispose()
-        {
-            StopListening();
+            var received = _mapper.Map(message);
+            var response = received.CreateEmptyResponse();
+            var eventArgs = new MessageReceivedEventArgs(received, response);
+            try
+            {
+                MessageReceived.Raise(this, eventArgs);
+            }
+            catch
+            {
+                eventArgs.HandledOk = false;
+            }
+            if (!eventArgs.HandledOk)
+                response = received.CreateFailureResponse();
+            var outMessage = _mapper.Map(response);
+            netMqSocketEventArgs.Socket.SendMultipartMessage(outMessage);
         }
     }
 }

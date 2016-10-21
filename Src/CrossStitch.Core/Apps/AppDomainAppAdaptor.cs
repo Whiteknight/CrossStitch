@@ -11,16 +11,30 @@ namespace CrossStitch.Core.Apps
     public class AppDomainAppAdaptor : IAppAdaptor
     {
         private readonly ComponentInstance _instance;
+        private readonly INetwork _network;
         private AppDomain _appDomain;
-        private ReceiveChannel _receiver;
-        private SendChannel _sender;
+        private readonly IReceiveChannel _receiver;
+        private ISendChannel _sender;
         private AppBootloader _bootloader;
-        private readonly NetMqMessageMapper _mapper;
 
-        public AppDomainAppAdaptor(ComponentInstance instance)
+        public AppDomainAppAdaptor(ComponentInstance instance, INetwork network)
         {
             _instance = instance;
-            _mapper = new NetMqMessageMapper(new JsonSerializer());
+            _network = network;
+            _receiver = network.CreateReceiveChannel(false);
+            _receiver.MessageReceived += AppMessageReceived;
+        }
+
+        public AppResourceUsage GetResources()
+        {
+            if (_appDomain == null)
+                return AppResourceUsage.Empty();
+            
+            return new AppResourceUsage {
+                UsedMemory = _appDomain.MonitoringSurvivedMemorySize,
+                TotalAllocatedMemory = _appDomain.MonitoringTotalAllocatedMemorySize,
+                ProcessorTime = _appDomain.MonitoringTotalProcessorTime,
+            };
         }
 
         public event EventHandler<AppStartedEventArgs> AppInitialized;
@@ -28,8 +42,6 @@ namespace CrossStitch.Core.Apps
 
         public bool Start()
         {
-            _receiver = new ReceiveChannel(_mapper);
-            _receiver.MessageReceived += AppMessageReceived;
             _receiver.StartListening("127.0.0.1");
 
             string domainName = "Instance_" + _instance.Id.ToString();
@@ -54,11 +66,15 @@ namespace CrossStitch.Core.Apps
         public void Stop()
         {
             _bootloader.Stop();
+            // Needed?
+            //RemotingServices.Disconnect(_bootloader);
+            _bootloader = null;
+
             AppDomain.Unload(_appDomain);
             _receiver.StopListening();
-            _receiver.Dispose();
-            _receiver = null;
             _sender.Disconnect();
+            _sender.Dispose();
+            _sender = null;
         }
 
         public bool SendMessage(MessageEnvelope envelope)
@@ -90,8 +106,9 @@ namespace CrossStitch.Core.Apps
                         .ToDictionary(a => a[0], a => a[1]);
                     if (_sender != null)
                         _sender.Dispose();
-                    _sender = new SendChannel(_mapper);
-                    _sender.Connect("tcp://localhost:" + values["ReceivePort"]);
+                    _sender = _network.CreateSendChannel();
+                    int receivePort = int.Parse(values["ReceivePort"]);
+                    _sender.Connect("localhost", receivePort);
                     AppInitialized.Raise(this, new AppStartedEventArgs(_instance.Id));
                 }
             }
@@ -100,6 +117,8 @@ namespace CrossStitch.Core.Apps
         public void Dispose()
         {
             Stop();
+            _receiver.Dispose();
+
         }
     }
 }

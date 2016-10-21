@@ -2,6 +2,7 @@
 using CrossStitch.App;
 using CrossStitch.App.Events;
 using CrossStitch.App.Networking;
+using CrossStitch.App.Networking.NetMq;
 using CrossStitch.Core.Backplane.Events;
 using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;

@@ -147,6 +147,62 @@ namespace CrossStitch.Core.Apps
             return results;
         }
 
+        public InstanceActionResult CreateInstance(ClientApplication application, ApplicationComponent component, ComponentVersion version)
+        {
+            var instance = new ComponentInstance(Guid.NewGuid(), version.Id) { State = InstanceStateType.Stopped };
+            bool added = _instances.TryAdd(instance.Id, instance);
+            if (!added)
+                return InstanceActionResult.Failure();
+
+            bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
+            if (!ok)
+                return InstanceActionResult.Failure();
+
+            return new InstanceActionResult {
+                IsSuccess = true,
+                InstanceId = instance.Id
+            };
+        }
+
+        public InstanceActionResult RemoveInstance(Guid instanceId)
+        {
+            ComponentInstance instance;
+            bool found = _instances.TryGetValue(instanceId, out instance);
+            if (!found)
+                return InstanceActionResult.Failure();
+
+            if (instance.State != InstanceStateType.Stopped || instance.State == InstanceStateType.Error)
+                return InstanceActionResult.Failure();
+
+            bool removed = _instances.TryRemove(instanceId, out instance);
+            if (!removed)
+                return InstanceActionResult.Failure();
+
+            IAppAdaptor adaptor;
+            removed = _adaptors.TryRemove(instanceId, out adaptor);
+            if (removed)
+                adaptor.Dispose();
+
+            _fileSystem.DeleteRunningInstanceDirectory(instanceId);
+            _fileSystem.DeleteDataInstanceDirectory(instanceId);
+            return new InstanceActionResult {
+                InstanceId = instanceId,
+                IsSuccess = true
+            };
+        }
+
+        public AppResourceUsage GetInstanceResources(Guid instanceId)
+        {
+            IAppAdaptor adaptor;
+            bool found = _adaptors.TryGetValue(instanceId, out adaptor);
+            if (!found)
+                return AppResourceUsage.Empty();
+
+            var usage = adaptor.GetResources();
+            _fileSystem.GetInstanceDiskUsage(instanceId, usage);
+            return usage;
+        }
+
         public void Dispose()
         {
             StopAll(false);

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using CrossStitch.Core.Messaging.RequestResponse;
 
 namespace CrossStitch.Core.Messaging
 {
-    public sealed class SubscriptionCollection : IDisposable
+    public sealed class SubscriptionCollection : ISubscribable, IDisposable
     {
         private readonly IMessageBus _messageBus;
         private readonly List<IDisposable> _subscriptions;
@@ -14,23 +15,24 @@ namespace CrossStitch.Core.Messaging
             _subscriptions = new List<IDisposable>();
         }
 
-        public void Subscribe<TPayload>(string name, Action<TPayload> subscriber)
-        {
-            var subscription = _messageBus.Subscribe<TPayload>(name, subscriber);
-            _subscriptions.Add(subscription);
-        }
-
-        //public void Subscribe<TRequest, TResponse>(string name, Func<TRequest, TResponse> subscriber)
-        //    where TRequest : IRequest<TResponse>
-        //{
-        //    var subscription = _messageBus.Subscribe<TRequest, TResponse>(name, subscriber);
-        //    _subscriptions.Add(subscription);
-        //}
-
         public void Dispose()
         {
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
+        }
+
+        public IDisposable Subscribe<TPayload>(string name, Action<TPayload> subscriber, Func<TPayload, bool> filter, PublishOptions options = null)
+        {
+            var token = _messageBus.Subscribe(name, subscriber, filter, options);
+            _subscriptions.Add(token);
+            return token;
+        }
+
+        public IDisposable Subscribe<TRequest, TResponse>(string name, Func<TRequest, TResponse> subscriber, Func<TRequest, bool> filter, PublishOptions options = null) where TRequest : IRequest<TResponse>
+        {
+            var token = _messageBus.Subscribe<TRequest, TResponse>(name, subscriber, filter, options);
+            _subscriptions.Add(token);
+            return token;
         }
     }
 }

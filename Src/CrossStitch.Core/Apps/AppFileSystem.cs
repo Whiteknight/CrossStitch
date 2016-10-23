@@ -93,7 +93,7 @@ namespace CrossStitch.Core.Apps
                 return 0;
             if (!Directory.Exists(path))
                 return 0;
-            return new DirectoryInfo(path).EnumerateFiles("*", SearchOption.AllDirectories).Aggregate(0, (current, file) => current + file.Length);
+            return new DirectoryInfo(path).EnumerateFiles("*", SearchOption.AllDirectories).Aggregate(0L, (current, file) => current + file.Length);
         }
     }
 }

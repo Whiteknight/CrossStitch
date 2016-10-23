@@ -2,6 +2,7 @@
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Messaging;
+using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Master
 {

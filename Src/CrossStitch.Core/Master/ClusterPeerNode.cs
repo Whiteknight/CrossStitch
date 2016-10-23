@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Apps;
+using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Backplane;
 
 namespace CrossStitch.Core.Master

@@ -3,9 +3,9 @@ using CrossStitch.App;
 using CrossStitch.App.Events;
 using CrossStitch.App.Networking;
 using CrossStitch.App.Networking.NetMq;
+using CrossStitch.App.Utility.Extensions;
 using CrossStitch.Core.Backplane.Events;
-using CrossStitch.Core.Utility;
-using CrossStitch.Core.Utility.Extensions;
+using CrossStitch.Core.Node;
 using NetMQ.Zyre;
 using NetMQ.Zyre.ZyreEvents;
 
@@ -41,13 +41,13 @@ namespace CrossStitch.Core.Backplane
         private void ZyreShoutEvent(object sender, ZyreEventShout e)
         {
             var envelope = _mapper.Map(e.Content);
-            MessageReceived.Raise(this, MessageEnvelope.ReceiveEventName, envelope);
+            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
         }
 
         private void ZyreWhisperEvent(object sender, ZyreEventWhisper e)
         {
             var envelope = _mapper.Map(e.Content);
-            MessageReceived.Raise(this, MessageEnvelope.ReceiveEventName, envelope);
+            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
         }
 
         private void ZyreLeaveEvent(object sender, ZyreEventLeave e)
@@ -142,6 +142,11 @@ namespace CrossStitch.Core.Backplane
             // Otherwise a zone type becomes a Shout and a Node type becomes a Whisper
             if (envelope.Header.ProxyNodeId.HasValue)
                 _zyre.Whisper(envelope.Header.ProxyNodeId.Value, message);
+            else if (envelope.Header.ToType == TargetType.Cluster)
+            {
+                foreach (var peer in _zyre.Peers())
+                    _zyre.Whisper(peer, message);
+            }
             else if (envelope.Header.ToType == TargetType.Zone)
                 _zyre.Shout(envelope.Header.ZoneName, message);
             else if (envelope.Header.ToType == TargetType.Node)

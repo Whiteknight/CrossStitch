@@ -1,10 +1,10 @@
 ﻿using System;
 using CrossStitch.App;
-using CrossStitch.Core;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Master;
 using CrossStitch.Core.Master.Events;
 using CrossStitch.Core.Messaging;
+using CrossStitch.Core.Node;
 
 namespace ClusterTest.Master
 {
@@ -26,7 +26,7 @@ namespace ClusterTest.Master
             //messageBus.Subscribe<ClusterCommandEvent>(ClusterCommandEvent.)
 
             var nodeConfig = NodeConfiguration.GetDefault();
-            using (var node = new RunningNode(backplaneConfig, nodeConfig, messageBus))
+            using (var node = new RunningNode(nodeConfig, messageBus))
             {
                 node.AddModule(backplaneModule);
                 node.AddModule(masterModule);

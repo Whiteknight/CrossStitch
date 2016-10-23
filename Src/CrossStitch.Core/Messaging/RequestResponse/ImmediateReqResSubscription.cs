@@ -6,10 +6,17 @@ namespace CrossStitch.Core.Messaging.RequestResponse
         where TRequest : IRequest<TResponse>
     {
         private readonly Func<TRequest, TResponse> _request;
+        private readonly Func<TRequest, bool> _filter;
 
-        public ImmediateReqResSubscription(Func<TRequest, TResponse> request)
+        public ImmediateReqResSubscription(Func<TRequest, TResponse> request, Func<TRequest, bool> filter)
         {
             _request = request;
+            _filter = filter;
+        }
+
+        public bool CanHandle(TRequest request)
+        {
+            return _filter == null || _filter(request);
         }
 
         public TResponse Request(TRequest request)

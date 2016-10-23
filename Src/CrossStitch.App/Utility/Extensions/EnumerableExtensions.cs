@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CrossStitch.Core.Utility.Extensions
+namespace CrossStitch.App.Utility.Extensions
 {
     public static class EnumerableExtensions
     {

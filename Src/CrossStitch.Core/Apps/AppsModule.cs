@@ -1,8 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Apps.Events;
+using CrossStitch.App.Networking;
+using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Logging.Events;
 using CrossStitch.Core.Messaging;
+using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Apps
 {
@@ -14,15 +16,22 @@ namespace CrossStitch.Core.Apps
         private readonly AppDataStorage _dataStorage;
         private RunningNode _node;
 
-        public AppsModule(AppsConfiguration configuration, IMessageBus messageBus)
+        public AppsModule(AppsConfiguration configuration, IMessageBus messageBus, INetwork network)
         {
             _configuration = configuration;
             _messageBus = messageBus;
             _instances = new InstanceManager(configuration, 
                 new AppFileSystem(configuration),
-                new AppDataStorage());
+                new AppDataStorage(),
+                network);
             _instances.AppStarted += InstancesOnAppStarted;
-            // TODO: Subscribe to request for AppResourceUsage
+
+            _messageBus.Subscribe<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
+        }
+
+        private List<InstanceInformation> GetInstanceInformation(InstanceInformationRequest instanceInformationRequest)
+        {
+            return _instances.GetInstanceInformation();
         }
 
         private void InstancesOnAppStarted(object sender, AppStartedEventArgs appStartedEventArgs)

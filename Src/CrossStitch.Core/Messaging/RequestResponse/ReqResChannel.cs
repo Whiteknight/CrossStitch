@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CrossStitch.Core.Messaging.Threading;
 
 namespace CrossStitch.Core.Messaging.RequestResponse
@@ -24,7 +25,7 @@ namespace CrossStitch.Core.Messaging.RequestResponse
         public BrokeredResponse<TResponse> Request(TRequest request)
         {
             List<TResponse> responses = new List<TResponse>();
-            foreach (var subscription in _subscriptions.Values)
+            foreach (var subscription in _subscriptions.Values.Where(s => s.CanHandle(request)))
             {
                 var response = subscription.Request(request);
                 responses.Add(response);
@@ -32,10 +33,10 @@ namespace CrossStitch.Core.Messaging.RequestResponse
             return new BrokeredResponse<TResponse>(responses);
         }
 
-        public SubscriptionToken Subscribe(Func<TRequest, TResponse> act, PublishOptions options)
+        public SubscriptionToken Subscribe(Func<TRequest, TResponse> act,Func<TRequest, bool> filter, PublishOptions options)
         {
             Guid id = Guid.NewGuid();
-            var subscription = CreateSubscription(act, options);
+            var subscription = CreateSubscription(act, filter, options);
             _subscriptions.Add(id, subscription);
             return new SubscriptionToken(this, id);
         }
@@ -45,16 +46,16 @@ namespace CrossStitch.Core.Messaging.RequestResponse
             _subscriptions.Clear();
         }
 
-        private IReqResSubscription<TRequest, TResponse> CreateSubscription(Func<TRequest, TResponse> func, PublishOptions options)
+        private IReqResSubscription<TRequest, TResponse> CreateSubscription(Func<TRequest, TResponse> func, Func<TRequest, bool> filter, PublishOptions options)
         {
             switch (options.DispatchType)
             {
                 case DispatchThreadType.AnyWorkerThread:
-                    return new AnyThreadReqResSubscription<TRequest, TResponse>(func, _threadPool, options.WaitTimeoutMs);
+                    return new AnyThreadReqResSubscription<TRequest, TResponse>(func, filter, _threadPool, options.WaitTimeoutMs);
                 case DispatchThreadType.SpecificThread:
-                    return new SpecificThreadReqResSubscription<TRequest, TResponse>(func, options.ThreadId, _threadPool, options.WaitTimeoutMs);
+                    return new SpecificThreadReqResSubscription<TRequest, TResponse>(func, filter, options.ThreadId, _threadPool, options.WaitTimeoutMs);
                 default:
-                    return new ImmediateReqResSubscription<TRequest, TResponse>(func);
+                    return new ImmediateReqResSubscription<TRequest, TResponse>(func, filter);
             }
         }
     }

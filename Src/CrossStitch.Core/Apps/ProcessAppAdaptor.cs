@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using CrossStitch.App.Events;
 using CrossStitch.App.Networking;
-using CrossStitch.Core.Utility.Extensions;
 using NetMQ.Sockets;
 
 namespace CrossStitch.Core.Apps
@@ -11,19 +10,23 @@ namespace CrossStitch.Core.Apps
     public class ProcessAppAdaptor : IAppAdaptor
     {
         private readonly ComponentInstance _instance;
+        private readonly INetwork _network;
         private Process _process;
+        
+
         public event EventHandler<AppStartedEventArgs> AppInitialized;
-        private ReceiveChannel _receiver;
+        private IReceiveChannel _receiver;
         private RequestSocket _clientSocket;
 
-        public ProcessAppAdaptor(ComponentInstance instance)
+        public ProcessAppAdaptor(ComponentInstance instance, INetwork network)
         {
             _instance = instance;
+            _network = network;
+            _receiver = _network.CreateReceiveChannel(false);
         }
 
         public bool Start()
         {
-            _receiver = new ReceiveChannel();
             _receiver.MessageReceived += MessageReceived;
             _receiver.StartListening("127.0.0.1");
 
@@ -81,6 +84,15 @@ namespace CrossStitch.Core.Apps
                 _clientSocket.Dispose();
                 _clientSocket = null;
             }
+        }
+
+        public AppResourceUsage GetResources()
+        {
+            return new AppResourceUsage {
+                ProcessorTime = _process.TotalProcessorTime,
+                TotalAllocatedMemory = _process.VirtualMemorySize64,
+                UsedMemory = _process.PagedMemorySize64
+            };
         }
 
         public void Dispose()

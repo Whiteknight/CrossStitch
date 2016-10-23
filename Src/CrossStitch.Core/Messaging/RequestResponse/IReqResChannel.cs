@@ -6,7 +6,7 @@ namespace CrossStitch.Core.Messaging.RequestResponse
         where TRequest : IRequest<TResponse>
     {
         BrokeredResponse<TResponse> Request(TRequest request);
-        SubscriptionToken Subscribe(Func<TRequest, TResponse> act, PublishOptions options);
+        SubscriptionToken Subscribe(Func<TRequest, TResponse> act, Func<TRequest, bool> filter, PublishOptions options);
     }
 
     public interface IReqResChannel : IChannel

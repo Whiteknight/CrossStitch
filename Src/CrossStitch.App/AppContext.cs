@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using CrossStitch.App.Networking;
 
 namespace CrossStitch.App
 {
     public class AppContext : IDisposable
     {
-        private readonly INetwork _network;
         private readonly int _communicationPort;
         private readonly ISendChannel _sender;
         private readonly IReceiveChannel _receiver;
 
         public AppContext(INetwork network, int communicationPort)
         {
-            _network = network;
             _communicationPort = communicationPort;
             _sender = network.CreateSendChannel();
             _receiver = network.CreateReceiveChannel(false);
@@ -25,17 +22,12 @@ namespace CrossStitch.App
             _sender.Connect("127.0.0.1", _communicationPort);
             _receiver.StartListening("127.0.0.1");
 
-            var envelope = new MessageEnvelope {
-                Header = new MessageHeader {
-                    FromType = TargetType.Local,
-                    ToType = TargetType.Local,
-                    PayloadType = MessagePayloadType.CommandString
-                },
-                CommandStrings = new List<string> {
-                    "App Instance Initialize",
-                    "ReceivePort=" + _receiver.Port
-                }
-            };
+            var envelope = MessageEnvelope.CreateNew()
+                .Local()
+                .WithCommandString("App Instance Initialize")
+                .WithCommandString("ReceivePort=" + _receiver.Port)
+                .Envelope;
+            
             return _sender.SendMessage(envelope);
         }
 

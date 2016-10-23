@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.App.Events;
+using CrossStitch.App.Networking;
+using CrossStitch.Core.Apps.Messages;
 
 namespace CrossStitch.Core.Apps
 {
@@ -15,12 +17,12 @@ namespace CrossStitch.Core.Apps
         private readonly InstanceAdaptorFactory _adaptorFactory;
         private ConcurrentDictionary<Guid, IAppAdaptor> _adaptors;
 
-        public InstanceManager(AppsConfiguration config, AppFileSystem fileSystem, AppDataStorage storage)
+        public InstanceManager(AppsConfiguration config, AppFileSystem fileSystem, AppDataStorage storage, INetwork network)
         {
             _config = config;
             _fileSystem = fileSystem;
             _storage = storage;
-            _adaptorFactory = new InstanceAdaptorFactory();
+            _adaptorFactory = new InstanceAdaptorFactory(network);
         }
 
         public event EventHandler<AppStartedEventArgs> AppStarted;
@@ -220,6 +222,11 @@ namespace CrossStitch.Core.Apps
                 return;
             instance.State = InstanceStateType.Running;
             AppStarted.Raise(this, appStartedEventArgs);
+        }
+
+        public List<InstanceInformation> GetInstanceInformation()
+        {
+            throw new NotImplementedException();
         }
     }
 }

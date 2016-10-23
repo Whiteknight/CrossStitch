@@ -2,7 +2,7 @@
 using CrossStitch.App.Events;
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Backplane.Events;
-using CrossStitch.Core.Utility;
+using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Backplane
 {

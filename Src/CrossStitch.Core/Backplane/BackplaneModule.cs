@@ -1,6 +1,8 @@
 ﻿using System;
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Messaging;
+using CrossStitch.Core.Node;
+using CrossStitch.Core.Node.Messages;
 
 namespace CrossStitch.Core.Backplane
 {
@@ -10,12 +12,15 @@ namespace CrossStitch.Core.Backplane
         private readonly IClusterBackplane _backplane;
         private readonly IMessageBus _messageBus;
         private readonly int _workerThreadId;
+        private readonly SubscriptionCollection _subscriptions;
+        private Guid _nodeId;
 
         public BackplaneModule(BackplaneConfiguration configuration, IClusterBackplane backplane, IMessageBus messageBus)
         {
             _configuration = configuration;
             _backplane = backplane;
             _messageBus = messageBus;
+            _subscriptions = new SubscriptionCollection(messageBus);
 
             // Forward messages from the backplane to the IMessageBus
             _backplane.MessageReceived += (s, e) => _messageBus.Publish(e);
@@ -24,19 +29,33 @@ namespace CrossStitch.Core.Backplane
 
             // Forward messages from the IMessageBus to the backplane
             _workerThreadId = _messageBus.StartDedicatedWorkerThread();
-            _messageBus.Subscribe<MessageEnvelope>(
+            _subscriptions.Subscribe<MessageEnvelope>(
                 MessageEnvelope.SendEventName, 
-                m => _backplane.Send(m), 
+                e => _backplane.Send(e), 
                 IsMessageSendable,
                 PublishOptions.SpecificThread(_workerThreadId)
             );
+            _subscriptions.Subscribe<NodeStatus>(NodeStatus.BroadcastEvent, BroadcastNodeStatus);
+        }
+
+        private void BroadcastNodeStatus(NodeStatus nodeStatus)
+        {
+            var envelope = MessageEnvelope.CreateNew()
+                .ToCluster()
+                .FromNode(_nodeId)
+                .WithEventName(NodeStatus.BroadcastEvent)
+                .WithObjectPayload(nodeStatus)
+                .Envelope;
+            _backplane.Send(envelope);
         }
 
         public string Name { get { return "Backplane"; } }
 
         public void Start(RunningNode context)
         {
+            // _backplane.Start fills in Context.NodeId
             _backplane.Start(context);
+            _nodeId = context.NodeId;
         }
 
         public void Stop()

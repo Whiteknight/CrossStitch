@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Apps.Events
+namespace CrossStitch.Core.Apps.Messages
 {
     public class AppInstanceEvent
     {

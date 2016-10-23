@@ -6,6 +6,7 @@ namespace CrossStitch.App.Networking
     {
         public Guid MessageId { get; set; }
         public MessagePayloadType PayloadType { get; set; }
+        public string EventName { get; set; }
         public TargetType FromType { get; set; }
         public Guid FromId { get; set; }
         public TargetType ToType { get; set; }

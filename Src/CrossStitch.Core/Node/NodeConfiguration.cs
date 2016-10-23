@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using CrossStitch.Core.Configuration;
+﻿using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core
+namespace CrossStitch.Core.Node
 {
     public class NodeConfiguration
     {

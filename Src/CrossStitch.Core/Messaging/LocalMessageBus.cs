@@ -51,11 +51,6 @@ namespace CrossStitch.Core.Messaging
             channel.Publish(payload);
         }
 
-        public IDisposable Subscribe<TPayload>(string name, Action<TPayload> subscriber, PublishOptions options = null)
-        {
-            return Subscribe(name, subscriber, null, options);
-        }
-
         public IDisposable Subscribe<TPayload>(string name, Action<TPayload> subscriber, Func<TPayload, bool> filter, PublishOptions options = null)
         {
             string key = GetPubSubKey(typeof(TPayload), name);
@@ -109,7 +104,7 @@ namespace CrossStitch.Core.Messaging
             return channelType.GetMethod("Request").Invoke(channel, new[] { request }) as IBrokeredResponse<object>;
         }
 
-        public IDisposable Subscribe<TRequest, TResponse>(string name, Func<TRequest, TResponse> subscriber, PublishOptions options = null)
+        public IDisposable Subscribe<TRequest, TResponse>(string name, Func<TRequest, TResponse> subscriber, Func<TRequest, bool> filter, PublishOptions options = null)
             where TRequest : IRequest<TResponse>
         {
             string key = GetReqResKey(typeof(TRequest), typeof(TResponse), name);
@@ -118,7 +113,7 @@ namespace CrossStitch.Core.Messaging
             var channel = _reqResChannels[key] as IReqResChannel<TRequest, TResponse>;
             if (channel == null)
                 throw new Exception("Channel has incorrect type");
-            return channel.Subscribe(subscriber, options ?? PublishOptions.Default);
+            return channel.Subscribe(subscriber, filter, options ?? PublishOptions.Default);
         }
 
         public void RunEventLoop(Func<bool> shouldStop = null, int timeoutMs = 500)

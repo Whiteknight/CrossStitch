@@ -2,6 +2,7 @@
 {
     public enum TargetType
     {
+        Cluster,
         Node,
         AppInstance,
         Zone,

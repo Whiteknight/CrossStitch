@@ -7,16 +7,23 @@ namespace CrossStitch.Core.Messaging.RequestResponse
         where TRequest : IRequest<TResponse>
     {
         private readonly Func<TRequest, TResponse> _func;
+        private readonly Func<TRequest, bool> _filter;
         private readonly int _threadId;
         private readonly MessagingWorkerThreadPool _threadPool;
         private readonly int _timeoutMs;
 
-        public SpecificThreadReqResSubscription(Func<TRequest, TResponse> func, int threadId, MessagingWorkerThreadPool threadPool, int timeoutMs)
+        public SpecificThreadReqResSubscription(Func<TRequest, TResponse> func, Func<TRequest, bool> filter, int threadId, MessagingWorkerThreadPool threadPool, int timeoutMs)
         {
             _func = func;
+            _filter = filter;
             _threadId = threadId;
             _threadPool = threadPool;
             _timeoutMs = timeoutMs;
+        }
+
+        public bool CanHandle(TRequest request)
+        {
+            return _filter == null || _filter(request);
         }
 
         public TResponse Request(TRequest request)

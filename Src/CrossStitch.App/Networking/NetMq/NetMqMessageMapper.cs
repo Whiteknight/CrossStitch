@@ -15,7 +15,7 @@ namespace CrossStitch.App.Networking.NetMq
 
         public MessageEnvelope Map(NetMQMessage source)
         {
-            var envelope = new MessageEnvelope();
+            var envelope = MessageEnvelope.CreateNew().Envelope;
             envelope.Header = _serializer.Deserialize<MessageHeader>(source.Pop().Buffer);
             if (envelope.Header.PayloadType == MessagePayloadType.Raw)
                 envelope.RawFrames = source.Select(f => f.ToByteArray(false)).ToList();

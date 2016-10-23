@@ -135,11 +135,4 @@ namespace CrossStitch.Core.Apps
         public InstanceStateType State { get; set; }
         public InstanceRunModeType RunMode { get; set; }
     }
-
-    public class InstanceInformation
-    {
-        public string ApplicationName { get; set; }
-        public string ComponentName { get; set; }
-        public Guid InstanceId { get; set; }
-    }
 }

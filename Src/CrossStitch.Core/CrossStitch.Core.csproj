@@ -66,18 +66,21 @@
     <Compile Include="Apps\AppsConfiguration.cs" />
     <Compile Include="Apps\AppsModule.cs" />
     <Compile Include="Apps\AppStartedEventArgs.cs" />
-    <Compile Include="Apps\Events\AppInstanceEvent.cs" />
+    <Compile Include="Apps\Messages\AppInstanceEvent.cs" />
     <Compile Include="Apps\IAppAdaptor.cs" />
     <Compile Include="Apps\InstanceActionResult.cs" />
     <Compile Include="Apps\InstanceAdaptorFactory.cs" />
     <Compile Include="Apps\InstanceManager.cs" />
+    <Compile Include="Apps\Messages\InstanceInformation.cs" />
+    <Compile Include="Apps\Messages\InstanceInformationRequest.cs" />
     <Compile Include="Apps\ProcessAppAdaptor.cs" />
     <Compile Include="Backplane\BackplaneModule.cs" />
     <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
     <Compile Include="BrokeredResponse.cs" />
-    <Compile Include="Apps\ClientApplication.cs" />
+    <Compile Include="Apps\Application.cs" />
     <Compile Include="ClientMessageBusProxy.cs" />
+    <Compile Include="Http\HttpConfiguration.cs" />
     <Compile Include="Logging\Events\LogEvent.cs" />
     <Compile Include="Master\ClusterPeerNode.cs" />
     <Compile Include="Backplane\BackplaneConfiguration.cs" />
@@ -88,6 +91,7 @@
     <Compile Include="Master\Events\NodeRemovedFromCluster.cs" />
     <Compile Include="Master\IClusterNodeManager.cs" />
     <Compile Include="Messaging\MessageBusExtensions.cs" />
+    <Compile Include="Timer\MessageTimerModule.cs" />
     <Compile Include="Messaging\PubSub\AnyThreadPubSubSubscription.cs" />
     <Compile Include="Messaging\RequestResponse\AnyThreadReqResSubscription.cs" />
     <Compile Include="Messaging\RequestResponse\DispatchableRequest.cs" />
@@ -111,8 +115,10 @@
     <Compile Include="Messaging\PubSub\SpecificThreadPubSubSubscription.cs" />
     <Compile Include="Messaging\RequestResponse\SpecificThreadReqResSubscription.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
-    <Compile Include="NodeConfiguration.cs" />
-    <Compile Include="RunningNode.cs" />
+    <Compile Include="Node\Messages\NodeStatus.cs" />
+    <Compile Include="Node\Messages\NodeStatusRequest.cs" />
+    <Compile Include="Node\NodeConfiguration.cs" />
+    <Compile Include="Node\RunningNode.cs" />
     <Compile Include="Master\MasterConfiguration.cs" />
     <Compile Include="Master\MasterModule.cs" />
     <Compile Include="Backplane\NodeCommunicationInformation.cs" />
@@ -123,7 +129,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Backplane\ZyreBackplane.cs" />
     <Compile Include="Master\ClusterNodeManager.cs" />
-    <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Timer\MessageTimerEvent.cs" />
+    <Compile Include="Timer\TimerMessageBusExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

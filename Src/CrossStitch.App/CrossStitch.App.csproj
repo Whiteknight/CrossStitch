@@ -74,6 +74,7 @@
     <Compile Include="Networking\NetMq\SendChannel.cs" />
     <Compile Include="Networking\TargetType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

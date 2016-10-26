@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Threading;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Timer
@@ -9,7 +8,7 @@ namespace CrossStitch.Core.Timer
     {
         private readonly IMessageBus _messageBus;
         private readonly int _delaySeconds;
-        private System.Threading.Timer _timer;
+        private Acquaintance.Timers.MessageTimer _timer;
         private int _messageId;
 
         public MessageTimerModule(IMessageBus messageBus)
@@ -22,35 +21,24 @@ namespace CrossStitch.Core.Timer
             if (delaySeconds < 1)
                 throw new ArgumentOutOfRangeException("delaySeconds", "delaySeconds must be 1 or higher");
             _messageBus = messageBus;
-            _delaySeconds = delaySeconds;
-            _messageId = 0;
+            _timer = new Acquaintance.Timers.MessageTimer(_messageBus, 5000, delaySeconds * 1000);
         }
 
         public string Name { get { return "Timer";  } }
 
         public void Start(RunningNode context)
         {
-            _timer = new System.Threading.Timer(TimerTick, null, 5000, _delaySeconds * 1000);
+            _timer.Start();
         }
 
         public void Stop()
         {
-            if (_timer == null)
-                return;
-
-            _timer.Dispose();
-            _timer = null;
-        }
-
-        private void TimerTick(object state)
-        {
-            var id = Interlocked.Increment(ref _messageId);
-            _messageBus.Publish(MessageTimerEvent.EventName, new MessageTimerEvent(id));
+            _timer.Stop();
         }
 
         public void Dispose()
         {
-            Stop();
+            _timer.Dispose();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using CrossStitch.Core.Messaging.RequestResponse;
+using Acquaintance.RequestResponse;
 
 namespace CrossStitch.Core.Node.Messages
 {

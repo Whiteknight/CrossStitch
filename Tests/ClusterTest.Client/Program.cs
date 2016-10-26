@@ -2,7 +2,7 @@
 using CrossStitch.App;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Master.Events;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node;
 
 namespace ClusterTest.Client
@@ -12,7 +12,7 @@ namespace ClusterTest.Client
         static void Main(string[] args)
         {
             var serializer = new JsonSerializer();
-            var messageBus = new LocalMessageBus();
+            var messageBus = new MessageBus();
             var backplaneConfig = BackplaneConfiguration.GetDefault();
             var backplane = new ZyreBackplane(backplaneConfig, "Client", serializer);
             var backplaneModule = new BackplaneModule(backplaneConfig, backplane, messageBus);

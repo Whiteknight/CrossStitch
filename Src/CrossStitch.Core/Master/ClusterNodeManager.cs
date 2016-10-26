@@ -5,7 +5,7 @@ using System.Linq;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Backplane.Events;
 using CrossStitch.Core.Master.Events;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 
 namespace CrossStitch.Core.Master
 {

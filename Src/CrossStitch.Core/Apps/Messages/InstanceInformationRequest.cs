@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using CrossStitch.Core.Messaging.RequestResponse;
+﻿using Acquaintance.RequestResponse;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Apps.Messages
 {

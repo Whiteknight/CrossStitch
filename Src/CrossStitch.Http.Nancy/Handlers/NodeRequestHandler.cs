@@ -1,5 +1,5 @@
 ﻿using System;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node.Messages;
 using Nancy;
 

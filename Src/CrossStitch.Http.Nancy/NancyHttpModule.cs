@@ -1,10 +1,11 @@
 ﻿using System;
 using CrossStitch.Core;
 using CrossStitch.Core.Http;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node;
 using Nancy.Bootstrapper;
 using Nancy.Hosting.Self;
+using Nancy.Responses.Negotiation;
 
 namespace CrossStitch.Http.NancyFx
 {
@@ -55,6 +56,17 @@ namespace CrossStitch.Http.NancyFx
         protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
         {
             container.Register<IMessageBus>(_messageBus);
+        }
+
+        protected override NancyInternalConfiguration InternalConfiguration
+        {
+            get
+            {
+                return NancyInternalConfiguration.WithOverrides((c) =>
+                {
+                    c.ResponseProcessors.Remove(typeof(ViewProcessor));
+                });
+            }
         }
     }
 }

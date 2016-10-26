@@ -3,7 +3,7 @@ using System.Linq;
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Logging.Events;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Apps

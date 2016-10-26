@@ -1,7 +1,7 @@
 ﻿using System;
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Backplane;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Master
@@ -28,7 +28,7 @@ namespace CrossStitch.Core.Master
                 MessageEnvelope.SendEventName,
                 ResolveAppInstanceNodeIdAndSend,
                 IsMessageAddressedToAppInstance,
-                PublishOptions.Default
+                SubscribeOptions.Default
             );
         }
 

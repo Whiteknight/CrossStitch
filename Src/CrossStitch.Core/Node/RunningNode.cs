@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node.Messages;
 using CrossStitch.Core.Timer;
+using Acquaintance.Timers;
 
 namespace CrossStitch.Core.Node
 {

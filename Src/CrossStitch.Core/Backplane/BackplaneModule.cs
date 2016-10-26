@@ -1,6 +1,6 @@
 ﻿using System;
 using CrossStitch.App.Networking;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node;
 using CrossStitch.Core.Node.Messages;
 
@@ -33,7 +33,7 @@ namespace CrossStitch.Core.Backplane
                 MessageEnvelope.SendEventName, 
                 e => _backplane.Send(e), 
                 IsMessageSendable,
-                PublishOptions.SpecificThread(_workerThreadId)
+                SubscribeOptions.SpecificThread(_workerThreadId)
             );
             _subscriptions.Subscribe<NodeStatus>(NodeStatus.BroadcastEvent, BroadcastNodeStatus);
         }

@@ -1,6 +1,6 @@
 ﻿using System;
 using CrossStitch.Core.Http;
-using CrossStitch.Core.Messaging;
+using Acquaintance;
 using CrossStitch.Core.Node;
 using CrossStitch.Http.NancyFx;
 
@@ -11,7 +11,7 @@ namespace HttpTest
         static void Main(string[] args)
         {
             var nodeConfig = NodeConfiguration.GetDefault();
-            var messageBus = new LocalMessageBus();
+            var messageBus = new MessageBus();
 
             using (var runningNode = new RunningNode(nodeConfig, messageBus))
             {

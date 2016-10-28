@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Acquaintance, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Acquaintance.0.0.1-beta\lib\net45\Acquaintance.dll</HintPath>
+      <HintPath>..\..\packages\Acquaintance.0.2.0-beta\lib\net45\Acquaintance.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Nancy, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">

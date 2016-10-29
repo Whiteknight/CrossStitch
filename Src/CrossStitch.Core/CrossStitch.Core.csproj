@@ -83,6 +83,8 @@
     <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
     <Compile Include="Apps\Application.cs" />
     <Compile Include="ClientMessageBusProxy.cs" />
+    <Compile Include="Data\DataModule.cs" />
+    <Compile Include="Data\IDataStorage.cs" />
     <Compile Include="Http\HttpConfiguration.cs" />
     <Compile Include="Logging\Events\LogEvent.cs" />
     <Compile Include="Master\ClusterPeerNode.cs" />

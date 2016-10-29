@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Acquaintance;
 using CrossStitch.App;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Master;
 using CrossStitch.Core.Master.Events;
-using Acquaintance;
 using CrossStitch.Core.Node;
+using System;
 
 namespace ClusterTest.Master
 {
@@ -17,7 +17,7 @@ namespace ClusterTest.Master
             var messageBus = new MessageBus();
             var backplaneConfig = BackplaneConfiguration.GetDefault();
             var backplane = new ZyreBackplane(backplaneConfig, "Master", serializer);
-            var backplaneModule = new BackplaneModule(backplaneConfig, backplane, messageBus);
+            var backplaneModule = new BackplaneModule(backplaneConfig, backplane);
             var nodeManager = new ClusterNodeManager(messageBus);
             var masterModule = new MasterModule(backplane, nodeManager, messageBus);
 

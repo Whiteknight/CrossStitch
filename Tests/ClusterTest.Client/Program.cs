@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Acquaintance;
 using CrossStitch.App;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Master.Events;
-using Acquaintance;
 using CrossStitch.Core.Node;
+using System;
 
 namespace ClusterTest.Client
 {
@@ -15,7 +15,7 @@ namespace ClusterTest.Client
             var messageBus = new MessageBus();
             var backplaneConfig = BackplaneConfiguration.GetDefault();
             var backplane = new ZyreBackplane(backplaneConfig, "Client", serializer);
-            var backplaneModule = new BackplaneModule(backplaneConfig, backplane, messageBus);
+            var backplaneModule = new BackplaneModule(backplaneConfig, backplane);
 
             messageBus.Subscribe<NodeAddedToClusterEvent>(NodeAddedToClusterEvent.EventName, NodeAdded);
             messageBus.Subscribe<NodeRemovedFromClusterEvent>(NodeRemovedFromClusterEvent.EventName, NodeRemoved);

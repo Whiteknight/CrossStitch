@@ -1,32 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Acquaintance;
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Logging.Events;
-using Acquaintance;
 using CrossStitch.Core.Node;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Apps
 {
     public class AppsModule : IModule
     {
         private readonly AppsConfiguration _configuration;
-        private readonly IMessageBus _messageBus;
+        private IMessageBus _messageBus;
+        private SubscriptionCollection _subscriptions;
         private readonly InstanceManager _instances;
         private readonly AppDataStorage _dataStorage;
         private RunningNode _node;
 
-        public AppsModule(AppsConfiguration configuration, IMessageBus messageBus, INetwork network)
+        public AppsModule(AppsConfiguration configuration, INetwork network)
         {
             _configuration = configuration;
-            _messageBus = messageBus;
             _instances = new InstanceManager(configuration, 
                 new AppFileSystem(configuration),
                 new AppDataStorage(),
                 network);
             _instances.AppStarted += InstancesOnAppStarted;
-
-            _messageBus.Subscribe<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
         }
 
         private List<InstanceInformation> GetInstanceInformation(InstanceInformationRequest instanceInformationRequest)
@@ -43,8 +41,12 @@ namespace CrossStitch.Core.Apps
         }
 
         public string Name { get { return "Apps"; } }
+
         public void Start(RunningNode context)
         {
+            _subscriptions = new SubscriptionCollection(context.MessageBus);
+            _subscriptions.Subscribe<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
+
             _node = context;
             var results = _instances.StartupActiveInstances();
             foreach (var result in results.Where(isr => isr.IsSuccess == false))
@@ -66,6 +68,8 @@ namespace CrossStitch.Core.Apps
         public void Stop()
         {
             _instances.StopAll(false);
+            _subscriptions.Dispose();
+            _subscriptions = null;
         }
 
         public void Dispose()

@@ -1,34 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Acquaintance;
+﻿using Acquaintance;
+using Acquaintance.Timers;
 using CrossStitch.Core.Node.Messages;
 using CrossStitch.Core.Timer;
-using Acquaintance.Timers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Node
 {
     public class RunningNode : IDisposable
     {
-        private readonly IMessageBus _messageBus;
         private readonly List<IModule> _modules;
         private readonly List<IModule> _managedModules;
-        private readonly SubscriptionCollection _subscriptions;
+        private SubscriptionCollection _subscriptions;
 
         public RunningNode(NodeConfiguration nodeConfig, IMessageBus messageBus)
         {
-            _messageBus = messageBus;
-            _subscriptions = new SubscriptionCollection(messageBus);
+            MessageBus = messageBus;
+            
             _modules = new List<IModule>();
             _managedModules = new List<IModule>();
-
             _managedModules.Add(new MessageTimerModule(messageBus));
-
-            _subscriptions.TimerSubscribe(6, t => _messageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()));
-            _subscriptions.Subscribe<NodeStatusRequest, NodeStatus>(r => GetStatus(r.NodeId));
         }
 
         public Guid NodeId { get; set; }
+
+        public IMessageBus MessageBus { get; private set; }
 
         public void AddModule(IModule module)
         {
@@ -37,6 +34,10 @@ namespace CrossStitch.Core.Node
 
         public void Start()
         {
+            _subscriptions = new SubscriptionCollection(MessageBus);
+            _subscriptions.TimerSubscribe(6, t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()));
+            _subscriptions.Subscribe<NodeStatusRequest, NodeStatus>(r => GetStatus(r.NodeId));
+
             foreach (var module in _managedModules)
                 module.Start(this);
             foreach (var module in _modules)
@@ -49,6 +50,9 @@ namespace CrossStitch.Core.Node
                 module.Stop();
             foreach (var module in _managedModules)
                 module.Stop();
+
+            _subscriptions.Dispose();
+            _subscriptions = null;
         }
 
         private NodeStatus GetStatus()
@@ -71,7 +75,8 @@ namespace CrossStitch.Core.Node
 
         public void Dispose()
         {
-            _subscriptions.Dispose();
+            if (_subscriptions != null)
+                _subscriptions.Dispose();
             foreach (var module in _managedModules)
                 module.Dispose();
             foreach (var module in _modules)

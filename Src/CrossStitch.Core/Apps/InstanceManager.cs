@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CrossStitch.App.Events;
+using CrossStitch.App.Networking;
+using CrossStitch.Core.Apps.Messages;
+using CrossStitch.Core.Data.Entities;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.App.Events;
-using CrossStitch.App.Networking;
-using CrossStitch.Core.Apps.Messages;
 
 namespace CrossStitch.Core.Apps
 {
@@ -12,12 +13,11 @@ namespace CrossStitch.Core.Apps
     {
         private readonly AppsConfiguration _config;
         private readonly AppFileSystem _fileSystem;
-        private readonly AppDataStorage _storage;
-        private ConcurrentDictionary<Guid, ComponentInstance> _instances;
+        private readonly AppsDataStorage _storage;
         private readonly InstanceAdaptorFactory _adaptorFactory;
         private ConcurrentDictionary<Guid, IAppAdaptor> _adaptors;
 
-        public InstanceManager(AppsConfiguration config, AppFileSystem fileSystem, AppDataStorage storage, INetwork network)
+        public InstanceManager(AppsConfiguration config, AppFileSystem fileSystem, AppsDataStorage storage, INetwork network)
         {
             _config = config;
             _fileSystem = fileSystem;
@@ -27,41 +27,33 @@ namespace CrossStitch.Core.Apps
 
         public event EventHandler<AppStartedEventArgs> AppStarted;
 
-        public List<InstanceActionResult> StartupActiveInstances()
+        public List<InstanceActionResult> StartupActiveInstances(IEnumerable<Instance> instances)
         {
-            if (_instances != null)
+            if (_adaptors != null)
                 throw new Exception("InstanceManager already started");
 
-            var instances = _storage.GetAllInstances().ToDictionary(i => i.Id);
-            _instances = new ConcurrentDictionary<Guid, ComponentInstance>(instances);
             _adaptors = new ConcurrentDictionary<Guid, IAppAdaptor>();
 
             List<InstanceActionResult> results = new List<InstanceActionResult>();
-            foreach (var instance in instances.Values.Where(i => i.State == InstanceStateType.Running))
+            foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running))
             {
-                var result = Start(instance.Id);
+                var result = Start(instance);
                 results.Add(result);
             }
-
+            
             return results;
         }
 
-        public InstanceActionResult Start(Guid instanceId)
+        public InstanceActionResult Start(Instance instance)
         {
-            ComponentInstance instance;
-            bool found = _instances.TryGetValue(instanceId, out instance);
-            if (!found)
-            {
-                return new InstanceActionResult {
-                    InstanceId = instanceId,
-                    IsSuccess = false
-                };
-            }
+            Guid instanceId = instance.Id;
+
             try
             {
                 instance.State = InstanceStateType.Started;
+
                 IAppAdaptor adaptor;
-                found = _adaptors.TryGetValue(instanceId, out adaptor);
+                bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
                 {
                     adaptor = _adaptorFactory.Create(instance);
@@ -86,7 +78,6 @@ namespace CrossStitch.Core.Apps
             catch (Exception e)
             {
                 instance.State = InstanceStateType.Error;
-                _storage.Save(instance);
                 return new InstanceActionResult
                 {
                     InstanceId = instance.Id,
@@ -109,16 +100,8 @@ namespace CrossStitch.Core.Apps
                         IsSuccess = false
                     };
                 }
-                if (persistState)
-                {
-                    ComponentInstance instance;
-                    found = _instances.TryGetValue(instanceId, out instance);
-                    if (found)
-                    {
-                        instance.State = InstanceStateType.Stopped;
-                        _storage.Save(instance);
-                    }
-                }
+                adaptor.Stop();
+
                 return new InstanceActionResult
                 {
                     IsSuccess = true,
@@ -151,37 +134,26 @@ namespace CrossStitch.Core.Apps
 
         public InstanceActionResult CreateInstance(ClientApplication application, ApplicationComponent component, ComponentVersion version)
         {
-            var instance = new ComponentInstance(Guid.NewGuid(), version.Id) { State = InstanceStateType.Stopped };
-            bool added = _instances.TryAdd(instance.Id, instance);
-            if (!added)
-                return InstanceActionResult.Failure();
+            //var instance = new ComponentInstance(Guid.NewGuid(), version.Id) { State = InstanceStateType.Stopped };
+            //bool added = _instances.TryAdd(instance.Id, instance);
+            //if (!added)
+            //    return InstanceActionResult.Failure();
 
-            bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
-            if (!ok)
-                return InstanceActionResult.Failure();
+            //bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
+            //if (!ok)
+            //    return InstanceActionResult.Failure();
 
-            return new InstanceActionResult {
-                IsSuccess = true,
-                InstanceId = instance.Id
-            };
+            //return new InstanceActionResult {
+            //    IsSuccess = true,
+            //    InstanceId = instance.Id
+            //};
+            return null;
         }
 
         public InstanceActionResult RemoveInstance(Guid instanceId)
         {
-            ComponentInstance instance;
-            bool found = _instances.TryGetValue(instanceId, out instance);
-            if (!found)
-                return InstanceActionResult.Failure();
-
-            if (instance.State != InstanceStateType.Stopped || instance.State == InstanceStateType.Error)
-                return InstanceActionResult.Failure();
-
-            bool removed = _instances.TryRemove(instanceId, out instance);
-            if (!removed)
-                return InstanceActionResult.Failure();
-
             IAppAdaptor adaptor;
-            removed = _adaptors.TryRemove(instanceId, out adaptor);
+            bool removed = _adaptors.TryRemove(instanceId, out adaptor);
             if (removed)
                 adaptor.Dispose();
 
@@ -208,19 +180,17 @@ namespace CrossStitch.Core.Apps
         public void Dispose()
         {
             StopAll(false);
-            _instances.Clear();
-            _instances = null;
             _adaptors.Clear();
             _adaptors = null;
         }
 
         private void AdaptorOnAppInitialized(object sender, AppStartedEventArgs appStartedEventArgs)
         {
-            ComponentInstance instance;
-            bool found = _instances.TryGetValue(appStartedEventArgs.InstanceId, out instance);
-            if (!found)
-                return;
-            instance.State = InstanceStateType.Running;
+            //ComponentInstance instance;
+            //bool found = _instances.TryGetValue(appStartedEventArgs.InstanceId, out instance);
+            //if (!found)
+            //    return;
+            //instance.State = InstanceStateType.Running;
             AppStarted.Raise(this, appStartedEventArgs);
         }
 

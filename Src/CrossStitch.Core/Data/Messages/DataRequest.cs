@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Data.Messages
 {
@@ -16,6 +17,32 @@ namespace CrossStitch.Core.Data.Messages
         public DataRequestType Type { get; set; }
         public TEntity Entity { get; set; }
         public Guid Id { get; set; }
+
+        public static DataRequest<TEntity> GetAll()
+        {
+            return new DataRequest<TEntity>
+            {
+                Type = DataRequestType.GetAll
+            };
+        }
+
+        public static DataRequest<TEntity> Get(Guid id)
+        {
+            return new DataRequest<TEntity>
+            {
+                Type = DataRequestType.Get,
+                Id = id
+            };
+        }
+
+        public static DataRequest<TEntity> Save(TEntity entity)
+        {
+            return new DataRequest<TEntity>
+            {
+                Type = DataRequestType.Save,
+                Entity = entity
+            };
+        }
     }
 
     public enum DataResponseType
@@ -31,6 +58,7 @@ namespace CrossStitch.Core.Data.Messages
     {
         public DataResponseType Type { get; set; }
         public TEntity Entity { get; set; }
+        public List<TEntity> Entities { get; set; }
 
         public static DataResponse<TEntity> BadRequest()
         {

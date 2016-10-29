@@ -1,23 +1,24 @@
-﻿using System;
+﻿using CrossStitch.App;
+using CrossStitch.App.Events;
+using CrossStitch.App.Networking;
+using CrossStitch.Core.Data.Entities;
+using System;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
-using CrossStitch.App;
-using CrossStitch.App.Events;
-using CrossStitch.App.Networking;
 
 namespace CrossStitch.Core.Apps
 {
     public class AppDomainAppAdaptor : IAppAdaptor
     {
-        private readonly ComponentInstance _instance;
+        private readonly Instance _instance;
         private readonly INetwork _network;
         private AppDomain _appDomain;
         private readonly IReceiveChannel _receiver;
         private ISendChannel _sender;
         private AppBootloader _bootloader;
 
-        public AppDomainAppAdaptor(ComponentInstance instance, INetwork network)
+        public AppDomainAppAdaptor(Instance instance, INetwork network)
         {
             _instance = instance;
             _network = network;

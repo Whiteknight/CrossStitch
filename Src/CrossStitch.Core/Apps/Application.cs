@@ -28,12 +28,7 @@ namespace CrossStitch.Core.Apps
             return component;
         }
 
-        public ComponentInstance CreateInstance(string componentName, string versionStr)
-        {
-            var component = GetComponent(componentName);
-
-            return component.CreateInstance(versionStr);
-        }
+        
 
         
     }
@@ -55,14 +50,12 @@ namespace CrossStitch.Core.Apps
             Name = name;
             Application = application;
             Versions = new Dictionary<string, ComponentVersion>();
-            Instances = new Dictionary<Guid, ComponentInstance>();
         }
 
         public Guid Id { get; set; }
         public ClientApplication Application { get; private set; }
         public string Name { get; set; }
         public Dictionary<string, ComponentVersion> Versions { get; set; }
-        public Dictionary<Guid, ComponentInstance> Instances { get; set; }
 
         public ComponentVersion GetVersion(string versionStr)
         {
@@ -76,15 +69,6 @@ namespace CrossStitch.Core.Apps
                 Versions.Add(versionStr, version);
             }
             return version;
-        }
-
-        public ComponentInstance CreateInstance(string versionStr)
-        {
-            var version = GetVersion(versionStr);
-            var id = Guid.NewGuid();
-            var instance = new ComponentInstance(id, version.Id);
-            Instances.Add(id, instance);
-            return instance;
         }
     }
 
@@ -102,37 +86,6 @@ namespace CrossStitch.Core.Apps
         public DateTime Created { get; set; }
     }
 
-    public enum InstanceStateType
-    {
-        Started,
-        Running,
-        Error,
-        Stopped
-    }
+    
 
-    public enum InstanceRunModeType
-    {
-        AppDomain,
-        Process
-    }
-
-    public class ComponentInstance
-    {
-        
-        // Represents a single running instance of a client application component.
-        public ComponentInstance(Guid id, Guid versionId)
-        {
-            Id = id;
-            VersionId = versionId;
-        }
-
-        public Guid Id { get; set; }
-        public string FullName { get; set; }
-        public string DirectoryPath { get; set; }
-        public string ExecutableName { get; set; }
-        public string ApplicationClassName { get; set; }
-        public Guid VersionId { get; set; }
-        public InstanceStateType State { get; set; }
-        public InstanceRunModeType RunMode { get; set; }
-    }
 }

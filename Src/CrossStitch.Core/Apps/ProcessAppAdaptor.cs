@@ -1,15 +1,16 @@
-﻿using System;
+﻿using CrossStitch.App.Events;
+using CrossStitch.App.Networking;
+using CrossStitch.Core.Data.Entities;
+using NetMQ.Sockets;
+using System;
 using System.Diagnostics;
 using System.IO;
-using CrossStitch.App.Events;
-using CrossStitch.App.Networking;
-using NetMQ.Sockets;
 
 namespace CrossStitch.Core.Apps
 {
     public class ProcessAppAdaptor : IAppAdaptor
     {
-        private readonly ComponentInstance _instance;
+        private readonly Instance _instance;
         private readonly INetwork _network;
         private Process _process;
         
@@ -18,7 +19,7 @@ namespace CrossStitch.Core.Apps
         private IReceiveChannel _receiver;
         private RequestSocket _clientSocket;
 
-        public ProcessAppAdaptor(ComponentInstance instance, INetwork network)
+        public ProcessAppAdaptor(Instance instance, INetwork network)
         {
             _instance = instance;
             _network = network;

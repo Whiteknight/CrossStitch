@@ -13,10 +13,29 @@ namespace CrossStitch.Core.Data.Entities
 
         public InstanceAdaptorDetails Adaptor { get; set; }
 
+        public string FullName { get; set; }
+        public string DirectoryPath { get; set; }
+        public string ExecutableName { get; set; }
+        public string ApplicationClassName { get; set; }
+        public InstanceStateType State { get; set; }
+    }
+
+    public enum InstanceStateType
+    {
+        Started,
+        Running,
+        Error,
+        Stopped
+    }
+
+    public enum InstanceRunModeType
+    {
+        AppDomain,
+        Process
     }
 
     public class InstanceAdaptorDetails
     {
-
+        public InstanceRunModeType RunMode { get; set; }
     }
 }

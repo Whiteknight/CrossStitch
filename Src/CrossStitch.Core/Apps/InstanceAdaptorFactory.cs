@@ -1,5 +1,6 @@
-﻿using System;
-using CrossStitch.App.Networking;
+﻿using CrossStitch.App.Networking;
+using CrossStitch.Core.Data.Entities;
+using System;
 
 namespace CrossStitch.Core.Apps
 {
@@ -12,9 +13,9 @@ namespace CrossStitch.Core.Apps
             _network = network;
         }
 
-        public IAppAdaptor Create(ComponentInstance instance)
+        public IAppAdaptor Create(Instance instance)
         {
-            switch (instance.RunMode)
+            switch (instance.Adaptor.RunMode)
             {
                 case InstanceRunModeType.AppDomain:
                     return new AppDomainAppAdaptor(instance, _network);

@@ -29,9 +29,9 @@ namespace CrossStitch.Core.Data
                 ThreadId = _workerThreadId
             };
             _subscriptions = new SubscriptionCollection(context.MessageBus);
-            _subscriptions.Subscribe<DataRequest<Application>, DataResponse<Application>>(HandleRequest, options);
-            _subscriptions.Subscribe<DataRequest<Instance>, DataResponse<Instance>>(HandleRequest, options);
-            _subscriptions.Subscribe<DataRequest<PeerNode>, DataResponse<PeerNode>>(HandleRequest, options);
+            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(HandleRequest, options);
+            _subscriptions.Listen<DataRequest<Instance>, DataResponse<Instance>>(HandleRequest, options);
+            _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(HandleRequest, options);
         }
 
         public void Stop()

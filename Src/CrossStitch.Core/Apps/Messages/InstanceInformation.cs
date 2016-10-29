@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrossStitch.Core.Data.Entities;
+using System;
 
 namespace CrossStitch.Core.Apps.Messages
 {

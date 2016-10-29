@@ -13,69 +13,85 @@ namespace CrossStitch.Core.Apps
         private readonly AppsConfiguration _configuration;
         private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
-        private readonly InstanceManager _instances;
-        private readonly AppDataStorage _dataStorage;
+        private InstanceManager _instanceManager;
+        private AppsDataStorage _dataStorage;
         private RunningNode _node;
+        private readonly INetwork _network;
 
         public AppsModule(AppsConfiguration configuration, INetwork network)
         {
             _configuration = configuration;
-            _instances = new InstanceManager(configuration, 
-                new AppFileSystem(configuration),
-                new AppDataStorage(),
-                network);
-            _instances.AppStarted += InstancesOnAppStarted;
-        }
-
-        private List<InstanceInformation> GetInstanceInformation(InstanceInformationRequest instanceInformationRequest)
-        {
-            return _instances.GetInstanceInformation();
-        }
-
-        private void InstancesOnAppStarted(object sender, AppStartedEventArgs appStartedEventArgs)
-        {
-            _messageBus.Publish("Started", new AppInstanceEvent {
-                InstanceId = appStartedEventArgs.InstanceId,
-                NodeId = _node.NodeId
-            });
+            _network = network;
         }
 
         public string Name { get { return "Apps"; } }
 
         public void Start(RunningNode context)
         {
-            _subscriptions = new SubscriptionCollection(context.MessageBus);
-            _subscriptions.Subscribe<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
-
             _node = context;
-            var results = _instances.StartupActiveInstances();
-            foreach (var result in results.Where(isr => isr.IsSuccess == false))
-            {
-                _messageBus.Publish(LogEvent.Error, new LogEvent {
-                    Exception = result.Exception,
-                    Message = "Instance " + result.InstanceId + " failed to start"
-                });
-            }
-            foreach (var result in results.Where(isr => isr.IsSuccess == true))
-            {
-                _messageBus.Publish(AppInstanceEvent.StartedEventName, new AppInstanceEvent {
-                    InstanceId = result.InstanceId,
-                    NodeId = context.NodeId
-                });
-            }
+            _subscriptions = new SubscriptionCollection(context.MessageBus);
+            _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
+
+            _dataStorage = new AppsDataStorage(context.MessageBus);
+            _instanceManager = new InstanceManager(_configuration, new AppFileSystem(_configuration), _dataStorage, _network);
+            _instanceManager.AppStarted += InstancesOnAppStarted;
+
+            StartupInstances();
         }
 
         public void Stop()
         {
-            _instances.StopAll(false);
-            _subscriptions.Dispose();
+            _instanceManager?.StopAll(false);
+            _instanceManager?.Dispose();
+            _instanceManager = null;
+            _subscriptions?.Dispose();
             _subscriptions = null;
         }
 
         public void Dispose()
         {
             Stop();
-            _instances.Dispose();
+            _instanceManager.Dispose();
+        }
+
+        private void StartupInstances()
+        {
+            var instances = _dataStorage.GetAllInstances();
+            var results = _instanceManager.StartupActiveInstances(instances);
+            foreach (var result in results.Where(isr => !isr.IsSuccess))
+            {
+                if (result.Instance != null)
+                    _dataStorage.Save(result.Instance);
+                _messageBus.Publish(LogEvent.Error, new LogEvent
+                {
+                    Exception = result.Exception,
+                    Message = "Instance " + result.InstanceId + " failed to start"
+                });
+            }
+            foreach (var result in results.Where(isr => isr.IsSuccess))
+            {
+                // We don't need to save the Instance here, because we aren't changing its state/
+                // It is still "Started"
+                _messageBus.Publish(AppInstanceEvent.StartedEventName, new AppInstanceEvent
+                {
+                    InstanceId = result.InstanceId,
+                    NodeId = _node.NodeId
+                });
+            }
+        }
+
+        private List<InstanceInformation> GetInstanceInformation(InstanceInformationRequest instanceInformationRequest)
+        {
+            return _instanceManager.GetInstanceInformation();
+        }
+
+        private void InstancesOnAppStarted(object sender, AppStartedEventArgs appStartedEventArgs)
+        {
+            _messageBus.Publish("Started", new AppInstanceEvent
+            {
+                InstanceId = appStartedEventArgs.InstanceId,
+                NodeId = _node.NodeId
+            });
         }
     }
 }

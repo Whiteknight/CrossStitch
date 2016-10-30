@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Data.Entities
 {
@@ -12,6 +13,7 @@ namespace CrossStitch.Core.Data.Entities
         public string Id { get; set; }
         public long StoreVersion { get; set; }
         public string Name { get; set; }
+        public Guid NodeId { get; set; }
         public List<ApplicationComponent> Components { get; set; }
     }
 

@@ -9,7 +9,6 @@ using System.Linq;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
-
     public class ApplicationModule : NancyModule
     {
         public ApplicationModule(IMessageBus messageBus)

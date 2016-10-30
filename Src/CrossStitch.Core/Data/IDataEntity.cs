@@ -1,10 +1,9 @@
-﻿using System;
-
-namespace CrossStitch.Core.Data
+﻿namespace CrossStitch.Core.Data
 {
     public interface IDataEntity
     {
-        Guid Id { get; set; }
-        long Version { get; set; }
+        string Id { get; set; }
+        string Name { get; set; }
+        long StoreVersion { get; set; }
     }
 }

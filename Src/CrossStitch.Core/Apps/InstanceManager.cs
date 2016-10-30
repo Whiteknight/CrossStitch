@@ -15,7 +15,7 @@ namespace CrossStitch.Core.Apps
         private readonly AppFileSystem _fileSystem;
         private readonly AppsDataStorage _storage;
         private readonly InstanceAdaptorFactory _adaptorFactory;
-        private ConcurrentDictionary<Guid, IAppAdaptor> _adaptors;
+        private ConcurrentDictionary<string, IAppAdaptor> _adaptors;
 
         public InstanceManager(AppsConfiguration config, AppFileSystem fileSystem, AppsDataStorage storage, INetwork network)
         {
@@ -32,7 +32,7 @@ namespace CrossStitch.Core.Apps
             if (_adaptors != null)
                 throw new Exception("InstanceManager already started");
 
-            _adaptors = new ConcurrentDictionary<Guid, IAppAdaptor>();
+            _adaptors = new ConcurrentDictionary<string, IAppAdaptor>();
 
             List<InstanceActionResult> results = new List<InstanceActionResult>();
             foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running))
@@ -46,7 +46,7 @@ namespace CrossStitch.Core.Apps
 
         public InstanceActionResult Start(Instance instance)
         {
-            Guid instanceId = instance.Id;
+            string instanceId = instance.Id;
 
             try
             {
@@ -87,7 +87,7 @@ namespace CrossStitch.Core.Apps
             }
         }
 
-        public InstanceActionResult Stop(Guid instanceId, bool persistState)
+        public InstanceActionResult Stop(string instanceId, bool persistState)
         {
             try
             {
@@ -150,7 +150,7 @@ namespace CrossStitch.Core.Apps
             return null;
         }
 
-        public InstanceActionResult RemoveInstance(Guid instanceId)
+        public InstanceActionResult RemoveInstance(string instanceId)
         {
             IAppAdaptor adaptor;
             bool removed = _adaptors.TryRemove(instanceId, out adaptor);
@@ -165,7 +165,7 @@ namespace CrossStitch.Core.Apps
             };
         }
 
-        public AppResourceUsage GetInstanceResources(Guid instanceId)
+        public AppResourceUsage GetInstanceResources(string instanceId)
         {
             IAppAdaptor adaptor;
             bool found = _adaptors.TryGetValue(instanceId, out adaptor);

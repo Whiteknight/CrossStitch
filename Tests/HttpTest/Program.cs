@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Acquaintance;
+using CrossStitch.Core.Data;
 using CrossStitch.Core.Http;
-using Acquaintance;
 using CrossStitch.Core.Node;
 using CrossStitch.Http.NancyFx;
+using System;
 
 namespace HttpTest
 {
@@ -18,6 +19,11 @@ namespace HttpTest
                 var httpConfiguration = HttpConfiguration.GetDefault();
                 var httpServer = new NancyHttpModule(httpConfiguration, messageBus);
                 runningNode.AddModule(httpServer);
+
+                var dataConfiguration = DataConfiguration.GetDefault();
+                var dataStorage = new FolderDataStorage(dataConfiguration);
+                var data = new DataModule(dataStorage);
+                runningNode.AddModule(data);
 
                 runningNode.Start();
                 Console.ReadKey();

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CrossStitch.Core.Data.Messages
 {
@@ -16,7 +15,7 @@ namespace CrossStitch.Core.Data.Messages
     {
         public DataRequestType Type { get; set; }
         public TEntity Entity { get; set; }
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public static DataRequest<TEntity> GetAll()
         {
@@ -26,7 +25,7 @@ namespace CrossStitch.Core.Data.Messages
             };
         }
 
-        public static DataRequest<TEntity> Get(Guid id)
+        public static DataRequest<TEntity> Get(string id)
         {
             return new DataRequest<TEntity>
             {

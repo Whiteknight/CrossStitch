@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
@@ -27,7 +26,7 @@ namespace CrossStitch.Core.Apps
             return true;
         }
 
-        public bool UnzipLibraryPackageToRunningBase(string appName, string componentName, string version, Guid instanceId)
+        public bool UnzipLibraryPackageToRunningBase(string appName, string componentName, string version, string instanceId)
         {
             string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
             if (!Directory.Exists(libraryDirectoryPath))
@@ -48,17 +47,17 @@ namespace CrossStitch.Core.Apps
             return true;
         }
 
-        private string GetInstanceRunningDirectory(Guid instanceId)
+        private string GetInstanceRunningDirectory(string instanceId)
         {
             return Path.Combine(_config.RunningAppBasePath, instanceId.ToString());
         }
 
-        private string GetInstanceDataDirectoryPath(Guid instanceId)
+        private string GetInstanceDataDirectoryPath(string instanceId)
         {
             return Path.Combine(_config.DataBasePath, instanceId.ToString());
         }
 
-        public bool DeleteRunningInstanceDirectory(Guid instanceId)
+        public bool DeleteRunningInstanceDirectory(string instanceId)
         {
             var runningDirectory = GetInstanceRunningDirectory(instanceId);
             if (!Directory.Exists(runningDirectory))
@@ -68,7 +67,7 @@ namespace CrossStitch.Core.Apps
             return true;
         }
 
-        public bool DeleteDataInstanceDirectory(Guid instanceId)
+        public bool DeleteDataInstanceDirectory(string instanceId)
         {
             var directory = GetInstanceDataDirectoryPath(instanceId);
             if (!Directory.Exists(directory))
@@ -78,7 +77,7 @@ namespace CrossStitch.Core.Apps
             return true;
         }
 
-        public void GetInstanceDiskUsage(Guid instanceId, AppResourceUsage usage)
+        public void GetInstanceDiskUsage(string instanceId, AppResourceUsage usage)
         {
             var runningDirectory = GetInstanceRunningDirectory(instanceId);
             usage.DiskAppUsageBytes = GetDirectorySizeOnDisk(runningDirectory);

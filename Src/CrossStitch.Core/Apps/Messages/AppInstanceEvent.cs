@@ -10,6 +10,6 @@ namespace CrossStitch.Core.Apps.Messages
         public const string RemovedEventName = "Removed";
         
         public Guid NodeId { get; set; }
-        public Guid InstanceId { get; set; }
+        public string InstanceId { get; set; }
     }
 }

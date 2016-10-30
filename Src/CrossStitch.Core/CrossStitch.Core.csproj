@@ -76,8 +76,10 @@
     <Compile Include="Apps\InstanceActionResult.cs" />
     <Compile Include="Apps\InstanceAdaptorFactory.cs" />
     <Compile Include="Apps\InstanceManager.cs" />
+    <Compile Include="Apps\Messages\InstanceCreateRequest.cs" />
     <Compile Include="Apps\Messages\InstanceInformation.cs" />
     <Compile Include="Apps\Messages\InstanceInformationRequest.cs" />
+    <Compile Include="Apps\Messages\PackageFileUploadRequest.cs" />
     <Compile Include="Apps\ProcessAppAdaptor.cs" />
     <Compile Include="Backplane\BackplaneModule.cs" />
     <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="Master\Events\NodeAddedToClusterEvent.cs" />
     <Compile Include="Master\Events\NodeRemovedFromCluster.cs" />
     <Compile Include="Master\IClusterNodeManager.cs" />
+    <Compile Include="Messages\GenericResponse.cs" />
     <Compile Include="Timer\MessageTimerModule.cs" />
     <Compile Include="IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />

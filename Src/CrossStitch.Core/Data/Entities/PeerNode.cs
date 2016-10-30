@@ -1,10 +1,9 @@
-﻿using System;
-
-namespace CrossStitch.Core.Data.Entities
+﻿namespace CrossStitch.Core.Data.Entities
 {
     public class PeerNode : IDataEntity
     {
-        public Guid Id { get; set; }
-        public long Version { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public long StoreVersion { get; set; }
     }
 }

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CrossStitch.Core.Data
 {
     public interface IDataStorage
     {
-        TEntity Get<TEntity>(Guid id)
+        TEntity Get<TEntity>(string id)
             where TEntity : class, IDataEntity;
 
         IEnumerable<TEntity> GetAll<TEntity>()
@@ -14,7 +13,7 @@ namespace CrossStitch.Core.Data
         long Save<TEntity>(TEntity entity)
             where TEntity : class, IDataEntity;
 
-        bool Delete<TEntity>(Guid id)
+        bool Delete<TEntity>(string id)
             where TEntity : class, IDataEntity;
     }
 }

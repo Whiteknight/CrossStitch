@@ -17,7 +17,7 @@ namespace CrossStitch.Core.Data
                 Directory.CreateDirectory(config.DataPath);
         }
 
-        public bool Delete<TEntity>(Guid id) 
+        public bool Delete<TEntity>(string id) 
             where TEntity : class, IDataEntity
         {
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, id);
@@ -29,7 +29,7 @@ namespace CrossStitch.Core.Data
             return false;
         }
 
-        public TEntity Get<TEntity>(Guid id) 
+        public TEntity Get<TEntity>(string id) 
             where TEntity : class, IDataEntity
         {
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, id);
@@ -65,40 +65,45 @@ namespace CrossStitch.Core.Data
         public long Save<TEntity>(TEntity entity)
             where TEntity : class, IDataEntity
         {
-            if (entity.Id != Guid.Empty)
+            if (string.IsNullOrEmpty(entity.Id))
             {
                 SaveNew<TEntity>(entity);
-                return entity.Version;
+                return entity.StoreVersion;
             }
 
             var stored = Get<TEntity>(entity.Id);
             if (stored == null)
             {
                 SaveNew<TEntity>(entity);
-                return entity.Version;
+                return entity.StoreVersion;
             }
 
-            if (entity.Version != stored.Version)
+            if (entity.StoreVersion != stored.StoreVersion)
                 return DataModule.VersionMismatch;
 
             SaveExisting<TEntity>(entity);
-            return entity.Version;
+            return entity.StoreVersion;
         }
 
         private void SaveNew<TEntity>(TEntity entity)
             where TEntity : class, IDataEntity
         {
-            entity.Id = Guid.NewGuid();
-            entity.Version = 1;
+            entity.Id = CreateId(entity);
+            entity.StoreVersion = 1;
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, entity.Id);
             string contents = JsonConvert.SerializeObject(entity);
             File.WriteAllText(filePath, contents);
         }
 
+        private string CreateId(IDataEntity dataEntity)
+        {
+            return dataEntity.Name.Replace(' ', '_');
+        }
+
         private void SaveExisting<TEntity>(TEntity entity)
             where TEntity : class, IDataEntity
         {
-            entity.Version++;
+            entity.StoreVersion++;
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, entity.Id);
             string contents = JsonConvert.SerializeObject(entity);
             File.WriteAllText(filePath, contents);
@@ -118,12 +123,12 @@ namespace CrossStitch.Core.Data
             return path;
         }
 
-        private string GetEntityFileName(Guid id)
+        private string GetEntityFileName(string id)
         {
             return id.ToString() + ".json";
         }
 
-        private string GetEntityFullFilePath<TEntity>(string basePath, Guid id)
+        private string GetEntityFullFilePath<TEntity>(string basePath, string id)
         {
             return Path.Combine(GetEntityDirectory<TEntity>(basePath), GetEntityFileName(id));
         }

@@ -1,7 +1,6 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Data.Messages;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,7 +27,7 @@ namespace CrossStitch.Core.Apps
             return response.Entities;
         }
 
-        public Instance GetInstance(Guid id)
+        public Instance GetInstance(string id)
         {
             var response = _messageBus
                 .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Get(id))

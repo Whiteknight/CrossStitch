@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Configs\data.json" />
     <None Include="Configs\http.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

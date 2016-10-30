@@ -1,15 +1,14 @@
-﻿using System;
-
-namespace CrossStitch.Core.Data.Entities
+﻿namespace CrossStitch.Core.Data.Entities
 {
     public class Instance : IDataEntity
     {
-        public Guid Id { get; set; }
-        public long Version { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public long StoreVersion { get; set; }
 
-        public Guid ApplicationId { get; set; }
-        public Guid ComponentId { get; set; }
-        public Guid VersionId { get; set; }
+        public string Application { get; set; }
+        public string Component { get; set; }
+        public string Version { get; set; }
 
         public InstanceAdaptorDetails Adaptor { get; set; }
 

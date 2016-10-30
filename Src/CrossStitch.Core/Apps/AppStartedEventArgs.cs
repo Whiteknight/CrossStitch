@@ -4,11 +4,11 @@ namespace CrossStitch.Core.Apps
 {
     public class AppStartedEventArgs : EventArgs
     {
-        public AppStartedEventArgs(Guid instanceId)
+        public AppStartedEventArgs(string instanceId)
         {
             InstanceId = instanceId;
         }
 
-        public Guid InstanceId { get; private set; }
+        public string InstanceId { get; private set; }
     }
 }

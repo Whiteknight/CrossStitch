@@ -18,7 +18,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
             {
                 var request = DataRequest<Application>.GetAll();
                 var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Responses;
+                return response.Responses.SelectMany(dr => dr.Entities.OrEmptyIfNull()).ToList();
             };
 
             Post["/"] = x =>
@@ -29,7 +29,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                     component.Versions = null;
                 var request = DataRequest<Application>.Save(application);
                 var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Responses;
+                return response.Responses.Select(dr => dr.Entity).ToList();
             };
 
             // TODO: Delete application
@@ -52,7 +52,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 string application = x.Application.ToString();
                 var request = DataRequest<Application>.Get(application);
                 var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Responses;
+                return response.Responses.Select(dr => dr.Entity).ToList();
             };
 
             // TODO: Post new Application/Component

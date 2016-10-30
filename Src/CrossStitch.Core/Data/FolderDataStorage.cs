@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,11 +48,6 @@ namespace CrossStitch.Core.Data
             List<TEntity> entities = new List<TEntity>();
             foreach (string file in Directory.EnumerateFiles(entityDirectoryPath))
             {
-                Guid id;
-                bool ok = Guid.TryParse(Path.GetFileNameWithoutExtension(file), out id);
-                if (!ok)
-                    continue;
-
                 var entity = GetEntityFromFile<TEntity>(file);
                 if (entity == null)
                     continue;

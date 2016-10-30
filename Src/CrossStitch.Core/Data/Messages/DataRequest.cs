@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Data.Messages
 {
@@ -106,6 +107,15 @@ namespace CrossStitch.Core.Data.Messages
             return new DataResponse<TEntity>
             {
                 Type = DataResponseType.VersionMismatch
+            };
+        }
+
+        public static DataResponse<TEntity> FoundAll(IEnumerable<TEntity> entities)
+        {
+            return new DataResponse<TEntity>
+            {
+                Type = DataResponseType.Success,
+                Entities = entities.ToList()
             };
         }
     }

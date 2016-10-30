@@ -54,6 +54,12 @@ namespace CrossStitch.Core.Data
         private DataResponse<TEntity> HandleRequest<TEntity>(DataRequest<TEntity> request)
             where TEntity : class, IDataEntity
         {
+            if (request.Type == DataRequestType.GetAll)
+            {
+                var all = _storage.GetAll<TEntity>();
+                return DataResponse<TEntity>.FoundAll(all);
+            }
+
             if (request.Type == DataRequestType.Get)
             {
                 var entity = _storage.Get<TEntity>(request.Id);

@@ -106,6 +106,8 @@
     <Compile Include="Master\Events\NodeRemovedFromCluster.cs" />
     <Compile Include="Master\IClusterNodeManager.cs" />
     <Compile Include="Messages\GenericResponse.cs" />
+    <Compile Include="Node\ApplicationCoordinator.cs" />
+    <Compile Include="Node\Messages\ApplicationMessage.cs" />
     <Compile Include="Timer\MessageTimerModule.cs" />
     <Compile Include="IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />

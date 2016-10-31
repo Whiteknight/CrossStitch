@@ -43,6 +43,15 @@ namespace CrossStitch.Core.Data.Messages
                 Entity = entity
             };
         }
+
+        public static DataRequest<TEntity> Delete(string id)
+        {
+            return new DataRequest<TEntity>
+            {
+                Type = DataRequestType.Delete,
+                Id = id
+            };
+        }
     }
 
     public enum DataResponseType

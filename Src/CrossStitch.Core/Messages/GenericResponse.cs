@@ -2,6 +2,11 @@
 {
     public class GenericResponse
     {
-        public bool Success { get; set; }
+        public GenericResponse(bool success)
+        {
+            Success = success;
+        }
+
+        public bool Success { get; private set; }
     }
 }

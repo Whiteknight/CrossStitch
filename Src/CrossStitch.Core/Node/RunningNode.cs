@@ -21,7 +21,8 @@ namespace CrossStitch.Core.Node
             _modules = new List<IModule>();
             _managedModules = new List<IModule>
             {
-                new MessageTimerModule(messageBus)
+                new MessageTimerModule(messageBus),
+                new ApplicationCoordinator()
             };
         }
 

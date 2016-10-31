@@ -3,6 +3,8 @@ using CrossStitch.App.Utility.Extensions;
 using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Data.Messages;
+using CrossStitch.Core.Messages;
+using CrossStitch.Core.Node.Messages;
 using Nancy;
 using Nancy.ModelBinding;
 using System.Linq;
@@ -23,29 +25,12 @@ namespace CrossStitch.Http.NancyFx.Handlers
 
             Post["/"] = x =>
             {
-                Application application = this.Bind<Application>();
-                application.StoreVersion = 0;
-                foreach (var component in application.Components.OrEmptyIfNull())
-                    component.Versions = null;
-                var request = DataRequest<Application>.Save(application);
-                var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Responses.Select(dr => dr.Entity).ToList();
+                ApplicationChangeRequest request = this.Bind<ApplicationChangeRequest>();
+                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, request);
             };
 
-            // TODO: Delete application
-
-            // TODO: Figure out what we want here, because I don't think we want to just overwrite
-            // all information about components and versions. We probably want to merge only certain
-            // fields.
-            //Put["/"] = x =>
-            //{
-            //    Application application = this.Bind<Application>();
-            //    foreach (var component in application.Components.OrEmptyIfNull())
-            //        component.Versions = null;
-            //    var request = DataRequest<Application>.Save(application);
-            //    var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-            //    return null;
-            //};
+            // TODO: Move application management logic to a new handler, and send data requests through
+            // that. 
 
             Get["/{Application}"] = x =>
             {
@@ -55,15 +40,33 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 return response.Responses.Select(dr => dr.Entity).ToList();
             };
 
+            Put["/{Application}"] = x =>
+            {
+                var request = this.Bind<ApplicationChangeRequest>();
+                request.Id = x.Application.ToString();
+                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Update, request);
+            };
+
+            Delete["/{Application}"] = x =>
+            {
+                var request = new ApplicationChangeRequest
+                {
+                    Id = x.Application.ToString()
+                };
+                return messageBus.Request<ApplicationChangeRequest, GenericResponse>(ApplicationChangeRequest.Delete, request);
+            };
+
             // TODO: Post new Application/Component
             // TODO: Delete Application/Component
 
             Post["/{Application}/components/{Component}/upload"] = x =>
             {
-                var request = new PackageFileUploadRequest();
-                request.Application = x.Application;
-                request.Component = x.Component;
-                request.Contents = Request.Files.Single().Value;
+                var request = new PackageFileUploadRequest
+                {
+                    Application = x.Application,
+                    Component = x.Component,
+                    Contents = Request.Files.Single().Value
+                };
 
                 // TODO: Validate the file. It should be a .zip
                 var response = messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
@@ -76,10 +79,12 @@ namespace CrossStitch.Http.NancyFx.Handlers
 
             Post["/{Application}/components/{Component}/versions/{Version}/createinstance"] = x =>
             {
-                var request = new InstanceCreateRequest();
-                request.ApplicationId = x.Application;
-                request.ComponentId = x.Component;
-                request.VersionId = x.Version;
+                var request = new InstanceCreateRequest
+                {
+                    ApplicationId = x.Application,
+                    ComponentId = x.Component,
+                    VersionId = x.Version
+                };
 
                 HttpFile file = Request.Files.Single();
 

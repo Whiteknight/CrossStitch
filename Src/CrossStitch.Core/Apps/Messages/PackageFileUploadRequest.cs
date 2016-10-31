@@ -1,18 +1,23 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace CrossStitch.Core.Apps.Messages
 {
     public class PackageFileUploadRequest
     {
-        public Guid ApplicationId { get; set; }
-        public Guid ComponentId { get; set; }
+        public string Application { get; set; }
+        public string Component { get; set; }
         public Stream Contents { get; set; }
     }
 
     public class PackageFileUploadResponse
     {
-        public Guid VersionId { get; set; }
-        public string Version { get; set; }
+        public PackageFileUploadResponse(bool success, string version)
+        {
+            Success = success;
+            Version = version;
+        }
+
+        public bool Success { get; private set; }
+        public string Version { get; private set; }
     }
 }

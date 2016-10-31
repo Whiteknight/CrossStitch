@@ -7,23 +7,30 @@ namespace CrossStitch.Core.Apps
     public class AppFileSystem
     {
         private readonly AppsConfiguration _config;
+        private readonly IVersionManager _versions;
 
-        public AppFileSystem(AppsConfiguration config)
+        public AppFileSystem(AppsConfiguration config, IVersionManager versions)
         {
             _config = config;
+            _versions = versions;
         }
 
-        public bool SavePackageToLibrary(string appName, string componentName, string version, Stream contents)
+        public string SavePackageToLibrary(string appName, string componentName, Stream contents)
         {
             string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
             if (!Directory.Exists(libraryDirectoryPath))
                 Directory.CreateDirectory(libraryDirectoryPath);
-            string libraryFilePath = Path.Combine(libraryDirectoryPath, version + ".zip");
+
+            var existingVersions = Directory.EnumerateFiles(libraryDirectoryPath, "*.zip")
+                .Select(f => Path.GetFileNameWithoutExtension(f));
+            var nextVersion = _versions.GetNextAvailableVersion(existingVersions);
+
+            string libraryFilePath = Path.Combine(libraryDirectoryPath, nextVersion + ".zip");
 
             using (var fileStream = File.Open(libraryFilePath, FileMode.Create, FileAccess.Write))
                 contents.CopyTo(fileStream);
 
-            return true;
+            return nextVersion;
         }
 
         public bool UnzipLibraryPackageToRunningBase(string appName, string componentName, string version, string instanceId)

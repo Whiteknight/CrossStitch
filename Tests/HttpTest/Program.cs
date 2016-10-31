@@ -1,4 +1,5 @@
 ﻿using Acquaintance;
+using CrossStitch.Core.Apps;
 using CrossStitch.Core.Data;
 using CrossStitch.Core.Http;
 using CrossStitch.Core.Node;
@@ -24,6 +25,10 @@ namespace HttpTest
                 var dataStorage = new FolderDataStorage(dataConfiguration);
                 var data = new DataModule(dataStorage);
                 runningNode.AddModule(data);
+
+                var appsConfiguration = AppsConfiguration.GetDefault();
+                var apps = new AppsModule(appsConfiguration, null);
+                runningNode.AddModule(apps);
 
                 runningNode.Start();
                 Console.ReadKey();

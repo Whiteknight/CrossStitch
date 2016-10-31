@@ -17,11 +17,13 @@ namespace CrossStitch.Core.Apps
         private AppsDataStorage _dataStorage;
         private RunningNode _node;
         private readonly INetwork _network;
+        private readonly AppFileSystem _fileSystem;
 
         public AppsModule(AppsConfiguration configuration, INetwork network)
         {
             _configuration = configuration;
             _network = network;
+            _fileSystem = new AppFileSystem(_configuration, new DateTimeVersionManager());
         }
 
         public string Name { get { return "Apps"; } }
@@ -29,11 +31,13 @@ namespace CrossStitch.Core.Apps
         public void Start(RunningNode context)
         {
             _node = context;
+            _messageBus = context.MessageBus;
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
+            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(UploadPackageFile);
 
             _dataStorage = new AppsDataStorage(context.MessageBus);
-            _instanceManager = new InstanceManager(_configuration, new AppFileSystem(_configuration), _dataStorage, _network);
+            _instanceManager = new InstanceManager(_configuration, _fileSystem, _dataStorage, _network);
             _instanceManager.AppStarted += InstancesOnAppStarted;
 
             StartupInstances();
@@ -92,6 +96,17 @@ namespace CrossStitch.Core.Apps
                 InstanceId = appStartedEventArgs.InstanceId,
                 NodeId = _node.NodeId
             });
+        }
+
+        private PackageFileUploadResponse UploadPackageFile(PackageFileUploadRequest request)
+        {
+            var application = _dataStorage.GetApplication(request.Application);
+            if (application == null)
+                return new PackageFileUploadResponse(false, null);
+            if (!application.Components.Any(c => c.Name == request.Component))
+                return new PackageFileUploadResponse(false, null);
+            string version = _fileSystem.SavePackageToLibrary(request.Application, request.Component, request.Contents);
+            return new PackageFileUploadResponse(true, version);
         }
     }
 }

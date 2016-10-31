@@ -1,6 +1,5 @@
 ﻿using System.Configuration;
 using System.IO;
-using CrossStitch.Core.Master;
 
 namespace CrossStitch.Core.Configuration
 {
@@ -27,6 +26,8 @@ namespace CrossStitch.Core.Configuration
         public static TConfig GetConfiguration<TConfig>(string fileName)
         {
             string fullPath = FindConfigFile(fileName);
+            // TODO: If the file can't be found, we should show some kind of warning but
+            // provide a default
             if (string.IsNullOrEmpty(fullPath))
                 throw new ConfigurationException("Could not find configuration file " + fileName);
 

@@ -64,15 +64,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Apps\AppDomainAppAdaptor.cs" />
+    <Compile Include="Apps\Adaptors\AppDomainAppAdaptor.cs" />
     <Compile Include="Apps\AppFileSystem.cs" />
     <Compile Include="Apps\AppResourceUsage.cs" />
     <Compile Include="Apps\AppsConfiguration.cs" />
     <Compile Include="Apps\AppsDataStorage.cs" />
     <Compile Include="Apps\AppsModule.cs" />
     <Compile Include="Apps\AppStartedEventArgs.cs" />
+    <Compile Include="Apps\Versions\DateTimeVersionManager.cs" />
+    <Compile Include="Apps\Versions\IVersionManager.cs" />
     <Compile Include="Apps\Messages\AppInstanceEvent.cs" />
-    <Compile Include="Apps\IAppAdaptor.cs" />
+    <Compile Include="Apps\Adaptors\IAppAdaptor.cs" />
     <Compile Include="Apps\InstanceActionResult.cs" />
     <Compile Include="Apps\InstanceAdaptorFactory.cs" />
     <Compile Include="Apps\InstanceManager.cs" />
@@ -80,7 +82,7 @@
     <Compile Include="Apps\Messages\InstanceInformation.cs" />
     <Compile Include="Apps\Messages\InstanceInformationRequest.cs" />
     <Compile Include="Apps\Messages\PackageFileUploadRequest.cs" />
-    <Compile Include="Apps\ProcessAppAdaptor.cs" />
+    <Compile Include="Apps\Adaptors\ProcessAppAdaptor.cs" />
     <Compile Include="Backplane\BackplaneModule.cs" />
     <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />

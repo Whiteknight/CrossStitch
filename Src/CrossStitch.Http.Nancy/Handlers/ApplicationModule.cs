@@ -61,10 +61,11 @@ namespace CrossStitch.Http.NancyFx.Handlers
             Post["/{Application}/components/{Component}/upload"] = x =>
             {
                 var request = new PackageFileUploadRequest();
-                request.ApplicationId = x.Application;
-                request.ComponentId = x.Component;
+                request.Application = x.Application;
+                request.Component = x.Component;
                 request.Contents = Request.Files.Single().Value;
 
+                // TODO: Validate the file. It should be a .zip
                 var response = messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
 
                 return response.Responses;

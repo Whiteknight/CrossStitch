@@ -48,5 +48,16 @@ namespace CrossStitch.Core.Apps
                 return false;
             return true;
         }
+
+        public Application GetApplication(string id)
+        {
+            var response = _messageBus
+                .Request<DataRequest<Application>, DataResponse<Application>>(DataRequest<Application>.Get(id))
+                .Responses
+                .FirstOrDefault(r => r.Type == DataResponseType.Success);
+            if (response == null)
+                return null;
+            return response.Entity;
+        }
     }
 }

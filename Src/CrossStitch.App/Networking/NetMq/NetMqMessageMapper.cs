@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using NetMQ;
+using System.Linq;
 using System.Text;
-using NetMQ;
 
 namespace CrossStitch.App.Networking.NetMq
 {
@@ -18,7 +18,7 @@ namespace CrossStitch.App.Networking.NetMq
             var envelope = MessageEnvelope.CreateNew().Envelope;
             envelope.Header = _serializer.Deserialize<MessageHeader>(source.Pop().Buffer);
             if (envelope.Header.PayloadType == MessagePayloadType.Raw)
-                envelope.RawFrames = source.Select(f => f.ToByteArray(false)).ToList();
+                envelope.RawFrames = source.Select(f => f.ToByteArray()).ToList();
             else if (envelope.Header.PayloadType == MessagePayloadType.Object)
             {
                 envelope.PayloadObjects = source

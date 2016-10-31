@@ -16,7 +16,7 @@ namespace CrossStitch.Core.Data
                 Directory.CreateDirectory(config.DataPath);
         }
 
-        public bool Delete<TEntity>(string id) 
+        public bool Delete<TEntity>(string id)
             where TEntity : class, IDataEntity
         {
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, id);
@@ -28,17 +28,14 @@ namespace CrossStitch.Core.Data
             return false;
         }
 
-        public TEntity Get<TEntity>(string id) 
+        public TEntity Get<TEntity>(string id)
             where TEntity : class, IDataEntity
         {
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, id);
-            if (!File.Exists(filePath))
-                return null;
-
-            return GetEntityFromFile<TEntity>(filePath);
+            return !File.Exists(filePath) ? null : GetEntityFromFile<TEntity>(filePath);
         }
 
-        public IEnumerable<TEntity> GetAll<TEntity>() 
+        public IEnumerable<TEntity> GetAll<TEntity>()
             where TEntity : class, IDataEntity
         {
             string entityDirectoryPath = GetEntityDirectory<TEntity>(_config.DataPath);
@@ -61,21 +58,21 @@ namespace CrossStitch.Core.Data
         {
             if (string.IsNullOrEmpty(entity.Id))
             {
-                SaveNew<TEntity>(entity);
+                SaveNew(entity);
                 return entity.StoreVersion;
             }
 
             var stored = Get<TEntity>(entity.Id);
             if (stored == null)
             {
-                SaveNew<TEntity>(entity);
+                SaveNew(entity);
                 return entity.StoreVersion;
             }
 
             if (entity.StoreVersion != stored.StoreVersion)
                 return DataModule.VersionMismatch;
 
-            SaveExisting<TEntity>(entity);
+            SaveExisting(entity);
             return entity.StoreVersion;
         }
 
@@ -89,7 +86,7 @@ namespace CrossStitch.Core.Data
             File.WriteAllText(filePath, contents);
         }
 
-        private string CreateId(IDataEntity dataEntity)
+        private static string CreateId(IDataEntity dataEntity)
         {
             return dataEntity.Name.Replace(' ', '_');
         }
@@ -103,7 +100,7 @@ namespace CrossStitch.Core.Data
             File.WriteAllText(filePath, contents);
         }
 
-        private TEntity GetEntityFromFile<TEntity>(string filePath)
+        private static TEntity GetEntityFromFile<TEntity>(string filePath)
         {
             string contents = File.ReadAllText(filePath);
             return JsonConvert.DeserializeObject<TEntity>(contents);
@@ -111,15 +108,15 @@ namespace CrossStitch.Core.Data
 
         private string GetEntityDirectory<TEntity>(string basePath)
         {
-            string path = Path.Combine(_config.DataPath, typeof(TEntity).Name);
+            string path = Path.Combine(basePath, typeof(TEntity).Name);
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             return path;
         }
 
-        private string GetEntityFileName(string id)
+        private static string GetEntityFileName(string id)
         {
-            return id.ToString() + ".json";
+            return id + ".json";
         }
 
         private string GetEntityFullFilePath<TEntity>(string basePath, string id)

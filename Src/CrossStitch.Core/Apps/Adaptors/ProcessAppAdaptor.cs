@@ -6,14 +6,13 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Apps.Adaptors
 {
     public class ProcessAppAdaptor : IAppAdaptor
     {
         private readonly Instance _instance;
-        private readonly INetwork _network;
         private Process _process;
-        
+
 
         public event EventHandler<AppStartedEventArgs> AppInitialized;
         private IReceiveChannel _receiver;
@@ -22,8 +21,7 @@ namespace CrossStitch.Core.Apps
         public ProcessAppAdaptor(Instance instance, INetwork network)
         {
             _instance = instance;
-            _network = network;
-            _receiver = _network.CreateReceiveChannel(false);
+            _receiver = network.CreateReceiveChannel(false);
         }
 
         public bool Start()
@@ -89,7 +87,8 @@ namespace CrossStitch.Core.Apps
 
         public AppResourceUsage GetResources()
         {
-            return new AppResourceUsage {
+            return new AppResourceUsage
+            {
                 ProcessorTime = _process.TotalProcessorTime,
                 TotalAllocatedMemory = _process.VirtualMemorySize64,
                 UsedMemory = _process.PagedMemorySize64

@@ -1,5 +1,6 @@
 ﻿using CrossStitch.App.Events;
 using CrossStitch.App.Networking;
+using CrossStitch.Core.Apps.Adaptors;
 using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Data.Entities;
 using System;
@@ -11,17 +12,13 @@ namespace CrossStitch.Core.Apps
 {
     public class InstanceManager : IDisposable
     {
-        private readonly AppsConfiguration _config;
         private readonly AppFileSystem _fileSystem;
-        private readonly AppsDataStorage _storage;
         private readonly InstanceAdaptorFactory _adaptorFactory;
         private ConcurrentDictionary<string, IAppAdaptor> _adaptors;
 
-        public InstanceManager(AppsConfiguration config, AppFileSystem fileSystem, AppsDataStorage storage, INetwork network)
+        public InstanceManager(AppFileSystem fileSystem, INetwork network)
         {
-            _config = config;
             _fileSystem = fileSystem;
-            _storage = storage;
             _adaptorFactory = new InstanceAdaptorFactory(network);
         }
 
@@ -40,7 +37,7 @@ namespace CrossStitch.Core.Apps
                 var result = Start(instance);
                 results.Add(result);
             }
-            
+
             return results;
         }
 
@@ -60,14 +57,15 @@ namespace CrossStitch.Core.Apps
                     bool added = _adaptors.TryAdd(instanceId, adaptor);
                     if (!added)
                     {
-                        return new InstanceActionResult {
+                        return new InstanceActionResult
+                        {
                             InstanceId = instanceId,
                             IsSuccess = false
                         };
                     }
                     adaptor.AppInitialized += AdaptorOnAppInitialized;
                 }
-                
+
                 bool started = adaptor.Start();
                 return new InstanceActionResult
                 {
@@ -95,7 +93,8 @@ namespace CrossStitch.Core.Apps
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
                 {
-                    return new InstanceActionResult {
+                    return new InstanceActionResult
+                    {
                         InstanceId = instanceId,
                         IsSuccess = false
                     };
@@ -132,23 +131,23 @@ namespace CrossStitch.Core.Apps
             return results;
         }
 
-        public InstanceActionResult CreateInstance(ClientApplication application, ApplicationComponent component, ComponentVersion version)
-        {
-            //var instance = new ComponentInstance(Guid.NewGuid(), version.Id) { State = InstanceStateType.Stopped };
-            //bool added = _instances.TryAdd(instance.Id, instance);
-            //if (!added)
-            //    return InstanceActionResult.Failure();
+        //public InstanceActionResult CreateInstance(ClientApplication application, ApplicationComponent component, ComponentVersion version)
+        //{
+        //var instance = new ComponentInstance(Guid.NewGuid(), version.Id) { State = InstanceStateType.Stopped };
+        //bool added = _instances.TryAdd(instance.Id, instance);
+        //if (!added)
+        //    return InstanceActionResult.Failure();
 
-            //bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
-            //if (!ok)
-            //    return InstanceActionResult.Failure();
+        //bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
+        //if (!ok)
+        //    return InstanceActionResult.Failure();
 
-            //return new InstanceActionResult {
-            //    IsSuccess = true,
-            //    InstanceId = instance.Id
-            //};
-            return null;
-        }
+        //return new InstanceActionResult {
+        //    IsSuccess = true,
+        //    InstanceId = instance.Id
+        //};
+        //    return null;
+        //}
 
         public InstanceActionResult RemoveInstance(string instanceId)
         {
@@ -159,7 +158,8 @@ namespace CrossStitch.Core.Apps
 
             _fileSystem.DeleteRunningInstanceDirectory(instanceId);
             _fileSystem.DeleteDataInstanceDirectory(instanceId);
-            return new InstanceActionResult {
+            return new InstanceActionResult
+            {
                 InstanceId = instanceId,
                 IsSuccess = true
             };

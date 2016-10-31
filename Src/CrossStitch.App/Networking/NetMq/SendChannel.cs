@@ -1,6 +1,6 @@
-﻿using System;
-using NetMQ;
+﻿using NetMQ;
 using NetMQ.Sockets;
+using System;
 
 namespace CrossStitch.App.Networking.NetMq
 {
@@ -23,7 +23,7 @@ namespace CrossStitch.App.Networking.NetMq
         public bool Connect(string host, int port)
         {
             _clientSocket = new RequestSocket();
-            string connection = string.Format("tcp://{0}:{1}", host, port);
+            string connection = $"tcp://{host}:{port}";
             _clientSocket.Connect(connection);
             return true;
         }

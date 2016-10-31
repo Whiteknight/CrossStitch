@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using CrossStitch.Core.Apps.Versions;
 
 namespace CrossStitch.Core.Apps
 {
@@ -22,7 +23,7 @@ namespace CrossStitch.Core.Apps
                 Directory.CreateDirectory(libraryDirectoryPath);
 
             var existingVersions = Directory.EnumerateFiles(libraryDirectoryPath, "*.zip")
-                .Select(f => Path.GetFileNameWithoutExtension(f));
+                .Select(Path.GetFileNameWithoutExtension);
             var nextVersion = _versions.GetNextAvailableVersion(existingVersions);
 
             string libraryFilePath = Path.Combine(libraryDirectoryPath, nextVersion + ".zip");
@@ -56,12 +57,12 @@ namespace CrossStitch.Core.Apps
 
         private string GetInstanceRunningDirectory(string instanceId)
         {
-            return Path.Combine(_config.RunningAppBasePath, instanceId.ToString());
+            return Path.Combine(_config.RunningAppBasePath, instanceId);
         }
 
         private string GetInstanceDataDirectoryPath(string instanceId)
         {
-            return Path.Combine(_config.DataBasePath, instanceId.ToString());
+            return Path.Combine(_config.DataBasePath, instanceId);
         }
 
         public bool DeleteRunningInstanceDirectory(string instanceId)

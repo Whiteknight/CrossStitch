@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Apps.Versions
 {
     public interface IVersionManager
     {

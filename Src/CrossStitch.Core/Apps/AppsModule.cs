@@ -1,6 +1,7 @@
 ﻿using Acquaintance;
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Apps.Messages;
+using CrossStitch.Core.Apps.Versions;
 using CrossStitch.Core.Logging.Events;
 using CrossStitch.Core.Node;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ namespace CrossStitch.Core.Apps
 {
     public class AppsModule : IModule
     {
-        private readonly AppsConfiguration _configuration;
         private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
         private InstanceManager _instanceManager;
@@ -21,12 +21,11 @@ namespace CrossStitch.Core.Apps
 
         public AppsModule(AppsConfiguration configuration, INetwork network)
         {
-            _configuration = configuration;
             _network = network;
-            _fileSystem = new AppFileSystem(_configuration, new DateTimeVersionManager());
+            _fileSystem = new AppFileSystem(configuration, new DateTimeVersionManager());
         }
 
-        public string Name { get { return "Apps"; } }
+        public string Name => "Apps";
 
         public void Start(RunningNode context)
         {
@@ -37,7 +36,7 @@ namespace CrossStitch.Core.Apps
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(UploadPackageFile);
 
             _dataStorage = new AppsDataStorage(context.MessageBus);
-            _instanceManager = new InstanceManager(_configuration, _fileSystem, _dataStorage, _network);
+            _instanceManager = new InstanceManager(_fileSystem, _network);
             _instanceManager.AppStarted += InstancesOnAppStarted;
 
             StartupInstances();

@@ -10,16 +10,14 @@ namespace CrossStitch.Core.Backplane
 {
     public sealed class BackplaneModule : IModule
     {
-        private readonly BackplaneConfiguration _configuration;
         private readonly IClusterBackplane _backplane;
         private IMessageBus _messageBus;
         private int _workerThreadId;
         private SubscriptionCollection _subscriptions;
         private Guid _nodeId;
 
-        public BackplaneModule(BackplaneConfiguration configuration, IClusterBackplane backplane)
+        public BackplaneModule(IClusterBackplane backplane)
         {
-            _configuration = configuration;
             _backplane = backplane;
         }
 
@@ -34,7 +32,7 @@ namespace CrossStitch.Core.Backplane
             _backplane.Send(envelope);
         }
 
-        public string Name { get { return "Backplane"; } }
+        public string Name => "Backplane";
 
         public void Start(RunningNode context)
         {
@@ -80,23 +78,20 @@ namespace CrossStitch.Core.Backplane
 
         private void ZoneMemberHandler(object sender, PayloadEventArgs<ZoneMemberEvent> e)
         {
-            if (_messageBus != null)
-                _messageBus.Publish(e);
+            _messageBus?.Publish(e);
         }
 
         private void ClusterMemberHandler(object sender, PayloadEventArgs<ClusterMemberEvent> e)
         {
-            if (_messageBus != null)
-                _messageBus.Publish(e);
+            _messageBus?.Publish(e);
         }
 
         private void MessageReceivedHandler(object sender, PayloadEventArgs<MessageEnvelope> e)
         {
-            if (_messageBus != null)
-                _messageBus.Publish(e);
+            _messageBus?.Publish(e);
         }
 
-        private bool IsMessageSendable(MessageEnvelope envelope)
+        private static bool IsMessageSendable(MessageEnvelope envelope)
         {
             return envelope.Header.ToType == TargetType.Node ||
                    envelope.Header.ToType == TargetType.Zone ||

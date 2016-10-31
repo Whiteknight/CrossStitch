@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Apps.Adaptors
 {
     public interface IAppAdaptor : IDisposable
     {

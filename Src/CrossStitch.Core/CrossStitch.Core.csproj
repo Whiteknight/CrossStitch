@@ -86,8 +86,6 @@
     <Compile Include="Backplane\BackplaneModule.cs" />
     <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
-    <Compile Include="Apps\Application.cs" />
-    <Compile Include="ClientMessageBusProxy.cs" />
     <Compile Include="Data\DataConfiguration.cs" />
     <Compile Include="Data\DataModule.cs" />
     <Compile Include="Data\Entities\Application.cs" />

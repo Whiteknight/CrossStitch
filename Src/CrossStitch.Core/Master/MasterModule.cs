@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Acquaintance;
 using CrossStitch.App.Networking;
-using CrossStitch.Core.Backplane;
-using Acquaintance;
 using CrossStitch.Core.Node;
+using System;
 
 namespace CrossStitch.Core.Master
 {
@@ -13,18 +12,14 @@ namespace CrossStitch.Core.Master
     public class MasterModule : IModule
     {
         // Module responsible for maintaining cluster state
-        private readonly IClusterBackplane _backplane;
         private RunningNode _runningNode;
         private readonly IClusterNodeManager _nodeManager;
-        private readonly IMessageBus _messageBus;
 
-        public MasterModule(IClusterBackplane backplane, IClusterNodeManager nodeManager, IMessageBus messageBus)
+        public MasterModule(IClusterNodeManager nodeManager, IMessageBus messageBus)
         {
-            _backplane = backplane;
             _nodeManager = nodeManager;
-            _messageBus = messageBus;
 
-            _messageBus.Subscribe<MessageEnvelope>(
+            messageBus.Subscribe<MessageEnvelope>(
                 MessageEnvelope.SendEventName,
                 ResolveAppInstanceNodeIdAndSend,
                 IsMessageAddressedToAppInstance,
@@ -32,7 +27,7 @@ namespace CrossStitch.Core.Master
             );
         }
 
-        private bool IsMessageAddressedToAppInstance(MessageEnvelope arg)
+        private static bool IsMessageAddressedToAppInstance(MessageEnvelope arg)
         {
             return arg.Header.ToType == TargetType.AppInstance;
         }
@@ -43,7 +38,7 @@ namespace CrossStitch.Core.Master
             // TODO: Resolve the NodeId for the message and publish again.
         }
 
-        public string Name { get; private set; }
+        public string Name => "Master";
 
         public void Start(RunningNode context)
         {

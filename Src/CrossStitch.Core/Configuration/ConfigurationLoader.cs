@@ -11,9 +11,7 @@ namespace CrossStitch.Core.Configuration
             if (!string.IsNullOrEmpty(basePath))
             {
                 string path = Path.Combine(basePath, fileName);
-                if (File.Exists(path))
-                    return path;
-                return null;
+                return File.Exists(path) ? path : null;
             }
 
             string fullPath = Path.Combine(".\\Configs\\", fileName);

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CrossStitch.App
+﻿namespace CrossStitch.App
 {
     public interface ICallIn
     {

@@ -1,9 +1,8 @@
-﻿using System;
+﻿using CrossStitch.App.Networking.NetMq;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using CrossStitch.App.Networking;
-using CrossStitch.App.Networking.NetMq;
 
 namespace CrossStitch.App
 {
@@ -38,7 +37,7 @@ namespace CrossStitch.App
                 var network = new NetMqNetwork();
                 _context = new AppContext(network, communicationPort);
                 _appInstance = Activator.CreateInstance(type);
-                var method = _appInstance.GetType().GetMethod("Start", new Type[] { typeof (AppContext) });
+                var method = _appInstance.GetType().GetMethod("Start", new[] { typeof(AppContext) });
                 if (method != null)
                 {
                     method.Invoke(_appInstance, new object[] { _context });

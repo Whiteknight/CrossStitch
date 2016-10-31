@@ -1,7 +1,7 @@
-﻿using System;
-using CrossStitch.App.Events;
+﻿using CrossStitch.App.Events;
 using NetMQ;
 using NetMQ.Sockets;
+using System;
 
 namespace CrossStitch.App.Networking.NetMq
 {
@@ -9,7 +9,6 @@ namespace CrossStitch.App.Networking.NetMq
     {
         private ResponseSocket _serverSocket;
         private NetMQPoller _poller;
-        public int Port { get; private set; }
         private readonly NetMqMessageMapper _mapper;
 
         public SingleReceiveChannel()
@@ -22,13 +21,15 @@ namespace CrossStitch.App.Networking.NetMq
             _mapper = mapper;
         }
 
+        public int Port { get; private set; }
+
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
         public void StartListening(string host = null)
         {
             if (_serverSocket != null)
                 throw new Exception("Socket is already listening");
-            string connection = string.Format("tcp://{0}", host ?? "*");
+            string connection = $"tcp://{host ?? "*"}";
             _serverSocket = new ResponseSocket();
             Port = _serverSocket.BindRandomPort(connection);
             _serverSocket.ReceiveReady += ServerSocketOnReceiveReady;
@@ -40,7 +41,7 @@ namespace CrossStitch.App.Networking.NetMq
         {
             if (_serverSocket != null)
                 throw new Exception("Socket is already listening");
-            string connection = string.Format("tcp://{0}:{1}", host ?? "*", port);
+            string connection = $"tcp://{host ?? "*"}:{port}";
             _serverSocket = new ResponseSocket();
             _serverSocket.Bind(connection);
             Port = port;

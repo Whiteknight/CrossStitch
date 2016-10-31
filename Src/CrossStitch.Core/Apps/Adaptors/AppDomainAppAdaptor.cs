@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Policy;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Apps.Adaptors
 {
     public class AppDomainAppAdaptor : IAppAdaptor
     {
@@ -30,8 +30,9 @@ namespace CrossStitch.Core.Apps
         {
             if (_appDomain == null)
                 return AppResourceUsage.Empty();
-            
-            return new AppResourceUsage {
+
+            return new AppResourceUsage
+            {
                 UsedMemory = _appDomain.MonitoringSurvivedMemorySize,
                 TotalAllocatedMemory = _appDomain.MonitoringTotalAllocatedMemorySize,
                 ProcessorTime = _appDomain.MonitoringTotalProcessorTime,
@@ -45,7 +46,7 @@ namespace CrossStitch.Core.Apps
         {
             _receiver.StartListening("127.0.0.1");
 
-            string domainName = "Instance_" + _instance.Id.ToString();
+            string domainName = "Instance_" + _instance.Id;
             var setup = new AppDomainSetup
             {
                 ApplicationName = _instance.FullName,
@@ -60,7 +61,10 @@ namespace CrossStitch.Core.Apps
 
             _appDomain = AppDomain.CreateDomain(domainName, evidence, setup);
             var proxyType = typeof(AppBootloader);
-            _bootloader = (AppBootloader)_appDomain.CreateInstanceFromAndUnwrap(proxyType.Assembly.Location, proxyType.FullName);
+            var location = proxyType.Assembly.Location;
+            if (string.IsNullOrEmpty(location))
+                return false;
+            _bootloader = (AppBootloader)_appDomain.CreateInstanceFromAndUnwrap(location, proxyType.FullName);
             return _bootloader.StartApp(assemblyFullName, _instance.ApplicationClassName, _receiver.Port);
         }
 

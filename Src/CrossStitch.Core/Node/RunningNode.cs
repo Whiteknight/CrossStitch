@@ -17,15 +17,17 @@ namespace CrossStitch.Core.Node
         public RunningNode(NodeConfiguration nodeConfig, IMessageBus messageBus)
         {
             MessageBus = messageBus;
-            
+
             _modules = new List<IModule>();
-            _managedModules = new List<IModule>();
-            _managedModules.Add(new MessageTimerModule(messageBus));
+            _managedModules = new List<IModule>
+            {
+                new MessageTimerModule(messageBus)
+            };
         }
 
         public Guid NodeId { get; set; }
 
-        public IMessageBus MessageBus { get; private set; }
+        public IMessageBus MessageBus { get; }
 
         public void AddModule(IModule module)
         {
@@ -57,7 +59,8 @@ namespace CrossStitch.Core.Node
 
         private NodeStatus GetStatus()
         {
-            return new NodeStatus {
+            return new NodeStatus
+            {
                 AccessedTime = DateTime.Now,
                 RunningModules = _modules.Select(m => m.Name).ToList()
             };
@@ -75,8 +78,7 @@ namespace CrossStitch.Core.Node
 
         public void Dispose()
         {
-            if (_subscriptions != null)
-                _subscriptions.Dispose();
+            _subscriptions?.Dispose();
             foreach (var module in _managedModules)
                 module.Dispose();
             foreach (var module in _modules)

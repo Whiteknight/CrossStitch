@@ -1,15 +1,12 @@
-﻿using System;
-using Acquaintance;
+﻿using Acquaintance;
 using CrossStitch.Core.Node;
+using System;
 
 namespace CrossStitch.Core.Timer
 {
     public class MessageTimerModule : IModule
     {
-        private readonly IMessageBus _messageBus;
-        private readonly int _delaySeconds;
-        private Acquaintance.Timers.MessageTimer _timer;
-        private int _messageId;
+        private readonly Acquaintance.Timers.MessageTimer _timer;
 
         public MessageTimerModule(IMessageBus messageBus)
             : this(messageBus, 10)
@@ -19,12 +16,11 @@ namespace CrossStitch.Core.Timer
         public MessageTimerModule(IMessageBus messageBus, int delaySeconds)
         {
             if (delaySeconds < 1)
-                throw new ArgumentOutOfRangeException("delaySeconds", "delaySeconds must be 1 or higher");
-            _messageBus = messageBus;
-            _timer = new Acquaintance.Timers.MessageTimer(_messageBus, 5000, delaySeconds * 1000);
+                throw new ArgumentOutOfRangeException(nameof(delaySeconds), "delaySeconds must be 1 or higher");
+            _timer = new Acquaintance.Timers.MessageTimer(messageBus, 5000, delaySeconds * 1000);
         }
 
-        public string Name { get { return "Timer";  } }
+        public string Name => "Timer";
 
         public void Start(RunningNode context)
         {

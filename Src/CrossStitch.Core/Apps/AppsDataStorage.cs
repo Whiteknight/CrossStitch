@@ -33,9 +33,7 @@ namespace CrossStitch.Core.Apps
                 .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Get(id))
                 .Responses
                 .FirstOrDefault(r => r.Type == DataResponseType.Success);
-            if (response == null)
-                return null;
-            return response.Entity;
+            return response?.Entity;
         }
 
         public bool Save(Instance instance)
@@ -44,9 +42,7 @@ namespace CrossStitch.Core.Apps
                 .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Save(instance))
                 .Responses
                 .FirstOrDefault(r => r.Type == DataResponseType.Success);
-            if (response == null)
-                return false;
-            return true;
+            return response != null;
         }
 
         public Application GetApplication(string id)
@@ -55,9 +51,7 @@ namespace CrossStitch.Core.Apps
                 .Request<DataRequest<Application>, DataResponse<Application>>(DataRequest<Application>.Get(id))
                 .Responses
                 .FirstOrDefault(r => r.Type == DataResponseType.Success);
-            if (response == null)
-                return null;
-            return response.Entity;
+            return response?.Entity;
         }
     }
 }

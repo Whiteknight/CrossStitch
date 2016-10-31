@@ -7,14 +7,12 @@ namespace CrossStitch.App.Events
         public static void Raise<TArgs>(this EventHandler<TArgs> handler, object sender, TArgs args)
             where TArgs : EventArgs
         {
-            if (handler != null)
-                handler(sender, args);
+            handler?.Invoke(sender, args);
         }
 
         public static void Raise<TPayload>(this EventHandler<PayloadEventArgs<TPayload>> handler, object sender, string command, TPayload payload)
         {
-            if (handler != null)
-                handler(sender, new PayloadEventArgs<TPayload>(command, payload));
+            handler?.Invoke(sender, new PayloadEventArgs<TPayload>(command, payload));
         }
     }
 }

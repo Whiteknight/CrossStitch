@@ -17,9 +17,9 @@ namespace ClusterTest.Master
             var messageBus = new MessageBus();
             var backplaneConfig = BackplaneConfiguration.GetDefault();
             var backplane = new ZyreBackplane(backplaneConfig, "Master", serializer);
-            var backplaneModule = new BackplaneModule(backplaneConfig, backplane);
+            var backplaneModule = new BackplaneModule(backplane);
             var nodeManager = new ClusterNodeManager(messageBus);
-            var masterModule = new MasterModule(backplane, nodeManager, messageBus);
+            var masterModule = new MasterModule(nodeManager, messageBus);
 
             messageBus.Subscribe<NodeAddedToClusterEvent>(NodeAddedToClusterEvent.EventName, NodeAdded);
             messageBus.Subscribe<NodeRemovedFromClusterEvent>(NodeRemovedFromClusterEvent.EventName, NodeRemoved);
@@ -30,7 +30,7 @@ namespace ClusterTest.Master
             {
                 node.AddModule(backplaneModule);
                 node.AddModule(masterModule);
-                
+
                 node.Start();
                 Console.WriteLine("Started MASTER node {0}", node.NodeId);
 

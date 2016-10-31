@@ -17,7 +17,7 @@ namespace CrossStitch.Core.Data
             _storage = storage;
         }
 
-        public string Name { get { return "Data"; } }
+        public string Name => "Data";
 
         public void Start(RunningNode context)
         {
@@ -81,7 +81,7 @@ namespace CrossStitch.Core.Data
                 if (request.Entity == null)
                     return DataResponse<TEntity>.BadRequest();
 
-                var version = _storage.Save<TEntity>(request.Entity);
+                var version = _storage.Save(request.Entity);
                 if (version == VersionMismatch)
                     return DataResponse<TEntity>.VersionMismatch();
                 return DataResponse<TEntity>.Saved(request.Entity);

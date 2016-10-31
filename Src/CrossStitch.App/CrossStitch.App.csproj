@@ -60,6 +60,7 @@
     <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="IMapper.cs" />
     <Compile Include="ISerializer.cs" />
+    <Compile Include="JsonSerializer.cs" />
     <Compile Include="Networking\INetwork.cs" />
     <Compile Include="Networking\IReceiveChannel.cs" />
     <Compile Include="Networking\ISendChannel.cs" />
@@ -70,7 +71,6 @@
     <Compile Include="Networking\NetMq\NetMqMessageMapper.cs" />
     <Compile Include="Networking\NetMq\MultiReceiveChannel.cs" />
     <Compile Include="Networking\NetMq\Network.cs" />
-    <Compile Include="Networking\RawMessage.cs" />
     <Compile Include="Networking\NetMq\SingleReceiveChannel.cs" />
     <Compile Include="Networking\NetMq\SendChannel.cs" />
     <Compile Include="Networking\TargetType.cs" />

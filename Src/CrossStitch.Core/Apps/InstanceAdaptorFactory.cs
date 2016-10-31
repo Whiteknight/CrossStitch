@@ -1,4 +1,5 @@
 ﻿using CrossStitch.App.Networking;
+using CrossStitch.Core.Apps.Adaptors;
 using CrossStitch.Core.Data.Entities;
 using System;
 

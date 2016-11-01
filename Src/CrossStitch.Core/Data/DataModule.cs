@@ -84,6 +84,7 @@ namespace CrossStitch.Core.Data
                 var version = _storage.Save(request.Entity);
                 if (version == VersionMismatch)
                     return DataResponse<TEntity>.VersionMismatch();
+                request.Entity.StoreVersion = version;
                 return DataResponse<TEntity>.Saved(request.Entity);
             }
 

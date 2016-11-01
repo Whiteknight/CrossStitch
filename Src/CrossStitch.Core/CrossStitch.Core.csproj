@@ -107,7 +107,9 @@
     <Compile Include="Master\IClusterNodeManager.cs" />
     <Compile Include="Messages\GenericResponse.cs" />
     <Compile Include="Node\ApplicationCoordinator.cs" />
+    <Compile Include="Node\DataHelperClient.cs" />
     <Compile Include="Node\Messages\ApplicationMessage.cs" />
+    <Compile Include="Node\Messages\ComponentChangeRequest.cs" />
     <Compile Include="Timer\MessageTimerModule.cs" />
     <Compile Include="IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />

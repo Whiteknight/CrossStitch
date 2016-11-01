@@ -26,7 +26,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
             Post["/"] = x =>
             {
                 ApplicationChangeRequest request = this.Bind<ApplicationChangeRequest>();
-                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, request);
+                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, request).Responses.First();
             };
 
             // TODO: Move application management logic to a new handler, and send data requests through
@@ -44,7 +44,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
             {
                 var request = this.Bind<ApplicationChangeRequest>();
                 request.Id = x.Application.ToString();
-                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Update, request);
+                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Update, request).Responses.First();
             };
 
             Delete["/{Application}"] = x =>
@@ -53,11 +53,22 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 {
                     Id = x.Application.ToString()
                 };
-                return messageBus.Request<ApplicationChangeRequest, GenericResponse>(ApplicationChangeRequest.Delete, request);
+                return messageBus.Request<ApplicationChangeRequest, GenericResponse>(ApplicationChangeRequest.Delete, request).Responses.First();
             };
 
-            // TODO: Post new Application/Component
-            // TODO: Delete Application/Component
+            Post["/{Application}/components"] = x =>
+            {
+                var request = this.Bind<ComponentChangeRequest>();
+                request.Application = x.Application.ToString();
+                return messageBus.Request<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Insert, request);
+            };
+            Delete["/{Application}/components/{Component}"] = x =>
+            {
+                var request = new ComponentChangeRequest();
+                request.Application = x.Application.ToString();
+                request.Name = x.Component.ToString();
+                return messageBus.Request<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Delete, request);
+            };
 
             Post["/{Application}/components/{Component}/upload"] = x =>
             {

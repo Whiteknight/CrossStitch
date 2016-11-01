@@ -1,6 +1,5 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data.Entities;
-using CrossStitch.Core.Data.Messages;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Node.Messages;
 using System.Linq;
@@ -12,6 +11,7 @@ namespace CrossStitch.Core.Node
         private SubscriptionCollection _subscriptions;
         private RunningNode _node;
         private IMessageBus _messageBus;
+        private DataHelperClient _data;
 
         public string Name => "ApplicationCoordinator";
 
@@ -20,29 +20,69 @@ namespace CrossStitch.Core.Node
             _node = context;
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _messageBus = context.MessageBus;
+            _data = new DataHelperClient(_messageBus);
 
             _subscriptions.Listen<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, CreateApplication);
             _subscriptions.Listen<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Update, UpdateApplication);
             _subscriptions.Listen<ApplicationChangeRequest, GenericResponse>(ApplicationChangeRequest.Delete, DeleteApplication);
+
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Insert, InsertComponent);
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Update, UpdateComponent);
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Delete, DeleteComponent);
+        }
+
+        private GenericResponse DeleteComponent(ComponentChangeRequest arg)
+        {
+            Application application = _data.Update<Application>(arg.Application, a =>
+            {
+                a.Components = a.Components.Where(c => c.Name != arg.Name).ToList();
+            });
+            return new GenericResponse(application != null);
+        }
+
+        private GenericResponse UpdateComponent(ComponentChangeRequest arg)
+        {
+            bool updated = false;
+            Application application = _data.Update<Application>(arg.Application, a =>
+            {
+                updated = false;
+                var component = a.Components.FirstOrDefault(c => c.Name == arg.Name);
+                if (component != null)
+                {
+                    updated = true;
+                    component.Name = arg.Name;
+                }
+            });
+            return new GenericResponse(application != null && updated);
+        }
+
+        private GenericResponse InsertComponent(ComponentChangeRequest arg)
+        {
+            bool updated = false;
+            Application application = _data.Update<Application>(arg.Application, a =>
+            {
+                updated = false;
+                var component = a.Components.FirstOrDefault(c => c.Name == arg.Name);
+                if (component == null)
+                {
+                    a.Components.Add(new ApplicationComponent
+                    {
+                        Name = arg.Name
+                    });
+                }
+            });
+            return new GenericResponse(application != null && updated);
         }
 
         private GenericResponse DeleteApplication(ApplicationChangeRequest arg)
         {
-            var request = DataRequest<Application>.Delete(arg.Id);
-            var response = _messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-            return new GenericResponse(response.Responses.Any(dr => dr.Type == DataResponseType.Success));
+            bool ok = _data.Delete<Application>(arg.Id);
+            return new GenericResponse(ok);
         }
 
         private Application UpdateApplication(ApplicationChangeRequest arg)
         {
-            var getResponse = _messageBus.Request<DataRequest<Application>, DataResponse<Application>>(DataRequest<Application>.Get(arg.Id));
-            var applicationEntity = getResponse.Responses.Select(dr => dr.Entity).FirstOrDefault();
-            if (applicationEntity == null)
-                return null;
-
-            applicationEntity.Name = arg.Name;
-            var response = _messageBus.Request<DataRequest<Application>, DataResponse<Application>>(DataRequest<Application>.Save(applicationEntity));
-            return response.Responses.Select(r => r.Entity).FirstOrDefault();
+            return _data.Update<Application>(arg.Id, a => a.Name = arg.Name);
         }
 
         // TODO: We also need to broadcast these messages out over the backplane so other nodes keep
@@ -51,15 +91,11 @@ namespace CrossStitch.Core.Node
         private Application CreateApplication(ApplicationChangeRequest arg)
         {
             // TODO: Check that an application with the same name doesn't already exist
-            Application application = new Application
+            return _data.Insert(new Application
             {
                 Name = arg.Name,
-                StoreVersion = 0,
                 NodeId = _node.NodeId
-            };
-            var request = DataRequest<Application>.Save(application);
-            var response = _messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-            return response.Responses.Select(dr => dr.Entity).FirstOrDefault();
+            });
         }
 
         public void Stop()

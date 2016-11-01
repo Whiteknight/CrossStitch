@@ -2,8 +2,8 @@
 {
     public class InstanceCreateRequest
     {
-        public string ApplicationId { get; set; }
-        public string ComponentId { get; set; }
-        public string VersionId { get; set; }
+        public string Application { get; set; }
+        public string Component { get; set; }
+        public string Version { get; set; }
     }
 }

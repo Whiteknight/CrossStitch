@@ -2,8 +2,10 @@
 using CrossStitch.App.Networking;
 using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Apps.Versions;
+using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Logging.Events;
 using CrossStitch.Core.Node;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -34,6 +36,7 @@ namespace CrossStitch.Core.Apps
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(UploadPackageFile);
+            _subscriptions.Listen<Instance, Instance>(Instance.CreateEvent, CreateInstance);
 
             _dataStorage = new AppsDataStorage(context.MessageBus);
             _instanceManager = new InstanceManager(_fileSystem, _network);
@@ -106,6 +109,11 @@ namespace CrossStitch.Core.Apps
                 return new PackageFileUploadResponse(false, null);
             string version = _fileSystem.SavePackageToLibrary(request.Application, request.Component, request.Contents);
             return new PackageFileUploadResponse(true, version);
+        }
+
+        private Instance CreateInstance(Instance arg)
+        {
+            throw new NotImplementedException();
         }
     }
 }

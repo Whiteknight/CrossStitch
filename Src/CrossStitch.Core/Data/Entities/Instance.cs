@@ -2,6 +2,8 @@
 {
     public class Instance : IDataEntity
     {
+        public const string CreateEvent = "Create";
+
         public string Id { get; set; }
         public string Name { get; set; }
         public long StoreVersion { get; set; }

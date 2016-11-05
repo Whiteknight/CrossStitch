@@ -20,13 +20,13 @@ namespace CrossStitch.Http.NancyFx.Handlers
             {
                 var request = DataRequest<Application>.GetAll();
                 var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Responses.SelectMany(dr => dr.Entities.OrEmptyIfNull()).ToList();
+                return response.Entities.OrEmptyIfNull().ToList();
             };
 
             Post["/"] = x =>
             {
                 ApplicationChangeRequest request = this.Bind<ApplicationChangeRequest>();
-                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, request).Responses.First();
+                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, request);
             };
 
             // TODO: Move application management logic to a new handler, and send data requests through
@@ -37,14 +37,14 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 string application = x.Application.ToString();
                 var request = DataRequest<Application>.Get(application);
                 var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Responses.Select(dr => dr.Entity).ToList();
+                return response.Entity;
             };
 
             Put["/{Application}"] = x =>
             {
                 var request = this.Bind<ApplicationChangeRequest>();
                 request.Id = x.Application.ToString();
-                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Update, request).Responses.First();
+                return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Update, request);
             };
 
             Delete["/{Application}"] = x =>
@@ -53,7 +53,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 {
                     Id = x.Application.ToString()
                 };
-                return messageBus.Request<ApplicationChangeRequest, GenericResponse>(ApplicationChangeRequest.Delete, request).Responses.First();
+                return messageBus.Request<ApplicationChangeRequest, GenericResponse>(ApplicationChangeRequest.Delete, request);
             };
 
             Post["/{Application}/components"] = x =>
@@ -80,9 +80,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 };
 
                 // TODO: Validate the file. It should be a .zip
-                var response = messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
-
-                return response.Responses;
+                return messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
             };
 
             // TODO: Get Application/Component/Version
@@ -95,7 +93,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 instance.Component = x.Component.ToString();
                 instance.Version = x.Version.ToString();
 
-                return messageBus.Request<Instance, Instance>(Instance.CreateEvent, instance).Responses.First();
+                return messageBus.Request<Instance, Instance>(Instance.CreateEvent, instance);
             };
         }
     }

@@ -23,15 +23,15 @@ namespace CrossStitch.Core.Data
         {
             _messageBus = context.MessageBus;
             _workerThreadId = context.MessageBus.StartDedicatedWorkerThread();
-            var options = new SubscribeOptions
+            var options = new ListenOptions
             {
                 DispatchType = Acquaintance.Threading.DispatchThreadType.SpecificThread,
                 ThreadId = _workerThreadId
             };
             _subscriptions = new SubscriptionCollection(context.MessageBus);
-            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(HandleRequest, options);
-            _subscriptions.Listen<DataRequest<Instance>, DataResponse<Instance>>(HandleRequest, options);
-            _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(HandleRequest, options);
+            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(HandleRequest, null, options);
+            _subscriptions.Listen<DataRequest<Instance>, DataResponse<Instance>>(HandleRequest, null, options);
+            _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(HandleRequest, null, options);
         }
 
         public void Stop()

@@ -1,7 +1,6 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Node.Messages;
 using Nancy;
-using System.Linq;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
@@ -10,7 +9,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
         public NodeModule(IMessageBus messageBus)
             : base("/node")
         {
-            Get["/"] = _ => messageBus.Request<NodeStatusRequest, NodeStatus>(new NodeStatusRequest()).Responses.First();
+            Get["/"] = _ => messageBus.Request<NodeStatusRequest, NodeStatus>(new NodeStatusRequest());
         }
     }
 }

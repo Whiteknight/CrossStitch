@@ -1,11 +1,7 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data;
-using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Data.Messages;
-using CrossStitch.Core.Messages;
-using CrossStitch.Core.Node.Messages;
 using System;
-using System.Linq;
 
 namespace CrossStitch.Core.Node
 {
@@ -24,19 +20,15 @@ namespace CrossStitch.Core.Node
         {
             return _messageBus
                 .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Get(id))
-                .Responses
-                .Select(dr => dr.Entity)
-                .First();
+                ?.Entity;
         }
 
         public bool Delete<TEntity>(string id)
             where TEntity : class, IDataEntity
         {
-            return _messageBus
-                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Delete(id))
-                .Responses
-                .Select(dr => dr.Type == DataResponseType.Success)
-                .FirstOrDefault();
+            var response = _messageBus
+                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Delete(id));
+            return response.Type == DataResponseType.Success;
         }
 
         public TEntity Insert<TEntity>(TEntity entity)
@@ -44,8 +36,7 @@ namespace CrossStitch.Core.Node
         {
             entity.StoreVersion = 0;
             var request = DataRequest<TEntity>.Save(entity);
-            var response = _messageBus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request);
-            return response.Responses.Select(dr => dr.Entity).FirstOrDefault();
+            return _messageBus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request)?.Entity;
         }
 
         public TEntity Update<TEntity>(string id, Action<TEntity> update)
@@ -57,9 +48,7 @@ namespace CrossStitch.Core.Node
             {
                 update(entity);
                 var response = _messageBus
-                    .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Save(entity))
-                    .Responses
-                    .First();
+                    .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Save(entity));
                 if (response.Type == DataResponseType.Success)
                     return response.Entity;
                 if (response.Type == DataResponseType.VersionMismatch)

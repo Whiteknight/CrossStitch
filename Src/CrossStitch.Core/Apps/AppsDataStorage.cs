@@ -18,9 +18,7 @@ namespace CrossStitch.Core.Apps
         public IEnumerable<Instance> GetAllInstances()
         {
             var response = _messageBus
-                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.GetAll())
-                .Responses
-                .FirstOrDefault(r => r.Type == DataResponseType.Success);
+                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.GetAll());
             if (response == null)
                 return Enumerable.Empty<Instance>();
 
@@ -30,27 +28,21 @@ namespace CrossStitch.Core.Apps
         public Instance GetInstance(string id)
         {
             var response = _messageBus
-                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Get(id))
-                .Responses
-                .FirstOrDefault(r => r.Type == DataResponseType.Success);
+                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Get(id));
             return response?.Entity;
         }
 
         public bool Save(Instance instance)
         {
             var response = _messageBus
-                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Save(instance))
-                .Responses
-                .FirstOrDefault(r => r.Type == DataResponseType.Success);
+                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Save(instance));
             return response != null;
         }
 
         public Application GetApplication(string id)
         {
             var response = _messageBus
-                .Request<DataRequest<Application>, DataResponse<Application>>(DataRequest<Application>.Get(id))
-                .Responses
-                .FirstOrDefault(r => r.Type == DataResponseType.Success);
+                .Request<DataRequest<Application>, DataResponse<Application>>(DataRequest<Application>.Get(id));
             return response?.Entity;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Acquaintance;
+using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Node.Messages;
@@ -29,6 +30,11 @@ namespace CrossStitch.Core.Node
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Insert, InsertComponent);
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Update, UpdateComponent);
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Delete, DeleteComponent);
+
+            _subscriptions.Listen<Instance, Instance>(Instance.CreateEvent, CreateInstance);
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Delete, DeleteInstance);
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Clone, CloneInstance);
+
         }
 
         private GenericResponse DeleteComponent(ComponentChangeRequest arg)
@@ -96,6 +102,35 @@ namespace CrossStitch.Core.Node
                 Name = arg.Name,
                 NodeId = _node.NodeId
             });
+        }
+
+        private Instance CreateInstance(Instance instance)
+        {
+            instance = _data.Insert<Instance>(instance);
+            return instance;
+        }
+
+        private InstanceResponse DeleteInstance(InstanceRequest request)
+        {
+            var stopResponse = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Stop, request);
+            bool deleted = _data.Delete<Instance>(request.Id);
+            return new InstanceResponse
+            {
+                Success = deleted
+            };
+        }
+
+        private InstanceResponse CloneInstance(InstanceRequest request)
+        {
+            var instance = _data.Get<Instance>(request.Id);
+            instance.Id = null;
+            instance.StoreVersion = 0;
+            instance = _data.Insert(instance);
+            return new InstanceResponse
+            {
+                Success = true,
+                Id = instance.Id
+            };
         }
 
         public void Stop()

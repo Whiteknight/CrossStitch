@@ -60,7 +60,7 @@ namespace CrossStitch.Core.Apps
                         return new InstanceActionResult
                         {
                             InstanceId = instanceId,
-                            IsSuccess = false
+                            Success = false
                         };
                     }
                     adaptor.AppInitialized += AdaptorOnAppInitialized;
@@ -70,7 +70,7 @@ namespace CrossStitch.Core.Apps
                 return new InstanceActionResult
                 {
                     InstanceId = instance.Id,
-                    IsSuccess = started
+                    Success = started
                 };
             }
             catch (Exception e)
@@ -79,13 +79,13 @@ namespace CrossStitch.Core.Apps
                 return new InstanceActionResult
                 {
                     InstanceId = instance.Id,
-                    IsSuccess = false,
+                    Success = false,
                     Exception = e
                 };
             }
         }
 
-        public InstanceActionResult Stop(string instanceId, bool persistState)
+        public InstanceActionResult Stop(string instanceId)
         {
             try
             {
@@ -96,14 +96,14 @@ namespace CrossStitch.Core.Apps
                     return new InstanceActionResult
                     {
                         InstanceId = instanceId,
-                        IsSuccess = false
+                        Success = false
                     };
                 }
                 adaptor.Stop();
 
                 return new InstanceActionResult
                 {
-                    IsSuccess = true,
+                    Success = true,
                     InstanceId = instanceId
                 };
             }
@@ -111,41 +111,42 @@ namespace CrossStitch.Core.Apps
             {
                 return new InstanceActionResult
                 {
-                    IsSuccess = false,
+                    Success = false,
                     Exception = e,
                     InstanceId = instanceId
                 };
             }
         }
 
-        public List<InstanceActionResult> StopAll(bool persistState)
+        public List<InstanceActionResult> StopAll()
         {
             var results = new List<InstanceActionResult>();
 
             foreach (var kvp in _adaptors)
             {
-                var result = Stop(kvp.Key, persistState);
+                var result = Stop(kvp.Key);
                 results.Add(result);
             }
 
             return results;
         }
 
-        //public InstanceActionResult CreateInstance(ClientApplication application, ApplicationComponent component, ComponentVersion version)
+        //public InstanceActionResult CreateInstance(Instance instance)
         //{
-        //var instance = new ComponentInstance(Guid.NewGuid(), version.Id) { State = InstanceStateType.Stopped };
-        //bool added = _instances.TryAdd(instance.Id, instance);
-        //if (!added)
-        //    return InstanceActionResult.Failure();
 
-        //bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
-        //if (!ok)
-        //    return InstanceActionResult.Failure();
+        //    bool added = _instances.TryAdd(instance.Id, instance);
+        //    if (!added)
+        //        return InstanceActionResult.Failure();
 
-        //return new InstanceActionResult {
-        //    IsSuccess = true,
-        //    InstanceId = instance.Id
-        //};
+        //    bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
+        //    if (!ok)
+        //        return InstanceActionResult.Failure();
+
+        //    return new InstanceActionResult
+        //    {
+        //        IsSuccess = true,
+        //        InstanceId = instance.Id
+        //    };
         //    return null;
         //}
 
@@ -161,7 +162,7 @@ namespace CrossStitch.Core.Apps
             return new InstanceActionResult
             {
                 InstanceId = instanceId,
-                IsSuccess = true
+                Success = true
             };
         }
 
@@ -179,7 +180,7 @@ namespace CrossStitch.Core.Apps
 
         public void Dispose()
         {
-            StopAll(false);
+            StopAll();
             _adaptors.Clear();
             _adaptors = null;
         }

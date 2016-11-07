@@ -5,7 +5,6 @@ using CrossStitch.Core.Apps.Versions;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Logging.Events;
 using CrossStitch.Core.Node;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,6 +19,7 @@ namespace CrossStitch.Core.Apps
         private RunningNode _node;
         private readonly INetwork _network;
         private readonly AppFileSystem _fileSystem;
+        private DataHelperClient _data;
 
         public AppsModule(AppsConfiguration configuration, INetwork network)
         {
@@ -36,11 +36,13 @@ namespace CrossStitch.Core.Apps
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(GetInstanceInformation);
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(UploadPackageFile);
-            _subscriptions.Listen<Instance, Instance>(Instance.CreateEvent, CreateInstance);
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Start, StartInstance);
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Stop, StopInstance);
 
             _dataStorage = new AppsDataStorage(context.MessageBus);
             _instanceManager = new InstanceManager(_fileSystem, _network);
             _instanceManager.AppStarted += InstancesOnAppStarted;
+            _data = new DataHelperClient(_messageBus);
 
             StartupInstances();
         }
@@ -64,7 +66,7 @@ namespace CrossStitch.Core.Apps
         {
             var instances = _dataStorage.GetAllInstances();
             var results = _instanceManager.StartupActiveInstances(instances);
-            foreach (var result in results.Where(isr => !isr.IsSuccess))
+            foreach (var result in results.Where(isr => !isr.Success))
             {
                 if (result.Instance != null)
                     _dataStorage.Save(result.Instance);
@@ -74,7 +76,7 @@ namespace CrossStitch.Core.Apps
                     Message = "Instance " + result.InstanceId + " failed to start"
                 });
             }
-            foreach (var result in results.Where(isr => isr.IsSuccess))
+            foreach (var result in results.Where(isr => isr.Success))
             {
                 // We don't need to save the Instance here, because we aren't changing its state/
                 // It is still "Started"
@@ -111,9 +113,24 @@ namespace CrossStitch.Core.Apps
             return new PackageFileUploadResponse(true, version);
         }
 
-        private Instance CreateInstance(Instance arg)
+        private InstanceResponse StartInstance(InstanceRequest request)
         {
-            throw new NotImplementedException();
+            var instance = _data.Get<Instance>(request.Id);
+            var result = _instanceManager.Start(instance);
+            return new InstanceResponse
+            {
+                Success = result.Success
+            };
+        }
+
+        private InstanceResponse StopInstance(InstanceRequest request)
+        {
+            var stopResult = _instanceManager.Stop(request.Id);
+            if (!stopResult.Success)
+                return new InstanceResponse { Success = false };
+
+            var updateResult = _data.Update<Instance>(request.Id, instance => instance.State = InstanceStateType.Stopped);
+            return new InstanceResponse { Success = updateResult != null };
         }
     }
 }

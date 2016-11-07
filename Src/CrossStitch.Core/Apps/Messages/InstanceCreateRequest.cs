@@ -1,9 +1,18 @@
 ﻿namespace CrossStitch.Core.Apps.Messages
 {
-    public class InstanceCreateRequest
+    public class InstanceRequest
     {
-        public string Application { get; set; }
-        public string Component { get; set; }
-        public string Version { get; set; }
+        public const string Start = "Start";
+        public const string Stop = "Stop";
+        public const string Clone = "Clone";
+        public const string Delete = "Delete";
+
+        public string Id { get; set; }
+    }
+
+    public class InstanceResponse
+    {
+        public string Id { get; set; }
+        public bool Success { get; set; }
     }
 }

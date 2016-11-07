@@ -24,6 +24,7 @@ namespace CrossStitch.Core.Node
                 new MessageTimerModule(messageBus),
                 new ApplicationCoordinator()
             };
+
         }
 
         public Guid NodeId { get; set; }

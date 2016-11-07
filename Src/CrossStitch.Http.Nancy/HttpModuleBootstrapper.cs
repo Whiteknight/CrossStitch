@@ -4,7 +4,6 @@ using Nancy.Responses.Negotiation;
 
 namespace CrossStitch.Http.NancyFx
 {
-
     public class HttpModuleBootstrapper : Nancy.DefaultNancyBootstrapper
     {
         private readonly IMessageBus _messageBus;

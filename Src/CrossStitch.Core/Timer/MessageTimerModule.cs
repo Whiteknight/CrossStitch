@@ -29,7 +29,7 @@ namespace CrossStitch.Core.Timer
         {
             if (_token != null)
                 return;
-            _token = _messageBus.AddModule(_timer);
+            _token = _messageBus.Modules.Add(_timer);
         }
 
         public void Stop()

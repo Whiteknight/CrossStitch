@@ -49,7 +49,7 @@ namespace CrossStitch.Core.Apps
 
         public void Stop()
         {
-            _instanceManager?.StopAll(false);
+            _instanceManager?.StopAll();
             _instanceManager?.Dispose();
             _instanceManager = null;
             _subscriptions?.Dispose();

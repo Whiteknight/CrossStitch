@@ -34,7 +34,6 @@ namespace CrossStitch.Core.Node
             _subscriptions.Listen<Instance, Instance>(Instance.CreateEvent, CreateInstance);
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Delete, DeleteInstance);
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Clone, CloneInstance);
-
         }
 
         private GenericResponse DeleteComponent(ComponentChangeRequest arg)

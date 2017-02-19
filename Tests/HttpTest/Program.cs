@@ -14,6 +14,7 @@ namespace HttpTest
         {
             var nodeConfig = NodeConfiguration.GetDefault();
             var messageBus = new MessageBus();
+            var network = new CrossStitch.App.Networking.NetMq.NetMqNetwork();
 
             using (var runningNode = new RunningNode(nodeConfig, messageBus))
             {
@@ -27,7 +28,7 @@ namespace HttpTest
                 runningNode.AddModule(data);
 
                 var appsConfiguration = AppsConfiguration.GetDefault();
-                var apps = new AppsModule(appsConfiguration, null);
+                var apps = new AppsModule(appsConfiguration, network);
                 runningNode.AddModule(apps);
 
                 runningNode.Start();

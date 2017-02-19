@@ -37,15 +37,16 @@ namespace CrossStitch.Core.Backplane
         public void Start(RunningNode context)
         {
             _messageBus = context.MessageBus;
-            _workerThreadId = _messageBus.StartDedicatedWorkerThread();
+            _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(_messageBus);
-            _subscriptions.Subscribe<MessageEnvelope>(
-                MessageEnvelope.SendEventName,
-                e => _backplane.Send(e),
-                IsMessageSendable,
-                SubscribeOptions.SpecificThread(_workerThreadId)
-            );
-            _subscriptions.Subscribe<NodeStatus>(NodeStatus.BroadcastEvent, BroadcastNodeStatus);
+            _subscriptions.Subscribe<MessageEnvelope>(s => s
+                .WithChannelName(MessageEnvelope.SendEventName)
+                .Invoke(e => _backplane.Send(e))
+                .OnThread(_workerThreadId)
+                .WithFilter(IsMessageSendable));
+            _subscriptions.Subscribe<NodeStatus>(s => s
+                .WithChannelName(NodeStatus.BroadcastEvent)
+                .Invoke(BroadcastNodeStatus));
 
             // Forward messages from the backplane to the IMessageBus
             _backplane.MessageReceived += MessageReceivedHandler;
@@ -67,13 +68,13 @@ namespace CrossStitch.Core.Backplane
 
             _subscriptions.Dispose();
             _subscriptions = null;
-            _messageBus.StopDedicatedWorkerThread(_workerThreadId);
+            _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
         }
 
         public void Dispose()
         {
             Stop();
-            _messageBus.StopDedicatedWorkerThread(_workerThreadId);
+            _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
         }
 
         private void ZoneMemberHandler(object sender, PayloadEventArgs<ZoneMemberEvent> e)

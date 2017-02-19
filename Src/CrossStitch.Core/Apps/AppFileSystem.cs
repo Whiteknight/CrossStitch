@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿using CrossStitch.Core.Apps.Versions;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using CrossStitch.Core.Apps.Versions;
 
 namespace CrossStitch.Core.Apps
 {
@@ -34,25 +34,40 @@ namespace CrossStitch.Core.Apps
             return nextVersion;
         }
 
-        public bool UnzipLibraryPackageToRunningBase(string appName, string componentName, string version, string instanceId)
+        public class Result
+        {
+            public bool Success { get; set; }
+            public string Path { get; set; }
+
+            public static Result Failure()
+            {
+                return new Result() { Success = false };
+            }
+        }
+
+        public Result UnzipLibraryPackageToRunningBase(string appName, string componentName, string version, string instanceId)
         {
             string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
             if (!Directory.Exists(libraryDirectoryPath))
-                return false;
+                return Result.Failure();
             string libraryFilePath = Path.Combine(libraryDirectoryPath, version + ".zip");
             var runningDirectory = GetInstanceRunningDirectory(instanceId);
             if (Directory.Exists(runningDirectory))
-                return false;
+                return Result.Failure();
             Directory.CreateDirectory(runningDirectory);
 
-            using (var fileStream = File.Open(libraryFilePath, FileMode.Open, FileAccess.Read))
+            using (FileStream fileStream = File.Open(libraryFilePath, FileMode.Open, FileAccess.Read))
             {
-                using (ZipArchive archive = new ZipArchive(fileStream, ZipArchiveMode.Read, true))
+                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Read, true))
                 {
                     archive.ExtractToDirectory(runningDirectory);
                 }
             }
-            return true;
+            return new Result
+            {
+                Success = true,
+                Path = runningDirectory
+            };
         }
 
         private string GetInstanceRunningDirectory(string instanceId)

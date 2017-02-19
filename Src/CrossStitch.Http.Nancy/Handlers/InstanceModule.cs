@@ -11,6 +11,10 @@ namespace CrossStitch.Http.NancyFx.Handlers
         public InstanceModule(IMessageBus messageBus)
             : base("/instances")
         {
+            Get["/"] = _ =>
+            {
+                return messageBus.Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.GetAll());
+            };
             Get["/{Instance}"] = _ =>
             {
                 string instance = _.Instance.ToString();

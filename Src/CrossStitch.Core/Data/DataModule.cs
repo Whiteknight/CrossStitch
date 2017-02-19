@@ -22,16 +22,11 @@ namespace CrossStitch.Core.Data
         public void Start(RunningNode context)
         {
             _messageBus = context.MessageBus;
-            _workerThreadId = context.MessageBus.StartDedicatedWorkerThread();
-            var options = new ListenOptions
-            {
-                DispatchType = Acquaintance.Threading.DispatchThreadType.SpecificThread,
-                ThreadId = _workerThreadId
-            };
+            _workerThreadId = context.MessageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(context.MessageBus);
-            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(HandleRequest, null, options);
-            _subscriptions.Listen<DataRequest<Instance>, DataResponse<Instance>>(HandleRequest, null, options);
-            _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(HandleRequest, null, options);
+            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<Instance>, DataResponse<Instance>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
         }
 
         public void Stop()
@@ -40,7 +35,7 @@ namespace CrossStitch.Core.Data
                 return;
             _subscriptions.Dispose();
             _subscriptions = null;
-            _messageBus.StopDedicatedWorkerThread(_workerThreadId);
+            _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
             _workerThreadId = 0;
         }
 
@@ -50,6 +45,7 @@ namespace CrossStitch.Core.Data
         }
 
         public const int VersionMismatch = -1;
+        public const int InvalidId = -2;
 
         private DataResponse<TEntity> HandleRequest<TEntity>(DataRequest<TEntity> request)
             where TEntity : class, IDataEntity

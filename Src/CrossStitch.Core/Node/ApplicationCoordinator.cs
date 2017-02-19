@@ -23,17 +23,22 @@ namespace CrossStitch.Core.Node
             _messageBus = context.MessageBus;
             _data = new DataHelperClient(_messageBus);
 
-            _subscriptions.Listen<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, CreateApplication);
-            _subscriptions.Listen<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Update, UpdateApplication);
-            _subscriptions.Listen<ApplicationChangeRequest, GenericResponse>(ApplicationChangeRequest.Delete, DeleteApplication);
+            _subscriptions.Listen<ApplicationChangeRequest, Application>(l => l
+                .WithChannelName(ApplicationChangeRequest.Insert)
+                .Invoke(CreateApplication));
+            _subscriptions.Listen<ApplicationChangeRequest, Application>(l => l
+                .WithChannelName(ApplicationChangeRequest.Update)
+                .Invoke(UpdateApplication));
+            _subscriptions.Listen<ApplicationChangeRequest, GenericResponse>(l => l
+                .WithChannelName(ApplicationChangeRequest.Delete)
+                .Invoke(DeleteApplication));
 
-            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Insert, InsertComponent);
-            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Update, UpdateComponent);
-            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Delete, DeleteComponent);
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Insert).Invoke(InsertComponent));
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Update).Invoke(UpdateComponent));
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Delete).Invoke(DeleteComponent));
 
-            _subscriptions.Listen<Instance, Instance>(Instance.CreateEvent, CreateInstance);
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Delete, DeleteInstance);
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(InstanceRequest.Clone, CloneInstance);
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Delete).Invoke(DeleteInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Clone).Invoke(CloneInstance));
         }
 
         private GenericResponse DeleteComponent(ComponentChangeRequest arg)
@@ -101,12 +106,6 @@ namespace CrossStitch.Core.Node
                 Name = arg.Name,
                 NodeId = _node.NodeId
             });
-        }
-
-        private Instance CreateInstance(Instance instance)
-        {
-            instance = _data.Insert<Instance>(instance);
-            return instance;
         }
 
         private InstanceResponse DeleteInstance(InstanceRequest request)

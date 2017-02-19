@@ -21,8 +21,8 @@ namespace ClusterTest.Master
             var nodeManager = new ClusterNodeManager(messageBus);
             var masterModule = new MasterModule(nodeManager, messageBus);
 
-            messageBus.Subscribe<NodeAddedToClusterEvent>(NodeAddedToClusterEvent.EventName, NodeAdded);
-            messageBus.Subscribe<NodeRemovedFromClusterEvent>(NodeRemovedFromClusterEvent.EventName, NodeRemoved);
+            messageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
+            messageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
             //messageBus.Subscribe<ClusterCommandEvent>(ClusterCommandEvent.)
 
             var nodeConfig = NodeConfiguration.GetDefault();

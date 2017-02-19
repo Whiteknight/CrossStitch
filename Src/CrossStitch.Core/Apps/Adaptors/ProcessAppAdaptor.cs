@@ -13,7 +13,6 @@ namespace CrossStitch.Core.Apps.Adaptors
         private readonly Instance _instance;
         private Process _process;
 
-
         public event EventHandler<AppStartedEventArgs> AppInitialized;
         private IReceiveChannel _receiver;
         private RequestSocket _clientSocket;
@@ -32,6 +31,7 @@ namespace CrossStitch.Core.Apps.Adaptors
             var executableName = Path.Combine(_instance.DirectoryPath, _instance.ExecutableName);
             _process = new Process();
 
+            _process.EnableRaisingEvents = true;
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.ErrorDialog = false;
             _process.StartInfo.FileName = executableName;
@@ -48,9 +48,16 @@ namespace CrossStitch.Core.Apps.Adaptors
             _process.BeginErrorReadLine();
             _process.BeginErrorReadLine();
 
+            _process.Exited += ProcessOnExited;
+
             AppInitialized.Raise(this, new AppStartedEventArgs(_instance.Id));
 
             return true;
+        }
+
+        private void ProcessOnExited(object sender, EventArgs e)
+        {
+            Cleanup(false);
         }
 
         private void ProcessOnErrorDataReceived(object sender, DataReceivedEventArgs dataReceivedEventArgs)
@@ -70,18 +77,33 @@ namespace CrossStitch.Core.Apps.Adaptors
 
         public void Stop()
         {
-            _process.CancelErrorRead();
-            _process.CancelOutputRead();
-            _process.Kill();
-            _process = null;
+            Cleanup(true);
+        }
 
-            _receiver.StopListening();
-            _receiver.Dispose();
-            _receiver = null;
+        private void Cleanup(bool requested)
+        {
+            if (_process != null && !_process.HasExited)
+            {
+                _process.CancelErrorRead();
+                _process.CancelOutputRead();
+                _process.Kill();
+                _process = null;
+            }
+            if (_receiver != null)
+            {
+                _receiver.StopListening();
+                _receiver.Dispose();
+                _receiver = null;
+            }
             if (_clientSocket != null)
             {
                 _clientSocket.Dispose();
                 _clientSocket = null;
+            }
+            if (!requested)
+            {
+                // Send some kind of event/message up the chain so that the application can know
+                // that the process has exited
             }
         }
 

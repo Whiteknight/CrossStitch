@@ -17,8 +17,8 @@ namespace ClusterTest.Client
             var backplane = new ZyreBackplane(backplaneConfig, "Client", serializer);
             var backplaneModule = new BackplaneModule(backplane);
 
-            messageBus.Subscribe<NodeAddedToClusterEvent>(NodeAddedToClusterEvent.EventName, NodeAdded);
-            messageBus.Subscribe<NodeRemovedFromClusterEvent>(NodeRemovedFromClusterEvent.EventName, NodeRemoved);
+            messageBus.Subscribe<NodeAddedToClusterEvent>(l => l.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
+            messageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
 
             var nodeConfig = NodeConfiguration.GetDefault();
             using (var node = new RunningNode(nodeConfig, messageBus))

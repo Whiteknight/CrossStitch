@@ -19,11 +19,11 @@ namespace CrossStitch.Core.Master
         {
             _nodeManager = nodeManager;
 
-            messageBus.Subscribe<MessageEnvelope>(
-                MessageEnvelope.SendEventName,
-                ResolveAppInstanceNodeIdAndSend,
-                IsMessageAddressedToAppInstance,
-                SubscribeOptions.Default
+            messageBus.Subscribe<MessageEnvelope>(s => s
+                .WithChannelName(MessageEnvelope.SendEventName)
+                .Invoke(ResolveAppInstanceNodeIdAndSend)
+                .OnWorkerThread()
+                .WithFilter(IsMessageAddressedToAppInstance)
             );
         }
 

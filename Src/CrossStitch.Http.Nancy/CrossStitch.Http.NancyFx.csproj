@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CrossStitch.Http.NancyFx</RootNamespace>
     <AssemblyName>CrossStitch.Http.NancyFx</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Acquaintance, Version=0.5.6157.35963, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Acquaintance.0.6.0-beta\lib\net461\Acquaintance.dll</HintPath>
+    <Reference Include="Acquaintance, Version=0.6.6229.2034, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Acquaintance.1.0.0-rc1\lib\net46\Acquaintance.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Nancy, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Handlers\ApplicationModule.cs" />
+    <Compile Include="Handlers\InstanceModule.cs" />
     <Compile Include="Handlers\NodeRequestHandler.cs" />
     <Compile Include="HttpModuleBootstrapper.cs" />
     <Compile Include="NancyHttpModule.cs" />

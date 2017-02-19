@@ -15,11 +15,11 @@ namespace CrossStitch.Core.Timer
         {
         }
 
-        public MessageTimerModule(IMessageBus messageBus, int delaySeconds)
+        public MessageTimerModule(IMessageBus messageBus, int intervalSeconds)
         {
-            if (delaySeconds < 1)
-                throw new ArgumentOutOfRangeException(nameof(delaySeconds), "delaySeconds must be 1 or higher");
-            _timer = new Acquaintance.Timers.MessageTimer(5000, delaySeconds * 1000);
+            if (intervalSeconds < 1)
+                throw new ArgumentOutOfRangeException(nameof(intervalSeconds), "intervalSeconds must be 1 or higher");
+            _timer = new Acquaintance.Timers.MessageTimer(delayMs: 5000, intervalMs: intervalSeconds * 1000);
             _messageBus = messageBus;
         }
 

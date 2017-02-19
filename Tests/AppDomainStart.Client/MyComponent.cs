@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CrossStitch.App;
+using System;
 using System.IO;
-using CrossStitch.App;
 
 namespace AppDomainStart.Client
 {
@@ -9,12 +9,12 @@ namespace AppDomainStart.Client
         public void Start()
         {
             var communicationPort = AppDomain.CurrentDomain.GetData("_communicationPort");
-            File.WriteAllText("C:/Test/MyComponent.txt", "Started:" + communicationPort);
+            File.AppendAllText("C:/Test/MyComponent.txt", "Started:" + communicationPort + "\n");
         }
 
         public void Stop()
         {
-            File.WriteAllText("C:/Test/MyComponent.txt", "Stopped");
+            File.AppendAllText("C:/Test/MyComponent.txt", "Stopped\n");
         }
     }
 }

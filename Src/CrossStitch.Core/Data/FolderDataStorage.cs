@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -57,17 +58,11 @@ namespace CrossStitch.Core.Data
             where TEntity : class, IDataEntity
         {
             if (string.IsNullOrEmpty(entity.Id))
-            {
-                SaveNew(entity);
-                return entity.StoreVersion;
-            }
+                return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
 
             var stored = Get<TEntity>(entity.Id);
             if (stored == null)
-            {
-                SaveNew(entity);
-                return entity.StoreVersion;
-            }
+                return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
 
             if (entity.StoreVersion != stored.StoreVersion)
                 return DataModule.VersionMismatch;
@@ -76,19 +71,25 @@ namespace CrossStitch.Core.Data
             return entity.StoreVersion;
         }
 
-        private void SaveNew<TEntity>(TEntity entity)
+        private bool SaveNew<TEntity>(TEntity entity)
             where TEntity : class, IDataEntity
         {
             entity.Id = CreateId(entity);
             entity.StoreVersion = 1;
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, entity.Id);
+            if (File.Exists(filePath))
+                return false;
+
             string contents = JsonConvert.SerializeObject(entity);
             File.WriteAllText(filePath, contents);
+            return true;
         }
 
         private static string CreateId(IDataEntity dataEntity)
         {
-            return dataEntity.Name.Replace(' ', '_');
+            if (!string.IsNullOrEmpty(dataEntity.Name))
+                return dataEntity.Name.Replace(' ', '_');
+            return Guid.NewGuid().ToString();
         }
 
         private void SaveExisting<TEntity>(TEntity entity)

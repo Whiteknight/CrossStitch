@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Acquaintance;
 using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Backplane.Events;
 using CrossStitch.Core.Master.Events;
-using Acquaintance;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Master
 {
@@ -20,15 +20,15 @@ namespace CrossStitch.Core.Master
             _messageBus = messageBus;
             _nodes = new ConcurrentDictionary<Guid, ClusterPeerNode>();
         }
-        
+
         public void Start()
         {
             if (_subscriptions != null)
                 throw new Exception("Node manager already started");
 
             _subscriptions = new SubscriptionCollection(_messageBus);
-            _subscriptions.Subscribe<ClusterMemberEvent>(ClusterMemberEvent.EnteringEvent, HandleNodeAdded);
-            _subscriptions.Subscribe<ClusterMemberEvent>(ClusterMemberEvent.ExitingEvent, HandleNodeRemoved);
+            _subscriptions.Subscribe<ClusterMemberEvent>(l => l.WithChannelName(ClusterMemberEvent.EnteringEvent).Invoke(HandleNodeAdded));
+            _subscriptions.Subscribe<ClusterMemberEvent>(l => l.WithChannelName(ClusterMemberEvent.ExitingEvent).Invoke(HandleNodeRemoved));
         }
 
         public void Stop()

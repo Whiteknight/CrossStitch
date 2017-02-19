@@ -1,10 +1,9 @@
-﻿using CrossStitch.App;
-using System;
+﻿using System;
 using System.IO;
 
 namespace AppDomainStart.Client
 {
-    public class MyComponent : ICallIn
+    public class TestStitch
     {
         public void Start()
         {

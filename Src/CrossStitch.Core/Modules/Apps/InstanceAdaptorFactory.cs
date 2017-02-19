@@ -18,8 +18,8 @@ namespace CrossStitch.Core.Apps
         {
             switch (instance.Adaptor.RunMode)
             {
-                case InstanceRunModeType.AppDomain:
-                    return new AppDomainAppAdaptor(instance, _network);
+                //case InstanceRunModeType.AppDomain:
+                //    return new AppDomainAppAdaptor(instance, _network);
                 case InstanceRunModeType.Process:
                     return new ProcessAppAdaptor(instance, _network);
             }

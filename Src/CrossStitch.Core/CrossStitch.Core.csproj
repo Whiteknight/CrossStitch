@@ -64,28 +64,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Apps\Adaptors\AppDomainAppAdaptor.cs" />
-    <Compile Include="Apps\AppFileSystem.cs" />
-    <Compile Include="Apps\AppResourceUsage.cs" />
-    <Compile Include="Apps\AppsConfiguration.cs" />
-    <Compile Include="Apps\AppsDataStorage.cs" />
-    <Compile Include="Apps\AppsModule.cs" />
-    <Compile Include="Apps\AppStartedEventArgs.cs" />
-    <Compile Include="Apps\Versions\DateTimeVersionManager.cs" />
-    <Compile Include="Apps\Versions\IVersionManager.cs" />
-    <Compile Include="Apps\Messages\AppInstanceEvent.cs" />
-    <Compile Include="Apps\Adaptors\IAppAdaptor.cs" />
-    <Compile Include="Apps\InstanceActionResult.cs" />
-    <Compile Include="Apps\InstanceAdaptorFactory.cs" />
-    <Compile Include="Apps\InstanceManager.cs" />
-    <Compile Include="Apps\Messages\InstanceCreateRequest.cs" />
-    <Compile Include="Apps\Messages\InstanceInformation.cs" />
-    <Compile Include="Apps\Messages\InstanceInformationRequest.cs" />
-    <Compile Include="Apps\Messages\PackageFileUploadRequest.cs" />
-    <Compile Include="Apps\Adaptors\ProcessAppAdaptor.cs" />
-    <Compile Include="Backplane\BackplaneModule.cs" />
-    <Compile Include="Backplane\Events\ClusterMemberEvent.cs" />
-    <Compile Include="Backplane\Events\ZoneMemberEvent.cs" />
+    <Compile Include="Modules\Apps\Adaptors\AppDomainAppAdaptor.cs" />
+    <Compile Include="Modules\Apps\AppFileSystem.cs" />
+    <Compile Include="Modules\Apps\AppResourceUsage.cs" />
+    <Compile Include="Modules\Apps\AppsConfiguration.cs" />
+    <Compile Include="Modules\Apps\AppsDataStorage.cs" />
+    <Compile Include="Modules\Apps\AppsModule.cs" />
+    <Compile Include="Modules\Apps\AppStartedEventArgs.cs" />
+    <Compile Include="Modules\Apps\Versions\DateTimeVersionManager.cs" />
+    <Compile Include="Modules\Apps\Versions\IVersionManager.cs" />
+    <Compile Include="Modules\Apps\Messages\AppInstanceEvent.cs" />
+    <Compile Include="Modules\Apps\Adaptors\IAppAdaptor.cs" />
+    <Compile Include="Modules\Apps\InstanceActionResult.cs" />
+    <Compile Include="Modules\Apps\InstanceAdaptorFactory.cs" />
+    <Compile Include="Modules\Apps\InstanceManager.cs" />
+    <Compile Include="Modules\Apps\Messages\InstanceCreateRequest.cs" />
+    <Compile Include="Modules\Apps\Messages\InstanceInformation.cs" />
+    <Compile Include="Modules\Apps\Messages\InstanceInformationRequest.cs" />
+    <Compile Include="Modules\Apps\Messages\PackageFileUploadRequest.cs" />
+    <Compile Include="Modules\Apps\Adaptors\ProcessAppAdaptor.cs" />
+    <Compile Include="Modules\Backplane\BackplaneModule.cs" />
+    <Compile Include="Modules\Backplane\Events\ClusterMemberEvent.cs" />
+    <Compile Include="Modules\Backplane\Events\ZoneMemberEvent.cs" />
     <Compile Include="Data\DataConfiguration.cs" />
     <Compile Include="Data\DataModule.cs" />
     <Compile Include="Data\Entities\Application.cs" />
@@ -95,45 +95,58 @@
     <Compile Include="Data\IDataEntity.cs" />
     <Compile Include="Data\IDataStorage.cs" />
     <Compile Include="Data\Messages\DataRequest.cs" />
+    <Compile Include="Events\EventHandlerExtensions.cs" />
+    <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="Extensions\MessageBusExtensions.cs" />
-    <Compile Include="Http\HttpConfiguration.cs" />
+    <Compile Include="Modules\Http\HttpConfiguration.cs" />
     <Compile Include="Logging\Events\LogEvent.cs" />
-    <Compile Include="Master\ClusterPeerNode.cs" />
-    <Compile Include="Backplane\BackplaneConfiguration.cs" />
+    <Compile Include="Modules\Master\ClusterPeerNode.cs" />
+    <Compile Include="Modules\Backplane\BackplaneConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
     <Compile Include="Configuration\ConfigurationLoader.cs" />
-    <Compile Include="Backplane\IClusterBackplane.cs" />
-    <Compile Include="Master\Events\NodeAddedToClusterEvent.cs" />
-    <Compile Include="Master\Events\NodeRemovedFromCluster.cs" />
-    <Compile Include="Master\IClusterNodeManager.cs" />
+    <Compile Include="Modules\Backplane\IClusterBackplane.cs" />
+    <Compile Include="Modules\Master\Events\NodeAddedToClusterEvent.cs" />
+    <Compile Include="Modules\Master\Events\NodeRemovedFromCluster.cs" />
+    <Compile Include="Modules\Master\IClusterNodeManager.cs" />
     <Compile Include="Messages\GenericResponse.cs" />
+    <Compile Include="Utility\Networking\INetwork.cs" />
+    <Compile Include="Utility\Networking\IReceiveChannel.cs" />
+    <Compile Include="Utility\Networking\ISendChannel.cs" />
+    <Compile Include="Utility\Networking\MessageEnvelope.cs" />
+    <Compile Include="Utility\Networking\MessageHeader.cs" />
+    <Compile Include="Utility\Networking\MessagePayloadType.cs" />
+    <Compile Include="Utility\Networking\MessageReceivedEventArgs.cs" />
+    <Compile Include="Utility\Networking\NetMq\MultiReceiveChannel.cs" />
+    <Compile Include="Utility\Networking\NetMq\NetMqMessageMapper.cs" />
+    <Compile Include="Utility\Networking\NetMq\Network.cs" />
+    <Compile Include="Utility\Networking\NetMq\SendChannel.cs" />
+    <Compile Include="Utility\Networking\NetMq\SingleReceiveChannel.cs" />
+    <Compile Include="Utility\Networking\TargetType.cs" />
     <Compile Include="Node\ApplicationCoordinator.cs" />
     <Compile Include="Node\DataHelperClient.cs" />
     <Compile Include="Node\Messages\ApplicationMessage.cs" />
     <Compile Include="Node\Messages\ComponentChangeRequest.cs" />
-    <Compile Include="Timer\MessageTimerModule.cs" />
+    <Compile Include="Modules\Timer\MessageTimerModule.cs" />
     <Compile Include="IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
     <Compile Include="Node\Messages\NodeStatus.cs" />
     <Compile Include="Node\Messages\NodeStatusRequest.cs" />
     <Compile Include="Node\NodeConfiguration.cs" />
     <Compile Include="Node\RunningNode.cs" />
-    <Compile Include="Master\MasterConfiguration.cs" />
-    <Compile Include="Master\MasterModule.cs" />
-    <Compile Include="Backplane\NodeCommunicationInformation.cs" />
+    <Compile Include="Modules\Master\MasterConfiguration.cs" />
+    <Compile Include="Modules\Master\MasterModule.cs" />
+    <Compile Include="Modules\Backplane\NodeCommunicationInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Backplane\ZyreBackplane.cs" />
-    <Compile Include="Master\ClusterNodeManager.cs" />
-    <Compile Include="Timer\MessageTimerEvent.cs" />
+    <Compile Include="Modules\Backplane\ZyreBackplane.cs" />
+    <Compile Include="Modules\Master\ClusterNodeManager.cs" />
+    <Compile Include="Modules\Timer\MessageTimerEvent.cs" />
+    <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Utility\IMapper.cs" />
+    <Compile Include="Utility\Serialization\ISerializer.cs" />
+    <Compile Include="Utility\Serialization\JsonSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CrossStitch.App\CrossStitch.App.csproj">
-      <Project>{b03dd321-d3df-47bf-b003-a076ae755196}</Project>
-      <Name>CrossStitch.App</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

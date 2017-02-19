@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core.Tests", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Client", "Tests\ClusterTest.Client\ClusterTest.Client.csproj", "{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.App", "Src\CrossStitch.App\CrossStitch.App.csproj", "{B03DD321-D3DF-47BF-B003-A076AE755196}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppStart", "AppStart", "{F9726972-F257-4C9A-BCA5-145726867E1A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppDomainStart.Client", "Tests\AppDomainStart.Client\AppDomainStart.Client.csproj", "{243FB975-9560-4ED3-8E79-A49F8FAE01EC}"
@@ -57,10 +55,6 @@ Global
 		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B03DD321-D3DF-47BF-B003-A076AE755196}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B03DD321-D3DF-47BF-B003-A076AE755196}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B03DD321-D3DF-47BF-B003-A076AE755196}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B03DD321-D3DF-47BF-B003-A076AE755196}.Release|Any CPU.Build.0 = Release|Any CPU
 		{243FB975-9560-4ED3-8E79-A49F8FAE01EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{243FB975-9560-4ED3-8E79-A49F8FAE01EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{243FB975-9560-4ED3-8E79-A49F8FAE01EC}.Release|Any CPU.ActiveCfg = Release|Any CPU

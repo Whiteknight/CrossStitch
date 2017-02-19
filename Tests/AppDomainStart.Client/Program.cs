@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AppDomainStart.Client
 {
@@ -10,6 +6,10 @@ namespace AppDomainStart.Client
     {
         static void Main(string[] args)
         {
+            var stitch = new TestStitch();
+            stitch.Start();
+            Console.ReadKey();
+            stitch.Stop();
         }
     }
 }

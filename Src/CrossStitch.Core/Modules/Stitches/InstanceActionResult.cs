@@ -1,7 +1,7 @@
-﻿using CrossStitch.Core.Data.Entities;
-using System;
+﻿using System;
+using CrossStitch.Core.Data.Entities;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
     public class InstanceActionResult
     {

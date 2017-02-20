@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.App
+﻿namespace CrossStitch.Core.Utility
 {
     public interface IMapper<in TSource, out TDest>
     {

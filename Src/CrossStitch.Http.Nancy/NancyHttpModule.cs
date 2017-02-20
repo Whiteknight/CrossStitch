@@ -1,9 +1,9 @@
 ﻿using Acquaintance;
 using CrossStitch.Core;
-using CrossStitch.Core.Http;
 using CrossStitch.Core.Node;
 using Nancy.Hosting.Self;
 using System;
+using CrossStitch.Core.Modules.Http;
 
 namespace CrossStitch.Http.NancyFx
 {

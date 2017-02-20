@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Apps.Messages
+﻿namespace CrossStitch.Core.Modules.Stitches.Messages
 {
     public class InstanceRequest
     {

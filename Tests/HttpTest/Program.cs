@@ -1,10 +1,11 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Apps;
 using CrossStitch.Core.Data;
-using CrossStitch.Core.Http;
 using CrossStitch.Core.Node;
 using CrossStitch.Http.NancyFx;
 using System;
+using CrossStitch.Core.Modules.Http;
+using CrossStitch.Core.Modules.Stitches;
+using CrossStitch.Core.Utility.Networking.NetMq;
 
 namespace HttpTest
 {
@@ -14,7 +15,7 @@ namespace HttpTest
         {
             var nodeConfig = NodeConfiguration.GetDefault();
             var messageBus = new MessageBus();
-            var network = new CrossStitch.App.Networking.NetMq.NetMqNetwork();
+            var network = new NetMqNetwork();
 
             using (var runningNode = new RunningNode(nodeConfig, messageBus))
             {
@@ -27,8 +28,8 @@ namespace HttpTest
                 var data = new DataModule(dataStorage);
                 runningNode.AddModule(data);
 
-                var appsConfiguration = AppsConfiguration.GetDefault();
-                var apps = new AppsModule(appsConfiguration, network);
+                var appsConfiguration = StitchesConfiguration.GetDefault();
+                var apps = new StitchesModule(appsConfiguration, network);
                 runningNode.AddModule(apps);
 
                 runningNode.Start();

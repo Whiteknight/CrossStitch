@@ -1,10 +1,10 @@
 ﻿using Acquaintance;
 using Acquaintance.Timers;
 using CrossStitch.Core.Node.Messages;
-using CrossStitch.Core.Timer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Modules.Timer;
 
 namespace CrossStitch.Core.Node
 {

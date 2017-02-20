@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Apps.Messages;
-using CrossStitch.Core.Backplane;
+using CrossStitch.Core.Modules.Backplane;
+using CrossStitch.Core.Modules.Stitches.Messages;
 
-namespace CrossStitch.Core.Master
+namespace CrossStitch.Core.Modules.Master
 {
     public class ClusterPeerNode
     {

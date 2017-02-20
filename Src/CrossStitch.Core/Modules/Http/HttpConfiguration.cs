@@ -1,6 +1,6 @@
 ﻿using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Http
+namespace CrossStitch.Core.Modules.Http
 {
     public class HttpConfiguration
     {

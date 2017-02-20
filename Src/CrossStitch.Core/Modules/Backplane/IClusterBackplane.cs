@@ -1,10 +1,10 @@
 ﻿using System;
-using CrossStitch.App.Events;
-using CrossStitch.App.Networking;
-using CrossStitch.Core.Backplane.Events;
+using CrossStitch.Core.Events;
+using CrossStitch.Core.Modules.Backplane.Events;
 using CrossStitch.Core.Node;
+using CrossStitch.Core.Utility.Networking;
 
-namespace CrossStitch.Core.Backplane
+namespace CrossStitch.Core.Modules.Backplane
 {
     public interface IClusterBackplane : IDisposable
     {

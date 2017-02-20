@@ -1,33 +1,33 @@
 ﻿using Acquaintance;
-using CrossStitch.App.Networking;
-using CrossStitch.Core.Apps.Messages;
-using CrossStitch.Core.Apps.Versions;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Logging.Events;
+using CrossStitch.Core.Modules.Stitches.Messages;
+using CrossStitch.Core.Modules.Stitches.Versions;
 using CrossStitch.Core.Node;
+using CrossStitch.Core.Utility.Networking;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
-    public class AppsModule : IModule
+    public class StitchesModule : IModule
     {
         private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
         private InstanceManager _instanceManager;
-        private AppsDataStorage _dataStorage;
+        private StitchesdataStorage _dataStorage;
         private RunningNode _node;
         private readonly INetwork _network;
-        private readonly AppFileSystem _fileSystem;
+        private readonly StitchFileSystem _fileSystem;
         private DataHelperClient _data;
 
-        public AppsModule(AppsConfiguration configuration, INetwork network)
+        public StitchesModule(StitchesConfiguration configuration, INetwork network)
         {
             _network = network;
-            _fileSystem = new AppFileSystem(configuration, new DateTimeVersionManager());
+            _fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
         }
 
-        public string Name => "Apps";
+        public string Name => "Stitches";
 
         public void Start(RunningNode context)
         {
@@ -41,7 +41,7 @@ namespace CrossStitch.Core.Apps
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Start).Invoke(StartInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Stop).Invoke(StopInstance));
 
-            _dataStorage = new AppsDataStorage(context.MessageBus);
+            _dataStorage = new StitchesdataStorage(context.MessageBus);
             _instanceManager = new InstanceManager(_fileSystem, _network);
             _instanceManager.AppStarted += InstancesOnAppStarted;
             _data = new DataHelperClient(_messageBus);
@@ -95,11 +95,11 @@ namespace CrossStitch.Core.Apps
             return _instanceManager.GetInstanceInformation();
         }
 
-        private void InstancesOnAppStarted(object sender, AppStartedEventArgs appStartedEventArgs)
+        private void InstancesOnAppStarted(object sender, StitchStartedEventArgs stitchStartedEventArgs)
         {
             _messageBus.Publish("Started", new AppInstanceEvent
             {
-                InstanceId = appStartedEventArgs.InstanceId,
+                InstanceId = stitchStartedEventArgs.InstanceId,
                 NodeId = _node.NodeId
             });
         }

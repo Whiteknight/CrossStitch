@@ -1,7 +1,7 @@
 using Acquaintance;
-using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Data.Messages;
+using CrossStitch.Core.Modules.Stitches.Messages;
 using Nancy;
 
 namespace CrossStitch.Http.NancyFx.Handlers

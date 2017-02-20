@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CrossStitch.Core.Master
+namespace CrossStitch.Core.Modules.Master
 {
     public interface IClusterNodeManager : IDisposable
     {

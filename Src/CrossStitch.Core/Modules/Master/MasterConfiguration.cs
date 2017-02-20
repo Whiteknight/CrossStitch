@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using CrossStitch.Core.Backplane;
 using CrossStitch.Core.Configuration;
+using CrossStitch.Core.Modules.Backplane;
 
-namespace CrossStitch.Core.Master
+namespace CrossStitch.Core.Modules.Master
 {
     public enum NodeDetectionType
     {

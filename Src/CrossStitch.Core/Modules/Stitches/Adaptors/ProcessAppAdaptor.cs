@@ -1,19 +1,19 @@
-﻿using CrossStitch.App.Events;
-using CrossStitch.App.Networking;
-using CrossStitch.Core.Data.Entities;
-using NetMQ.Sockets;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
+using CrossStitch.Core.Data.Entities;
+using CrossStitch.Core.Events;
+using CrossStitch.Core.Utility.Networking;
+using NetMQ.Sockets;
 
-namespace CrossStitch.Core.Apps.Adaptors
+namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
     public class ProcessAppAdaptor : IAppAdaptor
     {
         private readonly Instance _instance;
         private Process _process;
 
-        public event EventHandler<AppStartedEventArgs> AppInitialized;
+        public event EventHandler<StitchStartedEventArgs> AppInitialized;
         private IReceiveChannel _receiver;
         private RequestSocket _clientSocket;
 
@@ -50,7 +50,7 @@ namespace CrossStitch.Core.Apps.Adaptors
 
             _process.Exited += ProcessOnExited;
 
-            AppInitialized.Raise(this, new AppStartedEventArgs(_instance.Id));
+            AppInitialized.Raise(this, new StitchStartedEventArgs(_instance.Id));
 
             return true;
         }
@@ -107,9 +107,9 @@ namespace CrossStitch.Core.Apps.Adaptors
             }
         }
 
-        public AppResourceUsage GetResources()
+        public StitchResourceUsage GetResources()
         {
-            return new AppResourceUsage
+            return new StitchResourceUsage
             {
                 ProcessorTime = _process.TotalProcessorTime,
                 TotalAllocatedMemory = _process.VirtualMemorySize64,

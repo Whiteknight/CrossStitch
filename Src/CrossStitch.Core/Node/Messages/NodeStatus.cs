@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CrossStitch.Core.Apps.Messages;
+using CrossStitch.Core.Modules.Stitches.Messages;
 
 namespace CrossStitch.Core.Node.Messages
 {

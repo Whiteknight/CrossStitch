@@ -1,16 +1,16 @@
-﻿using CrossStitch.Core.Apps.Versions;
+﻿using CrossStitch.Core.Modules.Stitches.Versions;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
-    public class AppFileSystem
+    public class StitchFileSystem
     {
-        private readonly AppsConfiguration _config;
+        private readonly StitchesConfiguration _config;
         private readonly IVersionManager _versions;
 
-        public AppFileSystem(AppsConfiguration config, IVersionManager versions)
+        public StitchFileSystem(StitchesConfiguration config, IVersionManager versions)
         {
             _config = config;
             _versions = versions;
@@ -100,7 +100,7 @@ namespace CrossStitch.Core.Apps
             return true;
         }
 
-        public void GetInstanceDiskUsage(string instanceId, AppResourceUsage usage)
+        public void GetInstanceDiskUsage(string instanceId, StitchResourceUsage usage)
         {
             var runningDirectory = GetInstanceRunningDirectory(instanceId);
             usage.DiskAppUsageBytes = GetDirectorySizeOnDisk(runningDirectory);

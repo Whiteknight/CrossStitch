@@ -1,9 +1,9 @@
-﻿using CrossStitch.App.Utility.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Utility.Extensions;
 
-namespace CrossStitch.App.Networking
+namespace CrossStitch.Core.Utility.Networking
 {
     public class MessageEnvelope
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.App.Events
+namespace CrossStitch.Core.Events
 {
     public class PayloadEventArgs<TPayload> : EventArgs
     {

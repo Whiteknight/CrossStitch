@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Master.Events
+﻿namespace CrossStitch.Core.Modules.Master.Events
 {
     public class NodeRemovedFromClusterEvent
     {

@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using System.Text;
+﻿using System.Text;
+using Newtonsoft.Json;
 
-namespace CrossStitch.App
+namespace CrossStitch.Core.Utility.Serialization
 {
     public class JsonSerializer : ISerializer
     {

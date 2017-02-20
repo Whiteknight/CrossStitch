@@ -1,9 +1,9 @@
-﻿using CrossStitch.App.Networking;
-using CrossStitch.Core.Apps.Adaptors;
+﻿using System;
 using CrossStitch.Core.Data.Entities;
-using System;
+using CrossStitch.Core.Modules.Stitches.Adaptors;
+using CrossStitch.Core.Utility.Networking;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
     public class InstanceAdaptorFactory
     {

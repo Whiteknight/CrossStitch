@@ -1,15 +1,15 @@
 ﻿using System;
-using CrossStitch.App;
-using CrossStitch.App.Events;
-using CrossStitch.App.Networking;
-using CrossStitch.App.Networking.NetMq;
-using CrossStitch.App.Utility.Extensions;
-using CrossStitch.Core.Backplane.Events;
+using CrossStitch.Core.Events;
+using CrossStitch.Core.Modules.Backplane.Events;
 using CrossStitch.Core.Node;
+using CrossStitch.Core.Utility.Extensions;
+using CrossStitch.Core.Utility.Networking;
+using CrossStitch.Core.Utility.Networking.NetMq;
+using CrossStitch.Core.Utility.Serialization;
 using NetMQ.Zyre;
 using NetMQ.Zyre.ZyreEvents;
 
-namespace CrossStitch.Core.Backplane
+namespace CrossStitch.Core.Modules.Backplane
 {
     public sealed class ZyreBackplane : IClusterBackplane
     {

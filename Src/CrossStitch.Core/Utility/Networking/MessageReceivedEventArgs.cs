@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.App.Networking
+namespace CrossStitch.Core.Utility.Networking
 {
     public class MessageReceivedEventArgs : EventArgs
     {

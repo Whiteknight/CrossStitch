@@ -1,17 +1,17 @@
 ﻿using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
-    public class AppsConfiguration
+    public class StitchesConfiguration
     {
-        public static AppsConfiguration GetDefault()
+        public static StitchesConfiguration GetDefault()
         {
-            return ConfigurationLoader.GetConfiguration<AppsConfiguration>("apps.json");
+            return ConfigurationLoader.GetConfiguration<StitchesConfiguration>("apps.json");
         }
 
         public void SetDefaults()
         {
-            
+
         }
 
         public string DataBasePath { get; set; }

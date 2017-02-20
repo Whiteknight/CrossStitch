@@ -1,13 +1,13 @@
-﻿using Acquaintance;
-using CrossStitch.Core.Backplane;
-using CrossStitch.Core.Backplane.Events;
-using CrossStitch.Core.Master.Events;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Acquaintance;
+using CrossStitch.Core.Modules.Backplane;
+using CrossStitch.Core.Modules.Backplane.Events;
+using CrossStitch.Core.Modules.Master.Events;
 
-namespace CrossStitch.Core.Master
+namespace CrossStitch.Core.Modules.Master
 {
     public sealed class ClusterNodeManager : IClusterNodeManager
     {

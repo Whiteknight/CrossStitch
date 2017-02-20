@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.App.Networking
+﻿namespace CrossStitch.Core.Utility.Networking
 {
     public enum MessagePayloadType
     {

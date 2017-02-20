@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Backplane
+namespace CrossStitch.Core.Modules.Backplane
 {
     public class BackplaneConfiguration
     {

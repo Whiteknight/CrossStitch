@@ -1,7 +1,7 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Apps.Messages;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Node.Messages;
 using System.Linq;
 

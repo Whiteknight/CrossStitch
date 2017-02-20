@@ -1,9 +1,9 @@
-﻿using Acquaintance;
-using CrossStitch.App.Networking;
+﻿using System;
+using Acquaintance;
 using CrossStitch.Core.Node;
-using System;
+using CrossStitch.Core.Utility.Networking;
 
-namespace CrossStitch.Core.Master
+namespace CrossStitch.Core.Modules.Master
 {
     // The master module maintains detailed lists of status and configuration for nodes in the cluster
     // It periodically pings nodes to make sure all information is up to date.

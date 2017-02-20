@@ -1,6 +1,6 @@
-﻿using CrossStitch.App.Networking.NetMq;
-using CrossStitch.Core.Apps;
-using System;
+﻿using System;
+using CrossStitch.Core.Modules.Stitches;
+using CrossStitch.Core.Utility.Networking.NetMq;
 
 namespace AppDomainStart.Server
 {
@@ -22,9 +22,9 @@ namespace AppDomainStart.Server
             //adaptor.Stop();
         }
 
-        private static void AdaptorOnAppInitialized(object sender, AppStartedEventArgs appStartedEventArgs)
+        private static void AdaptorOnAppInitialized(object sender, StitchStartedEventArgs stitchStartedEventArgs)
         {
-            Console.WriteLine("Started app:" + appStartedEventArgs.InstanceId);
+            Console.WriteLine("Started app:" + stitchStartedEventArgs.InstanceId);
         }
     }
 }

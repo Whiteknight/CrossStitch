@@ -1,7 +1,7 @@
-﻿using CrossStitch.Core.Data.Entities;
-using System;
+﻿using System;
+using CrossStitch.Core.Data.Entities;
 
-namespace CrossStitch.Core.Apps.Messages
+namespace CrossStitch.Core.Modules.Stitches.Messages
 {
     public class InstanceInformation
     {

@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.App
+﻿namespace CrossStitch.Core.Utility.Serialization
 {
     public interface ISerializer
     {

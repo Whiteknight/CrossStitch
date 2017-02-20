@@ -1,28 +1,28 @@
-﻿using CrossStitch.App.Events;
-using CrossStitch.App.Networking;
-using CrossStitch.Core.Apps.Adaptors;
-using CrossStitch.Core.Apps.Messages;
-using CrossStitch.Core.Data.Entities;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Data.Entities;
+using CrossStitch.Core.Events;
+using CrossStitch.Core.Modules.Stitches.Adaptors;
+using CrossStitch.Core.Modules.Stitches.Messages;
+using CrossStitch.Core.Utility.Networking;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
     public class InstanceManager : IDisposable
     {
-        private readonly AppFileSystem _fileSystem;
+        private readonly StitchFileSystem _fileSystem;
         private readonly InstanceAdaptorFactory _adaptorFactory;
         private ConcurrentDictionary<string, IAppAdaptor> _adaptors;
 
-        public InstanceManager(AppFileSystem fileSystem, INetwork network)
+        public InstanceManager(StitchFileSystem fileSystem, INetwork network)
         {
             _fileSystem = fileSystem;
             _adaptorFactory = new InstanceAdaptorFactory(network);
         }
 
-        public event EventHandler<AppStartedEventArgs> AppStarted;
+        public event EventHandler<StitchStartedEventArgs> AppStarted;
 
         public List<InstanceActionResult> StartupActiveInstances(IEnumerable<Instance> instances)
         {
@@ -166,12 +166,12 @@ namespace CrossStitch.Core.Apps
             };
         }
 
-        public AppResourceUsage GetInstanceResources(string instanceId)
+        public StitchResourceUsage GetInstanceResources(string instanceId)
         {
             IAppAdaptor adaptor;
             bool found = _adaptors.TryGetValue(instanceId, out adaptor);
             if (!found)
-                return AppResourceUsage.Empty();
+                return StitchResourceUsage.Empty();
 
             var usage = adaptor.GetResources();
             _fileSystem.GetInstanceDiskUsage(instanceId, usage);
@@ -185,14 +185,14 @@ namespace CrossStitch.Core.Apps
             _adaptors = null;
         }
 
-        private void AdaptorOnAppInitialized(object sender, AppStartedEventArgs appStartedEventArgs)
+        private void AdaptorOnAppInitialized(object sender, StitchStartedEventArgs stitchStartedEventArgs)
         {
             //ComponentInstance instance;
             //bool found = _instances.TryGetValue(appStartedEventArgs.InstanceId, out instance);
             //if (!found)
             //    return;
             //instance.State = InstanceStateType.Running;
-            AppStarted.Raise(this, appStartedEventArgs);
+            AppStarted.Raise(this, stitchStartedEventArgs);
         }
 
         public List<InstanceInformation> GetInstanceInformation()

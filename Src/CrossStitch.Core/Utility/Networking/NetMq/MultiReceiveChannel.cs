@@ -1,9 +1,10 @@
-﻿using CrossStitch.App.Events;
+﻿using System;
+using CrossStitch.Core.Events;
+using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
 using NetMQ.Sockets;
-using System;
 
-namespace CrossStitch.App.Networking.NetMq
+namespace CrossStitch.Core.Utility.Networking.NetMq
 {
     public class MultiReceiveChannel : IReceiveChannel
     {

@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Timer
+﻿namespace CrossStitch.Core.Modules.Timer
 {
     public class MessageTimerEvent
     {

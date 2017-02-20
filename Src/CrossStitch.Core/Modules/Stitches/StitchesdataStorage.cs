@@ -4,13 +4,13 @@ using CrossStitch.Core.Data.Messages;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
-    public class AppsDataStorage
+    public class StitchesdataStorage
     {
         private readonly IMessageBus _messageBus;
 
-        public AppsDataStorage(IMessageBus messageBus)
+        public StitchesdataStorage(IMessageBus messageBus)
         {
             _messageBus = messageBus;
         }

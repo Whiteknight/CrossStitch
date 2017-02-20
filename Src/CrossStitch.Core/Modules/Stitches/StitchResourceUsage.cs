@@ -1,17 +1,17 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Apps
+namespace CrossStitch.Core.Modules.Stitches
 {
-    public class AppResourceUsage
+    public class StitchResourceUsage
     {
         public long UsedMemory { get; set; }
         public long TotalAllocatedMemory { get; set; }
         public TimeSpan ProcessorTime { get; set; }
         public long DiskAppUsageBytes { get; set; }
         public long DiskDataUsageBytes { get; set; }
-        public static AppResourceUsage Empty()
+        public static StitchResourceUsage Empty()
         {
-            return new AppResourceUsage();
+            return new StitchResourceUsage();
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using Acquaintance;
-using CrossStitch.App;
-using CrossStitch.Core.Backplane;
-using CrossStitch.Core.Master;
-using CrossStitch.Core.Master.Events;
 using CrossStitch.Core.Node;
 using System;
+using CrossStitch.Core.Modules.Backplane;
+using CrossStitch.Core.Modules.Master;
+using CrossStitch.Core.Modules.Master.Events;
+using CrossStitch.Core.Utility.Serialization;
 
 namespace ClusterTest.Master
 {

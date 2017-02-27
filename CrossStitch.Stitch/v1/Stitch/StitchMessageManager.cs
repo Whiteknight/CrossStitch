@@ -2,22 +2,22 @@
 using System.Linq;
 using System.Threading;
 
-namespace CrossStitch.Stitch.v1
+namespace CrossStitch.Stitch.v1.Stitch
 {
-    public class StitchConsoleManager : IDisposable
+    public class StitchMessageManager : IDisposable
     {
-        private readonly IMessageProcessor _processor;
-        private readonly StitchMessageReader _reader;
-        private readonly StitchMessageSender _sender;
+        private readonly IToStitchMessageProcessor _processor;
+        private readonly ToStitchMessageReader _reader;
+        private readonly FromStitchMessageSender _sender;
 
-        public StitchConsoleManager(IMessageProcessor processor, StitchMessageReader reader = null, StitchMessageSender sender = null)
+        public StitchMessageManager(IToStitchMessageProcessor processor, ToStitchMessageReader reader = null, FromStitchMessageSender sender = null)
         {
             if (processor == null)
                 throw new ArgumentNullException(nameof(processor));
 
             _processor = processor;
-            _reader = reader ?? new StitchMessageReader(Console.OpenStandardInput());
-            _sender = sender ?? new StitchMessageSender(Console.OpenStandardOutput());
+            _reader = reader ?? new ToStitchMessageReader(Console.OpenStandardInput());
+            _sender = sender ?? new FromStitchMessageSender(Console.OpenStandardOutput());
         }
 
         public void StartRunLoop()

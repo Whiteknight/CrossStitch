@@ -1,17 +1,18 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Newtonsoft.Json;
 
-namespace CrossStitch.Stitch.v1
+namespace CrossStitch.Stitch.v1.Stitch
 {
-    public class StitchMessageReader : IDisposable
+    // Message reader to read messages from the Core to the Stitch
+    public class ToStitchMessageReader : IDisposable
     {
         private readonly StreamReader _stdin;
         private const int ReadTimeoutMs = 10000;
 
-        public StitchMessageReader(Stream stdin)
+        public ToStitchMessageReader(Stream stdin)
         {
             _stdin = new StreamReader(stdin);
         }

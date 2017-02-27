@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Text;
 using System.Threading;
+using CrossStitch.Stitch.v1.Stitch;
 
 namespace CrossStitch.Stitch.Tests
 {
@@ -21,7 +22,7 @@ namespace CrossStitch.Stitch.Tests
         public void ReadMessage_Test1()
         {
             var input = CreateInputStream("{Id: 1}\nend\n");
-            var target = new StitchMessageReader(input);
+            var target = new ToStitchMessageReader(input);
             var result = target.ReadMessage(CancellationToken.None);
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
@@ -36,7 +37,7 @@ namespace CrossStitch.Stitch.Tests
 }
 end
 ");
-            var target = new StitchMessageReader(input);
+            var target = new ToStitchMessageReader(input);
             var result = target.ReadMessage(CancellationToken.None);
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
@@ -52,7 +53,7 @@ end
 }
 end
 ");
-            var target = new StitchMessageReader(input);
+            var target = new ToStitchMessageReader(input);
             var result = target.ReadMessage(CancellationToken.None);
             result.Should().NotBeNull();
             result.Id.Should().Be(1);

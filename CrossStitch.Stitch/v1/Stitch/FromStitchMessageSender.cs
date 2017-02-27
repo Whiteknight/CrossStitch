@@ -1,14 +1,15 @@
+using Newtonsoft.Json;
 using System;
 using System.IO;
-using Newtonsoft.Json;
 
-namespace CrossStitch.Stitch.v1
+namespace CrossStitch.Stitch.v1.Stitch
 {
-    public class StitchMessageSender : IDisposable
+    // Message sender for the Stitch to send responses to the Core
+    public class FromStitchMessageSender : IDisposable
     {
         private readonly StreamWriter _stdout;
 
-        public StitchMessageSender(Stream stdout)
+        public FromStitchMessageSender(Stream stdout)
         {
             _stdout = new StreamWriter(stdout);
         }

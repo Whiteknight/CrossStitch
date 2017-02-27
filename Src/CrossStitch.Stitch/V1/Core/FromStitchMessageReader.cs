@@ -29,7 +29,7 @@ namespace CrossStitch.Stitch.V1.Core
                 if (!ok)
                     continue;
                 var s = task.Result;
-                if (s == "end")
+                if (s.Trim() == "end")
                     break;
                 lines.Add(s);
             }

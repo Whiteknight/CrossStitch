@@ -1,8 +1,8 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Newtonsoft.Json;
 
 namespace CrossStitch.Stitch.V1.Stitch
 {
@@ -29,7 +29,7 @@ namespace CrossStitch.Stitch.V1.Stitch
                 if (!ok)
                     continue;
                 var s = task.Result;
-                if (s == "end")
+                if (s.Trim() == "end")
                     break;
                 lines.Add(s);
             }

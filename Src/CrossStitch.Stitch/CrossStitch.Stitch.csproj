@@ -49,7 +49,7 @@
     <Compile Include="V1\Stitch\StitchMessageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V1\FromStitchMessage.cs" />
-    <Compile Include="V1\IToStitchMessageProcessor.cs" />
+    <Compile Include="V1\Stitch\IToStitchMessageProcessor.cs" />
     <Compile Include="V1\Stitch\ToStitchMessageReader.cs" />
     <Compile Include="V1\Stitch\FromStitchMessageSender.cs" />
     <Compile Include="V1\ToStitchMessage.cs" />

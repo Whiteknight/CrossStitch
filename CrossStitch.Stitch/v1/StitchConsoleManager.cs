@@ -10,17 +10,14 @@ namespace CrossStitch.Stitch.v1
         private readonly StitchMessageReader _reader;
         private readonly StitchMessageSender _sender;
 
-        public StitchConsoleManager(IMessageProcessor processor)
+        public StitchConsoleManager(IMessageProcessor processor, StitchMessageReader reader = null, StitchMessageSender sender = null)
         {
             if (processor == null)
                 throw new ArgumentNullException(nameof(processor));
 
             _processor = processor;
-            var stdin = Console.OpenStandardInput();
-            _reader = new StitchMessageReader(stdin);
-
-            var stdout = Console.OpenStandardOutput();
-            _sender = new StitchMessageSender(stdout);
+            _reader = reader ?? new StitchMessageReader(Console.OpenStandardInput());
+            _sender = sender ?? new StitchMessageSender(Console.OpenStandardOutput());
         }
 
         public void StartRunLoop()

@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch", "CrossStitch.Stitch\CrossStitch.Stitch.csproj", "{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch.Tests", "CrossStitch.Stitch.Tests\CrossStitch.Stitch.Tests.csproj", "{15B56932-9606-41D4-BF7A-8638FD40904B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15B56932-9606-41D4-BF7A-8638FD40904B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15B56932-9606-41D4-BF7A-8638FD40904B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15B56932-9606-41D4-BF7A-8638FD40904B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15B56932-9606-41D4-BF7A-8638FD40904B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

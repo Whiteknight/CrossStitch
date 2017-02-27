@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 
-namespace CrossStitch.Stitch.v1.Stitch
+namespace CrossStitch.Stitch.V1.Stitch
 {
     public class StitchMessageManager : IDisposable
     {

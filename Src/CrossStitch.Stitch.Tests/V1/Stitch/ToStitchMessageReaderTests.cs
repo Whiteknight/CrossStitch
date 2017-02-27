@@ -1,15 +1,14 @@
-﻿using CrossStitch.Stitch.v1;
+﻿using CrossStitch.Stitch.V1.Stitch;
 using FluentAssertions;
 using NUnit.Framework;
 using System.IO;
 using System.Text;
 using System.Threading;
-using CrossStitch.Stitch.v1.Stitch;
 
-namespace CrossStitch.Stitch.Tests
+namespace CrossStitch.Stitch.Tests.V1.Stitch
 {
     [TestFixture]
-    public class StitchMessageReaderTests
+    public class ToStitchMessageReaderTests
     {
         private static Stream CreateInputStream(string s)
         {
@@ -32,11 +31,11 @@ namespace CrossStitch.Stitch.Tests
         public void ReadMessage_Test2()
         {
             var input = CreateInputStream(@"
-{
-    Id: 1
-}
-end
-");
+            {
+                Id: 1
+            }
+            end
+            ");
             var target = new ToStitchMessageReader(input);
             var result = target.ReadMessage(CancellationToken.None);
             result.Should().NotBeNull();
@@ -47,12 +46,12 @@ end
         public void ReadMessage_Heartbeat()
         {
             var input = CreateInputStream(@"
-{
-    Id: 1,
-    ChannelName: '_heartbeat'
-}
-end
-");
+            {
+                Id: 1,
+                ChannelName: '_heartbeat'
+            }
+            end
+            ");
             var target = new ToStitchMessageReader(input);
             var result = target.ReadMessage(CancellationToken.None);
             result.Should().NotBeNull();

@@ -33,9 +33,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch", "CrossStitch.Stitch\CrossStitch.Stitch.csproj", "{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch", "Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj", "{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch.Tests", "CrossStitch.Stitch.Tests\CrossStitch.Stitch.Tests.csproj", "{15B56932-9606-41D4-BF7A-8638FD40904B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch.Tests", "Src\CrossStitch.Stitch.Tests\CrossStitch.Stitch.Tests.csproj", "{15B56932-9606-41D4-BF7A-8638FD40904B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

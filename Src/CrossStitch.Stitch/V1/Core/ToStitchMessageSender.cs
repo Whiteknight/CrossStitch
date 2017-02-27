@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace CrossStitch.Stitch.v1.Core
+namespace CrossStitch.Stitch.V1.Core
 {
     // Message sender to send a message from the Core to the Stitch
     public class ToStitchMessageSender : IDisposable

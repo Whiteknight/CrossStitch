@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace CrossStitch.Stitch.v1.Core
+namespace CrossStitch.Stitch.V1.Core
 {
     // Processor class to run on the Core, to coordinate communications with the Stitch. There 
     // should be once instance of this for every stitch.

@@ -1,23 +1,23 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Newtonsoft.Json;
 
-namespace CrossStitch.Stitch.v1.Stitch
+namespace CrossStitch.Stitch.V1.Core
 {
-    // Message reader to read messages from the Core to the Stitch
-    public class ToStitchMessageReader : IDisposable
+    // Message reader to read messages from the Stitch to the Core
+    public class FromStitchMessageReader : IDisposable
     {
         private readonly StreamReader _stdin;
         private const int ReadTimeoutMs = 10000;
 
-        public ToStitchMessageReader(Stream stdin)
+        public FromStitchMessageReader(Stream stdin)
         {
             _stdin = new StreamReader(stdin);
         }
 
-        public ToStitchMessage ReadMessage(CancellationToken cancellationToken)
+        public FromStitchMessage ReadMessage(CancellationToken cancellationToken)
         {
             List<string> lines = new List<string>();
             while (true)
@@ -35,7 +35,7 @@ namespace CrossStitch.Stitch.v1.Stitch
             }
 
             string buffer = string.Join("\n", lines);
-            return JsonConvert.DeserializeObject<ToStitchMessage>(buffer);
+            return JsonConvert.DeserializeObject<FromStitchMessage>(buffer);
         }
 
         public void Dispose()

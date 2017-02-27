@@ -4,20 +4,20 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 
-namespace CrossStitch.Stitch.v1.Core
+namespace CrossStitch.Stitch.V1.Stitch
 {
-    // Message reader to read messages from the Stitch to the Core
-    public class FromStitchMessageReader : IDisposable
+    // Message reader to read messages from the Core to the Stitch
+    public class ToStitchMessageReader : IDisposable
     {
         private readonly StreamReader _stdin;
         private const int ReadTimeoutMs = 10000;
 
-        public FromStitchMessageReader(Stream stdin)
+        public ToStitchMessageReader(Stream stdin)
         {
             _stdin = new StreamReader(stdin);
         }
 
-        public FromStitchMessage ReadMessage(CancellationToken cancellationToken)
+        public ToStitchMessage ReadMessage(CancellationToken cancellationToken)
         {
             List<string> lines = new List<string>();
             while (true)
@@ -35,7 +35,7 @@ namespace CrossStitch.Stitch.v1.Core
             }
 
             string buffer = string.Join("\n", lines);
-            return JsonConvert.DeserializeObject<FromStitchMessage>(buffer);
+            return JsonConvert.DeserializeObject<ToStitchMessage>(buffer);
         }
 
         public void Dispose()

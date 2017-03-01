@@ -3,10 +3,10 @@ using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Logging.Events;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Modules.Stitches.Versions;
+using CrossStitch.Core.Networking;
 using CrossStitch.Core.Node;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Networking;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -42,7 +42,7 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Stop).Invoke(StopInstance));
 
             _dataStorage = new StitchesdataStorage(context.MessageBus);
-            _instanceManager = new InstanceManager(_fileSystem, _network);
+            _instanceManager = new InstanceManager(context, _fileSystem);
             _instanceManager.AppStarted += InstancesOnAppStarted;
             _data = new DataHelperClient(_messageBus);
 
@@ -95,11 +95,11 @@ namespace CrossStitch.Core.Modules.Stitches
             return _instanceManager.GetInstanceInformation();
         }
 
-        private void InstancesOnAppStarted(object sender, StitchStartedEventArgs stitchStartedEventArgs)
+        private void InstancesOnAppStarted(object sender, StitchProcessEventArgs stitchProcessEventArgs)
         {
             _messageBus.Publish("Started", new AppInstanceEvent
             {
-                InstanceId = stitchStartedEventArgs.InstanceId,
+                InstanceId = stitchProcessEventArgs.InstanceId,
                 NodeId = _node.NodeId
             });
         }

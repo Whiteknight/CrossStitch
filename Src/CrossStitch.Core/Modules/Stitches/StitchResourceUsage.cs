@@ -4,6 +4,7 @@ namespace CrossStitch.Core.Modules.Stitches
 {
     public class StitchResourceUsage
     {
+        public int ProcessId { get; set; }
         public long UsedMemory { get; set; }
         public long TotalAllocatedMemory { get; set; }
         public TimeSpan ProcessorTime { get; set; }

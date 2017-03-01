@@ -10,10 +10,10 @@ namespace CrossStitch.Stitch.V1.Core
         private readonly FromStitchMessageReader _reader;
         private readonly ToStitchMessageSender _sender;
 
-        public CoreMessageManager(string nodeName, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
+        public CoreMessageManager(IRunningNodeContext nodeContext, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
         {
             _reader = reader ?? new FromStitchMessageReader(Console.OpenStandardInput());
-            _sender = sender ?? new ToStitchMessageSender(Console.OpenStandardOutput(), nodeName);
+            _sender = sender ?? new ToStitchMessageSender(Console.OpenStandardOutput(), nodeContext);
         }
 
         public FromStitchMessage SendMessage(ToStitchMessage message, CancellationToken cancellation)

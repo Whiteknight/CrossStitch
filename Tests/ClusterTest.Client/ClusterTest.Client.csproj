@@ -64,6 +64,10 @@
       <Project>{a9a30edf-7047-4d0f-a756-816eb85d0384}</Project>
       <Name>CrossStitch.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj">
+      <Project>{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}</Project>
+      <Name>CrossStitch.Stitch</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

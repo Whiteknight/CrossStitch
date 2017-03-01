@@ -1,35 +1,36 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using CrossStitch.Core.Data.Entities;
+﻿using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Events;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Core.Modules.Stitches.Messages;
-using CrossStitch.Core.Networking;
+using CrossStitch.Stitch;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
     public class InstanceManager : IDisposable
     {
         private readonly StitchFileSystem _fileSystem;
-        private readonly InstanceAdaptorFactory _adaptorFactory;
-        private ConcurrentDictionary<string, IAppAdaptor> _adaptors;
+        private readonly StitchAdaptorFactory _adaptorFactory;
+        private ConcurrentDictionary<string, IStitchAdaptor> _adaptors;
 
-        public InstanceManager(StitchFileSystem fileSystem, INetwork network)
+        public InstanceManager(IRunningNodeContext nodeContext, StitchFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _adaptorFactory = new InstanceAdaptorFactory(network);
+            // TODO: We need a way to get the unique string name of the node at this point.
+            _adaptorFactory = new StitchAdaptorFactory(nodeContext);
         }
 
-        public event EventHandler<StitchStartedEventArgs> AppStarted;
+        public event EventHandler<StitchProcessEventArgs> AppStarted;
 
         public List<InstanceActionResult> StartupActiveInstances(IEnumerable<Instance> instances)
         {
             if (_adaptors != null)
                 throw new Exception("InstanceManager already started");
 
-            _adaptors = new ConcurrentDictionary<string, IAppAdaptor>();
+            _adaptors = new ConcurrentDictionary<string, IStitchAdaptor>();
 
             List<InstanceActionResult> results = new List<InstanceActionResult>();
             foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running))
@@ -49,7 +50,7 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 instance.State = InstanceStateType.Started;
 
-                IAppAdaptor adaptor;
+                IStitchAdaptor adaptor;
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
                 {
@@ -63,7 +64,7 @@ namespace CrossStitch.Core.Modules.Stitches
                             Success = false
                         };
                     }
-                    adaptor.AppInitialized += AdaptorOnAppInitialized;
+                    adaptor.StitchInitialized += AdaptorOnStitchInitialized;
                 }
 
                 bool started = adaptor.Start();
@@ -89,7 +90,7 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             try
             {
-                IAppAdaptor adaptor;
+                IStitchAdaptor adaptor;
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
                 {
@@ -152,7 +153,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public InstanceActionResult RemoveInstance(string instanceId)
         {
-            IAppAdaptor adaptor;
+            IStitchAdaptor adaptor;
             bool removed = _adaptors.TryRemove(instanceId, out adaptor);
             if (removed)
                 adaptor.Dispose();
@@ -168,7 +169,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public StitchResourceUsage GetInstanceResources(string instanceId)
         {
-            IAppAdaptor adaptor;
+            IStitchAdaptor adaptor;
             bool found = _adaptors.TryGetValue(instanceId, out adaptor);
             if (!found)
                 return StitchResourceUsage.Empty();
@@ -185,14 +186,14 @@ namespace CrossStitch.Core.Modules.Stitches
             _adaptors = null;
         }
 
-        private void AdaptorOnAppInitialized(object sender, StitchStartedEventArgs stitchStartedEventArgs)
+        private void AdaptorOnStitchInitialized(object sender, StitchProcessEventArgs stitchProcessEventArgs)
         {
             //ComponentInstance instance;
             //bool found = _instances.TryGetValue(appStartedEventArgs.InstanceId, out instance);
             //if (!found)
             //    return;
             //instance.State = InstanceStateType.Running;
-            AppStarted.Raise(this, stitchStartedEventArgs);
+            AppStarted.Raise(this, stitchProcessEventArgs);
         }
 
         public List<InstanceInformation> GetInstanceInformation()

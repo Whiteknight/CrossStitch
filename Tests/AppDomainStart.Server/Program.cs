@@ -22,9 +22,9 @@ namespace AppDomainStart.Server
             //adaptor.Stop();
         }
 
-        private static void AdaptorOnAppInitialized(object sender, StitchStartedEventArgs stitchStartedEventArgs)
+        private static void AdaptorOnAppInitialized(object sender, StitchProcessEventArgs stitchProcessEventArgs)
         {
-            Console.WriteLine("Started app:" + stitchStartedEventArgs.InstanceId);
+            Console.WriteLine("Started app:" + stitchProcessEventArgs.InstanceId);
         }
     }
 }

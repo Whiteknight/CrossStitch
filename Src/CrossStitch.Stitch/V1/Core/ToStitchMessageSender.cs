@@ -7,19 +7,20 @@ namespace CrossStitch.Stitch.V1.Core
     // Message sender to send a message from the Core to the Stitch
     public class ToStitchMessageSender : IDisposable
     {
-        private readonly string _nodeName;
+        private readonly IRunningNodeContext _nodeContext;
         private readonly StreamWriter _stdout;
 
-        public ToStitchMessageSender(Stream stdout, string nodeName)
+        public ToStitchMessageSender(Stream stdout, IRunningNodeContext nodeContext)
         {
-            _nodeName = nodeName;
+            _nodeContext = nodeContext;
+
             _stdout = new StreamWriter(stdout);
         }
 
-        public ToStitchMessageSender(StreamWriter stdout, string nodeName)
+        public ToStitchMessageSender(StreamWriter stdout, IRunningNodeContext nodeContext)
         {
-            _nodeName = nodeName;
             _stdout = stdout;
+            _nodeContext = nodeContext;
         }
 
         public void SendMessage(ToStitchMessage message)
@@ -37,7 +38,7 @@ namespace CrossStitch.Stitch.V1.Core
                 ChannelName = ToStitchMessage.HeartbeatChannelName,
                 Data = string.Empty,
                 Id = id,
-                NodeName = _nodeName,
+                NodeName = _nodeContext.Name,
                 StitchId = 0
             });
         }

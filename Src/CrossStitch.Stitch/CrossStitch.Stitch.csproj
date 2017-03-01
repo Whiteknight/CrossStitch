@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRunningNodeContext.cs" />
     <Compile Include="V1\Core\CoreMessageManager.cs" />
     <Compile Include="V1\Core\FromStitchMessageReader.cs" />
     <Compile Include="V1\Stitch\StitchMessageManager.cs" />

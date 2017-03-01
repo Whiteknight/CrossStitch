@@ -1,11 +1,11 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data;
-using CrossStitch.Core.Node;
-using CrossStitch.Http.NancyFx;
-using System;
 using CrossStitch.Core.Modules.Http;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Core.Networking.NetMq;
+using CrossStitch.Core.Node;
+using CrossStitch.Http.NancyFx;
+using System;
 
 namespace HttpTest
 {

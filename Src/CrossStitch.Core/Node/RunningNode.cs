@@ -8,7 +8,9 @@ using System.Linq;
 
 namespace CrossStitch.Core.Node
 {
-    public class RunningNode : IDisposable
+    // TODO: We need to provide a smaller RunningNodeContext object which will hold things like NodeId 
+    // and NodeName, but won't expose all the other methods from this class.
+    public class RunningNode : IDisposable, CrossStitch.Stitch.IRunningNodeContext
     {
         private readonly List<IModule> _modules;
         private readonly List<IModule> _managedModules;
@@ -61,7 +63,7 @@ namespace CrossStitch.Core.Node
             _subscriptions = null;
         }
 
-        private NodeStatus GetStatus()
+        public NodeStatus GetStatus()
         {
             return new NodeStatus
             {

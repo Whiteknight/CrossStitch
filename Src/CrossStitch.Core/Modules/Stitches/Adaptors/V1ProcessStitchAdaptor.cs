@@ -1,26 +1,30 @@
 ﻿using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Events;
+using CrossStitch.Core.Node;
+using CrossStitch.Stitch.V1;
 using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using CrossStitch.Stitch;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
-    public class V1ProcessStitchAdaptor : IAppAdaptor
+    public class V1ProcessStitchAdaptor : IStitchAdaptor
     {
         private readonly Instance _instance;
+        private readonly IRunningNodeContext _nodeContext;
         private Process _process;
         private CoreMessageManager _channel;
-        private readonly string _nodeName;
 
-        public event EventHandler<StitchStartedEventArgs> AppInitialized;
+        public event EventHandler<StitchProcessEventArgs> StitchInitialized;
+        public event EventHandler<StitchProcessEventArgs> StitchExited;
 
-        public V1ProcessStitchAdaptor(Instance instance, string nodeName)
+        public V1ProcessStitchAdaptor(Instance instance, IRunningNodeContext nodeContext)
         {
             _instance = instance;
-            _nodeName = nodeName;
+            _nodeContext = nodeContext;
         }
 
         // TODO: This whole thing needs to be synchronized so we don't attempt to send a new message
@@ -46,15 +50,24 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             _process.Start();
 
             var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
-            var toStitchSender = new ToStitchMessageSender(_process.StandardInput, _nodeName);
-            _channel = new CoreMessageManager(_nodeName, fromStitchReader, toStitchSender);
+            var toStitchSender = new ToStitchMessageSender(_process.StandardInput, _nodeContext);
+            _channel = new CoreMessageManager(_nodeContext, fromStitchReader, toStitchSender);
 
-            AppInitialized.Raise(this, new StitchStartedEventArgs(_instance.Id));
+            StitchInitialized.Raise(this, new StitchProcessEventArgs(_instance.Id, true));
 
             return true;
         }
 
-        public void SendMessage(long messageId, string channel, string data, string nodeName, long senderId)
+        public bool SendHeartbeat(long id)
+        {
+            // TODO
+            throw new NotImplementedException();
+        }
+
+        // TODO: Convert this to take some kind of object instead of all these primitive values
+        // TODO: This should maybe return something more intesting than just a bool. We might want to know
+        // how long the round-trip took or other details.
+        public bool SendMessage(long messageId, string channel, string data, string nodeName, long senderId)
         {
             var response = _channel.SendMessage(new Stitch.V1.ToStitchMessage
             {
@@ -64,6 +77,9 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
                 ChannelName = channel,
                 Data = data
             }, CancellationToken.None);
+
+            // TODO: Compare IDs? Other verification? Is there other data we want from the Stitch?
+            return response.Command == FromStitchMessage.CommandAck;
         }
 
         private void ProcessOnExited(object sender, EventArgs e)
@@ -92,8 +108,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             }
             if (!requested)
             {
-                // Send some kind of event/message up the chain so that the application can know
-                // that the process has exited
+                StitchExited.Raise(this, new StitchProcessEventArgs(_instance.Id, false));
             }
         }
 
@@ -101,6 +116,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
         {
             return new StitchResourceUsage
             {
+                ProcessId = _process.Id,
                 ProcessorTime = _process.TotalProcessorTime,
                 TotalAllocatedMemory = _process.VirtualMemorySize64,
                 UsedMemory = _process.PagedMemorySize64

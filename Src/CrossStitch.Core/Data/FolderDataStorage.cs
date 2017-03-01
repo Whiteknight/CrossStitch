@@ -6,6 +6,8 @@ using System.Linq;
 
 namespace CrossStitch.Core.Data
 {
+    // TODO: The DataModule is operating on a single dedicated thread. We should have a cache here
+    // so we don't have to hit disk for every get
     public class FolderDataStorage : IDataStorage
     {
         private readonly DataConfiguration _config;

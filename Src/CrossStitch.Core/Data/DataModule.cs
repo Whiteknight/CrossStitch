@@ -7,6 +7,8 @@ namespace CrossStitch.Core.Data
 {
     public sealed class DataModule : IModule
     {
+        public const int VersionMismatch = -1;
+        public const int InvalidId = -2;
         private readonly IDataStorage _storage;
         private SubscriptionCollection _subscriptions;
         private IMessageBus _messageBus;
@@ -44,9 +46,8 @@ namespace CrossStitch.Core.Data
             Stop();
         }
 
-        public const int VersionMismatch = -1;
-        public const int InvalidId = -2;
-
+        // TODO: Get/GetAll with a Filter predicate that we can execute on the Data thread and only
+        // return values which match.
         private DataResponse<TEntity> HandleRequest<TEntity>(DataRequest<TEntity> request)
             where TEntity : class, IDataEntity
         {

@@ -17,6 +17,11 @@ namespace CrossStitch.Stitch.V1.Core
             _stdin = new StreamReader(stdin);
         }
 
+        public FromStitchMessageReader(StreamReader stdin)
+        {
+            _stdin = stdin;
+        }
+
         public FromStitchMessage ReadMessage(CancellationToken cancellationToken)
         {
             List<string> lines = new List<string>();

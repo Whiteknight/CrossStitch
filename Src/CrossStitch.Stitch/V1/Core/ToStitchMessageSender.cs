@@ -1,6 +1,6 @@
+using Newtonsoft.Json;
 using System;
 using System.IO;
-using Newtonsoft.Json;
 
 namespace CrossStitch.Stitch.V1.Core
 {
@@ -14,6 +14,12 @@ namespace CrossStitch.Stitch.V1.Core
         {
             _nodeName = nodeName;
             _stdout = new StreamWriter(stdout);
+        }
+
+        public ToStitchMessageSender(StreamWriter stdout, string nodeName)
+        {
+            _nodeName = nodeName;
+            _stdout = stdout;
         }
 
         public void SendMessage(ToStitchMessage message)

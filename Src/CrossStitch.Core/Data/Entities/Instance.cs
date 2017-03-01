@@ -32,7 +32,7 @@
     public enum InstanceRunModeType
     {
         //AppDomain,
-        Process
+        V1Process
     }
 
     public class InstanceAdaptorDetails

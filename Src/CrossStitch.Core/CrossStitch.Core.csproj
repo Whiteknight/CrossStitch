@@ -76,13 +76,13 @@
     <Compile Include="Modules\Stitches\Messages\AppInstanceEvent.cs" />
     <Compile Include="Modules\Stitches\Adaptors\IAppAdaptor.cs" />
     <Compile Include="Modules\Stitches\InstanceActionResult.cs" />
-    <Compile Include="Modules\Stitches\InstanceAdaptorFactory.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\InstanceAdaptorFactory.cs" />
     <Compile Include="Modules\Stitches\InstanceManager.cs" />
     <Compile Include="Modules\Stitches\Messages\InstanceCreateRequest.cs" />
     <Compile Include="Modules\Stitches\Messages\InstanceInformation.cs" />
     <Compile Include="Modules\Stitches\Messages\InstanceInformationRequest.cs" />
     <Compile Include="Modules\Stitches\Messages\PackageFileUploadRequest.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\ProcessAppAdaptor.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\V1ProcessStitchAdaptor.cs" />
     <Compile Include="Modules\Backplane\BackplaneModule.cs" />
     <Compile Include="Modules\Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Modules\Backplane\Events\ZoneMemberEvent.cs" />
@@ -147,6 +147,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CrossStitch.Stitch\CrossStitch.Stitch.csproj">
+      <Project>{4bd40e13-2f9a-41c9-aed4-dc160b3d48a6}</Project>
+      <Name>CrossStitch.Stitch</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

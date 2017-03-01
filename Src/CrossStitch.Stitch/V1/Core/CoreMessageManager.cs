@@ -16,51 +16,16 @@ namespace CrossStitch.Stitch.V1.Core
             _sender = sender ?? new ToStitchMessageSender(Console.OpenStandardOutput(), nodeName);
         }
 
-        public void StartRunLoop()
+        public FromStitchMessage SendMessage(ToStitchMessage message, CancellationToken cancellation)
         {
-            StartRunLoop(CancellationToken.None);
+            _sender.SendMessage(message);
+            return _reader.ReadMessage(cancellation);
         }
 
-        public void StartRunLoop(CancellationToken cancellationToken)
+        public FromStitchMessage SendHeartbeat(long id, CancellationToken cancellation)
         {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                var message = _reader.ReadMessage(cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                    return;
-                if (message == null)
-                    continue;
-
-                switch (message.Command)
-                {
-                    case FromStitchMessage.CommandSync:
-                        OnSyncReceived(message);
-                        break;
-                    case FromStitchMessage.CommandAck:
-                        OnAckReceived(message);
-                        break;
-                    case FromStitchMessage.CommandFail:
-                        OnFailReceived(message);
-                        break;
-                }
-            }
-        }
-
-        // TODO: Setup events for all of these cases.
-
-        private void OnFailReceived(FromStitchMessage message)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnAckReceived(FromStitchMessage message)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnSyncReceived(FromStitchMessage message)
-        {
-            throw new NotImplementedException();
+            _sender.SendHeartbeat(id);
+            return _reader.ReadMessage(cancellation);
         }
 
         public void Dispose()

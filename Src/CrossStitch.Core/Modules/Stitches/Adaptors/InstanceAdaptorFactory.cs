@@ -1,17 +1,19 @@
-﻿using System;
-using CrossStitch.Core.Data.Entities;
+﻿using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Core.Utility.Networking;
+using System;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
     public class InstanceAdaptorFactory
     {
         private readonly INetwork _network;
+        private readonly string _nodeName;
 
-        public InstanceAdaptorFactory(INetwork network)
+        public InstanceAdaptorFactory(INetwork network, string nodeName)
         {
             _network = network;
+            _nodeName = nodeName;
         }
 
         public IAppAdaptor Create(Instance instance)
@@ -20,8 +22,8 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 //case InstanceRunModeType.AppDomain:
                 //    return new AppDomainAppAdaptor(instance, _network);
-                case InstanceRunModeType.Process:
-                    return new ProcessAppAdaptor(instance, _network);
+                case InstanceRunModeType.V1Process:
+                    return new V1ProcessStitchAdaptor(instance, _nodeName);
             }
 
             throw new Exception("Run mode not supported");

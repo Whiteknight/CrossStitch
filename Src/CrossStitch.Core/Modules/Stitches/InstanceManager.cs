@@ -6,7 +6,7 @@ using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Events;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Core.Modules.Stitches.Messages;
-using CrossStitch.Core.Utility.Networking;
+using CrossStitch.Core.Networking;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

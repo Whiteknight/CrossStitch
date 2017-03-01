@@ -5,7 +5,7 @@ using CrossStitch.Http.NancyFx;
 using System;
 using CrossStitch.Core.Modules.Http;
 using CrossStitch.Core.Modules.Stitches;
-using CrossStitch.Core.Utility.Networking.NetMq;
+using CrossStitch.Core.Networking.NetMq;
 
 namespace HttpTest
 {

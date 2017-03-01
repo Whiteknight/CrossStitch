@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Extensions
+﻿namespace CrossStitch.Core.MessageBus
 {
     public static class MessageBusExtensions
     {

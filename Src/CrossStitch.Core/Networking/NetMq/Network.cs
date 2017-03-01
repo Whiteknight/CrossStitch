@@ -1,6 +1,6 @@
 ﻿using CrossStitch.Core.Utility.Serialization;
 
-namespace CrossStitch.Core.Utility.Networking.NetMq
+namespace CrossStitch.Core.Networking.NetMq
 {
     public class NetMqNetwork : INetwork
     {

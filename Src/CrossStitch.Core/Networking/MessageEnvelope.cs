@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.Core.Utility.Extensions;
 
-namespace CrossStitch.Core.Utility.Networking
+namespace CrossStitch.Core.Networking
 {
     public class MessageEnvelope
     {

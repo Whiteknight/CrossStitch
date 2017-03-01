@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Messages
+﻿namespace CrossStitch.Core.MessageBus
 {
     public class GenericResponse
     {

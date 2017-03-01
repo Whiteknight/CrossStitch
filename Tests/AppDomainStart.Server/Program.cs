@@ -1,6 +1,6 @@
 ﻿using System;
 using CrossStitch.Core.Modules.Stitches;
-using CrossStitch.Core.Utility.Networking.NetMq;
+using CrossStitch.Core.Networking.NetMq;
 
 namespace AppDomainStart.Server
 {

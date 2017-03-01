@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CrossStitch.Stitch.V1
+namespace CrossStitch.Stitch.V1.Stitch
 {
     public interface IToStitchMessageProcessor
     {

@@ -1,11 +1,11 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Data.Messages;
-using CrossStitch.Core.Messages;
 using CrossStitch.Core.Node.Messages;
 using Nancy;
 using Nancy.ModelBinding;
 using System.Linq;
+using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Utility.Extensions;
 

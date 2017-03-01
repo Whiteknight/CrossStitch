@@ -4,9 +4,9 @@ using CrossStitch.Core.Logging.Events;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using CrossStitch.Core.Node;
-using CrossStitch.Core.Utility.Networking;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Networking;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

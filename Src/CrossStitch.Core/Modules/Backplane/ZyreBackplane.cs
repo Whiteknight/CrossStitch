@@ -1,10 +1,10 @@
 ﻿using System;
 using CrossStitch.Core.Events;
 using CrossStitch.Core.Modules.Backplane.Events;
+using CrossStitch.Core.Networking;
+using CrossStitch.Core.Networking.NetMq;
 using CrossStitch.Core.Node;
 using CrossStitch.Core.Utility.Extensions;
-using CrossStitch.Core.Utility.Networking;
-using CrossStitch.Core.Utility.Networking.NetMq;
 using CrossStitch.Core.Utility.Serialization;
 using NetMQ.Zyre;
 using NetMQ.Zyre.ZyreEvents;

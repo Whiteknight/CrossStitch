@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using System.Text;
+using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
 
-namespace CrossStitch.Core.Utility.Networking.NetMq
+namespace CrossStitch.Core.Networking.NetMq
 {
     public class NetMqMessageMapper : IMapper<NetMQMessage, MessageEnvelope>, IMapper<MessageEnvelope, NetMQMessage>
     {

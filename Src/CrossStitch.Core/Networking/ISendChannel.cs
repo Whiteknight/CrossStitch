@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Utility.Networking
+namespace CrossStitch.Core.Networking
 {
     public interface ISendChannel : IDisposable
     {

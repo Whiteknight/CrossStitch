@@ -67,7 +67,7 @@
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
     <Compile Include="Modules\Stitches\StitchResourceUsage.cs" />
     <Compile Include="Modules\Stitches\StitchesConfiguration.cs" />
-    <Compile Include="Modules\Stitches\StitchesdataStorage.cs" />
+    <Compile Include="Modules\Stitches\StitchesDataStorage.cs" />
     <Compile Include="Modules\Stitches\StitchesModule.cs" />
     <Compile Include="Modules\Stitches\StitchProcessEventArgs.cs" />
     <Compile Include="Modules\Stitches\Versions\DateTimeVersionManager.cs" />
@@ -76,7 +76,7 @@
     <Compile Include="Modules\Stitches\Adaptors\IStitchAdaptor.cs" />
     <Compile Include="Modules\Stitches\InstanceActionResult.cs" />
     <Compile Include="Modules\Stitches\Adaptors\StitchAdaptorFactory.cs" />
-    <Compile Include="Modules\Stitches\InstanceManager.cs" />
+    <Compile Include="Modules\Stitches\StitchInstanceManager.cs" />
     <Compile Include="Modules\Stitches\Messages\InstanceCreateRequest.cs" />
     <Compile Include="Modules\Stitches\Messages\InstanceInformation.cs" />
     <Compile Include="Modules\Stitches\Messages\InstanceInformationRequest.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="Data\DataConfiguration.cs" />
     <Compile Include="Data\DataModule.cs" />
     <Compile Include="Data\Entities\Application.cs" />
-    <Compile Include="Data\Entities\Instance.cs" />
+    <Compile Include="Data\Entities\StitchInstance.cs" />
     <Compile Include="Data\Entities\PeerNode.cs" />
     <Compile Include="Data\FolderDataStorage.cs" />
     <Compile Include="Data\IDataEntity.cs" />

@@ -13,7 +13,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
     public class V1ProcessStitchAdaptor : IStitchAdaptor
     {
-        private readonly Instance _instance;
+        private readonly StitchInstance _stitchInstance;
         private readonly IRunningNodeContext _nodeContext;
         private Process _process;
         private CoreMessageManager _channel;
@@ -21,9 +21,9 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
         public event EventHandler<StitchProcessEventArgs> StitchInitialized;
         public event EventHandler<StitchProcessEventArgs> StitchExited;
 
-        public V1ProcessStitchAdaptor(Instance instance, IRunningNodeContext nodeContext)
+        public V1ProcessStitchAdaptor(StitchInstance stitchInstance, IRunningNodeContext nodeContext)
         {
-            _instance = instance;
+            _stitchInstance = stitchInstance;
             _nodeContext = nodeContext;
         }
 
@@ -33,14 +33,14 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
 
         public bool Start()
         {
-            var executableName = Path.Combine(_instance.DirectoryPath, _instance.ExecutableName);
+            var executableName = Path.Combine(_stitchInstance.DirectoryPath, _stitchInstance.ExecutableName);
             _process = new Process();
 
             _process.EnableRaisingEvents = true;
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.ErrorDialog = false;
             _process.StartInfo.FileName = executableName;
-            _process.StartInfo.WorkingDirectory = _instance.DirectoryPath;
+            _process.StartInfo.WorkingDirectory = _stitchInstance.DirectoryPath;
             _process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             _process.StartInfo.UseShellExecute = false;
             _process.StartInfo.RedirectStandardError = true;
@@ -53,7 +53,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             var toStitchSender = new ToStitchMessageSender(_process.StandardInput, _nodeContext);
             _channel = new CoreMessageManager(_nodeContext, fromStitchReader, toStitchSender);
 
-            StitchInitialized.Raise(this, new StitchProcessEventArgs(_instance.Id, true));
+            StitchInitialized.Raise(this, new StitchProcessEventArgs(_stitchInstance.Id, true));
 
             return true;
         }
@@ -108,7 +108,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             }
             if (!requested)
             {
-                StitchExited.Raise(this, new StitchProcessEventArgs(_instance.Id, false));
+                StitchExited.Raise(this, new StitchProcessEventArgs(_stitchInstance.Id, false));
             }
         }
 

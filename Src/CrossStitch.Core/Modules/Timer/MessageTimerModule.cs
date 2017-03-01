@@ -1,17 +1,18 @@
-﻿using System;
-using Acquaintance;
+﻿using Acquaintance;
 using CrossStitch.Core.Node;
+using System;
 
 namespace CrossStitch.Core.Modules.Timer
 {
     public class MessageTimerModule : IModule
     {
+        public const int TimerIntervalSeconds = 10;
         private readonly Acquaintance.Timers.MessageTimer _timer;
         private IDisposable _token;
         private readonly IMessageBus _messageBus;
 
         public MessageTimerModule(IMessageBus messageBus)
-            : this(messageBus, 10)
+            : this(messageBus, TimerIntervalSeconds)
         {
         }
 

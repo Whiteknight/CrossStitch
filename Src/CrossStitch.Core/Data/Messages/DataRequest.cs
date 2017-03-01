@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CrossStitch.Core.Data.Messages
@@ -17,6 +18,26 @@ namespace CrossStitch.Core.Data.Messages
         public DataRequestType Type { get; set; }
         public TEntity Entity { get; set; }
         public string Id { get; set; }
+
+        // InPlaceUpdate is a delegate which will execute on the Data thread.
+        public Action<TEntity> InPlaceUpdate { get; set; }
+
+        public bool IsValid()
+        {
+            switch (Type)
+            {
+                case DataRequestType.Get:
+                    return !string.IsNullOrEmpty(Id);
+                case DataRequestType.GetAll:
+                    return true;
+                case DataRequestType.Save:
+                    return Entity != null || (InPlaceUpdate != null && !string.IsNullOrEmpty(Id));
+                case DataRequestType.Delete:
+                    return !string.IsNullOrEmpty(Id);
+                default:
+                    return false;
+            }
+        }
 
         public static DataRequest<TEntity> GetAll()
         {
@@ -41,6 +62,16 @@ namespace CrossStitch.Core.Data.Messages
             {
                 Type = DataRequestType.Save,
                 Entity = entity
+            };
+        }
+
+        public static DataRequest<TEntity> Save(string id, Action<TEntity> updateInPlace)
+        {
+            return new DataRequest<TEntity>
+            {
+                Type = DataRequestType.Save,
+                Id = id,
+                InPlaceUpdate = updateInPlace
             };
         }
 
@@ -128,5 +159,4 @@ namespace CrossStitch.Core.Data.Messages
             };
         }
     }
-
 }

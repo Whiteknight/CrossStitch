@@ -1,49 +1,56 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Data.Messages;
+using CrossStitch.Core.Node;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
-    public class StitchesdataStorage
+    public class StitchesDataStorage : DataHelperClient
     {
-        private readonly IMessageBus _messageBus;
-
-        public StitchesdataStorage(IMessageBus messageBus)
+        public StitchesDataStorage(IMessageBus messageBus)
+            : base(messageBus)
         {
-            _messageBus = messageBus;
         }
 
-        public IEnumerable<Instance> GetAllInstances()
+        public IEnumerable<StitchInstance> GetAllInstances()
         {
-            var response = _messageBus
-                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.GetAll());
+            var response = Bus
+                .Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.GetAll());
             if (response == null)
-                return Enumerable.Empty<Instance>();
+                return Enumerable.Empty<StitchInstance>();
 
             return response.Entities;
         }
 
-        public Instance GetInstance(string id)
+        public StitchInstance GetInstance(string id)
         {
-            var response = _messageBus
-                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Get(id));
-            return response?.Entity;
+            return Get<StitchInstance>(id);
         }
 
-        public bool Save(Instance instance)
+        public bool Save(StitchInstance stitchInstance)
         {
-            var response = _messageBus
-                .Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.Save(instance));
+
+            var response = Bus
+                .Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.Save(stitchInstance));
             return response != null;
         }
 
         public Application GetApplication(string id)
         {
-            var response = _messageBus
-                .Request<DataRequest<Application>, DataResponse<Application>>(DataRequest<Application>.Get(id));
-            return response?.Entity;
+            return Get<Application>(id);
+        }
+
+        public void MarkHeartbeatSync(string id)
+        {
+            Update<StitchInstance>(id, si => si.MissedHeartbeats = 0);
+        }
+
+        public void MarkHeartbeatMissed(string id)
+        {
+            // TODO: Should we threshold here and set the status, or do that calculation later?
+            Update<StitchInstance>(id, si => si.MissedHeartbeats++);
         }
     }
 }

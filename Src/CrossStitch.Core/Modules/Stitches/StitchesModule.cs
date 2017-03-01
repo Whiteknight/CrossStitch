@@ -1,9 +1,10 @@
 ﻿using Acquaintance;
+using Acquaintance.Timers;
 using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Logging.Events;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Modules.Stitches.Versions;
-using CrossStitch.Core.Networking;
+using CrossStitch.Core.Modules.Timer;
 using CrossStitch.Core.Node;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +13,17 @@ namespace CrossStitch.Core.Modules.Stitches
 {
     public class StitchesModule : IModule
     {
+        private readonly StitchesConfiguration _configuration;
         private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
-        private InstanceManager _instanceManager;
-        private StitchesdataStorage _dataStorage;
+        private StitchInstanceManager _stitchInstanceManager;
+        private StitchesDataStorage _dataStorage;
         private RunningNode _node;
-        private readonly INetwork _network;
         private readonly StitchFileSystem _fileSystem;
-        private DataHelperClient _data;
 
-        public StitchesModule(StitchesConfiguration configuration, INetwork network)
+        public StitchesModule(StitchesConfiguration configuration)
         {
-            _network = network;
+            _configuration = configuration;
             _fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
         }
 
@@ -37,23 +37,25 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(l => l.OnDefaultChannel().Invoke(GetInstanceInformation));
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l.OnDefaultChannel().Invoke(UploadPackageFile));
 
-            _subscriptions.Listen<Instance, Instance>(l => l.WithChannelName(Instance.CreateEvent).Invoke(CreateInstance));
+            _subscriptions.Listen<StitchInstance, StitchInstance>(l => l.WithChannelName(StitchInstance.CreateEvent).Invoke(CreateInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Start).Invoke(StartInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Stop).Invoke(StopInstance));
 
-            _dataStorage = new StitchesdataStorage(context.MessageBus);
-            _instanceManager = new InstanceManager(context, _fileSystem);
-            _instanceManager.AppStarted += InstancesOnAppStarted;
-            _data = new DataHelperClient(_messageBus);
+            int timerTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / MessageTimerModule.TimerIntervalSeconds;
+            _subscriptions.TimerSubscribe(timerTickMultiple, b => b.Invoke(e => SendScheduledHeartbeat()));
+
+            _dataStorage = new StitchesDataStorage(context.MessageBus);
+            _stitchInstanceManager = new StitchInstanceManager(context, _fileSystem);
+            _stitchInstanceManager.StitchStarted += StitchInstancesOnStitchStarted;
 
             StartupInstances();
         }
 
         public void Stop()
         {
-            _instanceManager?.StopAll();
-            _instanceManager?.Dispose();
-            _instanceManager = null;
+            _stitchInstanceManager?.StopAll();
+            _stitchInstanceManager?.Dispose();
+            _stitchInstanceManager = null;
             _subscriptions?.Dispose();
             _subscriptions = null;
         }
@@ -61,17 +63,17 @@ namespace CrossStitch.Core.Modules.Stitches
         public void Dispose()
         {
             Stop();
-            _instanceManager.Dispose();
+            _stitchInstanceManager.Dispose();
         }
 
         private void StartupInstances()
         {
             var instances = _dataStorage.GetAllInstances();
-            var results = _instanceManager.StartupActiveInstances(instances);
+            var results = _stitchInstanceManager.StartupActiveInstances(instances);
             foreach (var result in results.Where(isr => !isr.Success))
             {
-                if (result.Instance != null)
-                    _dataStorage.Save(result.Instance);
+                if (result.StitchInstance != null)
+                    _dataStorage.Save(result.StitchInstance);
                 _messageBus.Publish(LogEvent.Error, new LogEvent
                 {
                     Exception = result.Exception,
@@ -92,10 +94,10 @@ namespace CrossStitch.Core.Modules.Stitches
 
         private List<InstanceInformation> GetInstanceInformation(InstanceInformationRequest instanceInformationRequest)
         {
-            return _instanceManager.GetInstanceInformation();
+            return _stitchInstanceManager.GetInstanceInformation();
         }
 
-        private void InstancesOnAppStarted(object sender, StitchProcessEventArgs stitchProcessEventArgs)
+        private void StitchInstancesOnStitchStarted(object sender, StitchProcessEventArgs stitchProcessEventArgs)
         {
             _messageBus.Publish("Started", new AppInstanceEvent
             {
@@ -117,39 +119,39 @@ namespace CrossStitch.Core.Modules.Stitches
             string version = _fileSystem.SavePackageToLibrary(request.Application, request.Component, request.Contents);
 
             // Update the Application record with the new Version
-            _data.Update<Application>(request.Application, a => a.AddVersion(request.Component, version));
+            _dataStorage.Update<Application>(request.Application, a => a.AddVersion(request.Component, version));
             return new PackageFileUploadResponse(true, version);
         }
 
-        private Instance CreateInstance(Instance instance)
+        private StitchInstance CreateInstance(StitchInstance stitchInstance)
         {
             // Check to make sure we have a record for this version.
-            Application application = _dataStorage.GetApplication(instance.Application);
+            Application application = _dataStorage.GetApplication(stitchInstance.Application);
             if (application == null)
                 return null;
-            if (!application.HasVersion(instance.Component, instance.Version))
+            if (!application.HasVersion(stitchInstance.Component, stitchInstance.Version))
                 return null;
 
-            instance = _data.Insert(instance);
+            stitchInstance = _dataStorage.Insert(stitchInstance);
 
             // Unzip a copy of the version from the library into the running base
-            var result = _fileSystem.UnzipLibraryPackageToRunningBase(instance.Application, instance.Component, instance.Version, instance.Id);
+            var result = _fileSystem.UnzipLibraryPackageToRunningBase(stitchInstance.Application, stitchInstance.Component, stitchInstance.Version, stitchInstance.Id);
 
             // TODO: How do we communicate failure here? We need to use better request/response types for this
             if (!result.Success)
             {
-                _data.Delete<Instance>(instance.Id);
+                _dataStorage.Delete<StitchInstance>(stitchInstance.Id);
                 return null;
             }
-            instance = _data.Update<Instance>(instance.Id, i => i.DirectoryPath = result.Path);
+            stitchInstance = _dataStorage.Update<StitchInstance>(stitchInstance.Id, i => i.DirectoryPath = result.Path);
 
-            return instance;
+            return stitchInstance;
         }
 
         private InstanceResponse StartInstance(InstanceRequest request)
         {
-            var instance = _data.Get<Instance>(request.Id);
-            var result = _instanceManager.Start(instance);
+            var instance = _dataStorage.Get<StitchInstance>(request.Id);
+            var result = _stitchInstanceManager.Start(instance);
             return new InstanceResponse
             {
                 Success = result.Success
@@ -158,12 +160,34 @@ namespace CrossStitch.Core.Modules.Stitches
 
         private InstanceResponse StopInstance(InstanceRequest request)
         {
-            var stopResult = _instanceManager.Stop(request.Id);
+            var stopResult = _stitchInstanceManager.Stop(request.Id);
             if (!stopResult.Success)
                 return new InstanceResponse { Success = false };
 
-            var updateResult = _data.Update<Instance>(request.Id, instance => instance.State = InstanceStateType.Stopped);
+            var updateResult = _dataStorage.Update<StitchInstance>(request.Id, instance => instance.State = InstanceStateType.Stopped);
             return new InstanceResponse { Success = updateResult != null };
+        }
+
+        private void SendScheduledHeartbeat()
+        {
+            // TODO: Generate a unique-per-node heartbeat id, preferrably monotonically increasing
+            long id = 0;
+            var instances = _dataStorage.GetAllInstances()
+                .Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started)
+                .ToList(); ;
+            var results = _stitchInstanceManager.SendHeartbeats(id, instances);
+            foreach (var result in results)
+            {
+                if (!result.Found)
+                {
+                    _dataStorage.Update<StitchInstance>(result.InstanceId, si => si.State = InstanceStateType.Missing);
+                    continue;
+                }
+                if (result.Success)
+                    _dataStorage.MarkHeartbeatSync(result.InstanceId);
+                else
+                    _dataStorage.MarkHeartbeatMissed(result.InstanceId);
+            }
         }
     }
 }

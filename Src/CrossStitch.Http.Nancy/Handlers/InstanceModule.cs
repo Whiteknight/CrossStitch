@@ -13,13 +13,13 @@ namespace CrossStitch.Http.NancyFx.Handlers
         {
             Get["/"] = _ =>
             {
-                return messageBus.Request<DataRequest<Instance>, DataResponse<Instance>>(DataRequest<Instance>.GetAll());
+                return messageBus.Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.GetAll());
             };
             Get["/{Instance}"] = _ =>
             {
                 string instance = _.Instance.ToString();
-                var request = DataRequest<Instance>.Get(instance);
-                var response = messageBus.Request<DataRequest<Instance>, DataResponse<Instance>>(request);
+                var request = DataRequest<StitchInstance>.Get(instance);
+                var response = messageBus.Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(request);
                 return response.Entity;
             };
             Post["/{Instance}/start"] = _ =>

@@ -10,22 +10,22 @@ using System.Linq;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
-    public class InstanceManager : IDisposable
+    public class StitchInstanceManager : IDisposable
     {
         private readonly StitchFileSystem _fileSystem;
         private readonly StitchAdaptorFactory _adaptorFactory;
         private ConcurrentDictionary<string, IStitchAdaptor> _adaptors;
 
-        public InstanceManager(IRunningNodeContext nodeContext, StitchFileSystem fileSystem)
+        public StitchInstanceManager(IRunningNodeContext nodeContext, StitchFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             // TODO: We need a way to get the unique string name of the node at this point.
             _adaptorFactory = new StitchAdaptorFactory(nodeContext);
         }
 
-        public event EventHandler<StitchProcessEventArgs> AppStarted;
+        public event EventHandler<StitchProcessEventArgs> StitchStarted;
 
-        public List<InstanceActionResult> StartupActiveInstances(IEnumerable<Instance> instances)
+        public List<InstanceActionResult> StartupActiveInstances(IEnumerable<StitchInstance> instances)
         {
             if (_adaptors != null)
                 throw new Exception("InstanceManager already started");
@@ -42,26 +42,28 @@ namespace CrossStitch.Core.Modules.Stitches
             return results;
         }
 
-        public InstanceActionResult Start(Instance instance)
+        public InstanceActionResult Start(StitchInstance stitchInstance)
         {
-            string instanceId = instance.Id;
+            string instanceId = stitchInstance.Id;
+            IStitchAdaptor adaptor = null;
 
             try
             {
-                instance.State = InstanceStateType.Started;
+                stitchInstance.State = InstanceStateType.Started;
 
-                IStitchAdaptor adaptor;
+
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
                 {
-                    adaptor = _adaptorFactory.Create(instance);
+                    adaptor = _adaptorFactory.Create(stitchInstance);
                     bool added = _adaptors.TryAdd(instanceId, adaptor);
                     if (!added)
                     {
                         return new InstanceActionResult
                         {
                             InstanceId = instanceId,
-                            Success = false
+                            Success = false,
+                            Found = false
                         };
                     }
                     adaptor.StitchInitialized += AdaptorOnStitchInitialized;
@@ -70,34 +72,37 @@ namespace CrossStitch.Core.Modules.Stitches
                 bool started = adaptor.Start();
                 return new InstanceActionResult
                 {
-                    InstanceId = instance.Id,
-                    Success = started
+                    InstanceId = stitchInstance.Id,
+                    Success = started,
+                    Found = true
                 };
             }
             catch (Exception e)
             {
-                instance.State = InstanceStateType.Error;
+                stitchInstance.State = InstanceStateType.Error;
                 return new InstanceActionResult
                 {
-                    InstanceId = instance.Id,
+                    InstanceId = stitchInstance.Id,
                     Success = false,
-                    Exception = e
+                    Exception = e,
+                    Found = adaptor != null
                 };
             }
         }
 
         public InstanceActionResult Stop(string instanceId)
         {
+            IStitchAdaptor adaptor = null;
             try
             {
-                IStitchAdaptor adaptor;
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
                 {
                     return new InstanceActionResult
                     {
                         InstanceId = instanceId,
-                        Success = false
+                        Success = false,
+                        Found = false
                     };
                 }
                 adaptor.Stop();
@@ -113,6 +118,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 return new InstanceActionResult
                 {
                     Success = false,
+                    Found = adaptor != null,
                     Exception = e,
                     InstanceId = instanceId
                 };
@@ -193,12 +199,42 @@ namespace CrossStitch.Core.Modules.Stitches
             //if (!found)
             //    return;
             //instance.State = InstanceStateType.Running;
-            AppStarted.Raise(this, stitchProcessEventArgs);
+            StitchStarted.Raise(this, stitchProcessEventArgs);
         }
 
         public List<InstanceInformation> GetInstanceInformation()
         {
             throw new NotImplementedException();
+        }
+
+        public List<InstanceActionResult> SendHeartbeats(long id, IEnumerable<StitchInstance> instances)
+        {
+            var results = new List<InstanceActionResult>();
+            foreach (var instance in instances)
+            {
+                IStitchAdaptor adaptor;
+                bool found = _adaptors.TryGetValue(instance.Id, out adaptor);
+                if (!found)
+                {
+                    results.Add(new InstanceActionResult
+                    {
+                        Found = false,
+                        InstanceId = instance.Id,
+                        Success = false
+                    });
+                    continue;
+                }
+
+                bool ok = adaptor.SendHeartbeat(id);
+                results.Add(new InstanceActionResult
+                {
+                    StitchInstance = instance,
+                    InstanceId = instance.Id,
+                    Found = true,
+                    Success = ok
+                });
+            }
+            return results;
         }
     }
 }

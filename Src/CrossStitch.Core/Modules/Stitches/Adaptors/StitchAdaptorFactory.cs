@@ -13,14 +13,14 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             _nodeContext = nodeContext;
         }
 
-        public IStitchAdaptor Create(Instance instance)
+        public IStitchAdaptor Create(StitchInstance stitchInstance)
         {
-            switch (instance.Adaptor.RunMode)
+            switch (stitchInstance.Adaptor.RunMode)
             {
                 //case InstanceRunModeType.AppDomain:
                 //    return new AppDomainAppAdaptor(instance, _network);
                 case InstanceRunModeType.V1Process:
-                    return new V1ProcessStitchAdaptor(instance, _nodeContext);
+                    return new V1ProcessStitchAdaptor(stitchInstance, _nodeContext);
             }
 
             throw new Exception("Run mode not supported");

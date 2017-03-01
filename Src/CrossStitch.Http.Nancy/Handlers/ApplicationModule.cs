@@ -85,12 +85,12 @@ namespace CrossStitch.Http.NancyFx.Handlers
 
             Post["/{Application}/components/{Component}/versions/{Version}/createinstance"] = x =>
             {
-                Instance instance = this.Bind<Instance>();
-                instance.Application = x.Application.ToString();
-                instance.Component = x.Component.ToString();
-                instance.Version = x.Version.ToString();
+                StitchInstance stitchInstance = this.Bind<StitchInstance>();
+                stitchInstance.Application = x.Application.ToString();
+                stitchInstance.Component = x.Component.ToString();
+                stitchInstance.Version = x.Version.ToString();
 
-                return messageBus.Request<Instance, Instance>(Instance.CreateEvent, instance);
+                return messageBus.Request<StitchInstance, StitchInstance>(StitchInstance.CreateEvent, stitchInstance);
             };
         }
     }

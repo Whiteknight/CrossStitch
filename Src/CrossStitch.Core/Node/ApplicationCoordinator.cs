@@ -111,7 +111,7 @@ namespace CrossStitch.Core.Node
         private InstanceResponse DeleteInstance(InstanceRequest request)
         {
             var stopResponse = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Stop, request);
-            bool deleted = _data.Delete<Instance>(request.Id);
+            bool deleted = _data.Delete<StitchInstance>(request.Id);
             return new InstanceResponse
             {
                 Success = deleted
@@ -120,7 +120,7 @@ namespace CrossStitch.Core.Node
 
         private InstanceResponse CloneInstance(InstanceRequest request)
         {
-            var instance = _data.Get<Instance>(request.Id);
+            var instance = _data.Get<StitchInstance>(request.Id);
             instance.Id = null;
             instance.StoreVersion = 0;
             instance = _data.Insert(instance);

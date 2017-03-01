@@ -26,7 +26,6 @@ namespace CrossStitch.Core.Node
                 new MessageTimerModule(messageBus),
                 new ApplicationCoordinator()
             };
-
         }
 
         public Guid NodeId { get; set; }
@@ -43,7 +42,11 @@ namespace CrossStitch.Core.Node
         public void Start()
         {
             _subscriptions = new SubscriptionCollection(MessageBus);
-            _subscriptions.TimerSubscribe(6, t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()));
+
+            // Publish the status of the node every 60 seconds
+            _subscriptions.TimerSubscribe(6, b => b
+                .Invoke(t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()))
+                .OnWorkerThread());
             _subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
 
             foreach (var module in _managedModules)

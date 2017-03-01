@@ -29,7 +29,7 @@ namespace HttpTest
                 runningNode.AddModule(data);
 
                 var appsConfiguration = StitchesConfiguration.GetDefault();
-                var apps = new StitchesModule(appsConfiguration, network);
+                var apps = new StitchesModule(appsConfiguration);
                 runningNode.AddModule(apps);
 
                 runningNode.Start();

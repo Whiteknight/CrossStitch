@@ -25,7 +25,7 @@ namespace CrossStitch.Core.Data
             _workerThreadId = context.MessageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
-            _subscriptions.Listen<DataRequest<Instance>, DataResponse<Instance>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
         }
 
@@ -50,41 +50,48 @@ namespace CrossStitch.Core.Data
         private DataResponse<TEntity> HandleRequest<TEntity>(DataRequest<TEntity> request)
             where TEntity : class, IDataEntity
         {
-            if (request.Type == DataRequestType.GetAll)
+            switch (request.Type)
             {
-                var all = _storage.GetAll<TEntity>();
-                return DataResponse<TEntity>.FoundAll(all);
-            }
-
-            if (request.Type == DataRequestType.Get)
-            {
-                var entity = _storage.Get<TEntity>(request.Id);
-                if (entity == null)
-                    return DataResponse<TEntity>.NotFound();
-                return DataResponse<TEntity>.Found(entity);
-            }
-
-            if (request.Type == DataRequestType.Delete)
-            {
-                bool ok = _storage.Delete<TEntity>(request.Id);
-                if (!ok)
-                    return DataResponse<TEntity>.NotFound();
-                return DataResponse<TEntity>.Ok();
-            }
-
-            if (request.Type == DataRequestType.Save)
-            {
-                if (request.Entity == null)
+                case DataRequestType.GetAll:
+                    var all = _storage.GetAll<TEntity>();
+                    return DataResponse<TEntity>.FoundAll(all);
+                case DataRequestType.Get:
+                    var entity = _storage.Get<TEntity>(request.Id);
+                    return entity == null ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Found(entity);
+                case DataRequestType.Delete:
+                    bool ok = _storage.Delete<TEntity>(request.Id);
+                    return !ok ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Ok();
+                case DataRequestType.Save:
+                    return HandleSaveRequest(request);
+                default:
                     return DataResponse<TEntity>.BadRequest();
+            }
+        }
 
-                var version = _storage.Save(request.Entity);
-                if (version == VersionMismatch)
-                    return DataResponse<TEntity>.VersionMismatch();
-                request.Entity.StoreVersion = version;
-                return DataResponse<TEntity>.Saved(request.Entity);
+        private DataResponse<TEntity> HandleSaveRequest<TEntity>(DataRequest<TEntity> request) where TEntity : class, IDataEntity
+        {
+            if (!request.IsValid())
+                return DataResponse<TEntity>.BadRequest();
+
+            // If we are doing an in-place update, we need the entity to not exist, the ID to
+            // be provided, and the InPlaceUpdate delegate to be set
+            if (request.Entity == null && !string.IsNullOrEmpty(request.Id) && request.InPlaceUpdate != null)
+            {
+                request.Entity = _storage.Get<TEntity>(request.Id);
+                if (request.Entity == null)
+                    return DataResponse<TEntity>.NotFound();
+                request.InPlaceUpdate(request.Entity);
             }
 
-            return DataResponse<TEntity>.BadRequest();
+            // If we don't have an entity at this point, it's an error
+            if (request.Entity == null)
+                return DataResponse<TEntity>.BadRequest();
+
+            var version = _storage.Save(request.Entity);
+            if (version == VersionMismatch)
+                return DataResponse<TEntity>.VersionMismatch();
+            request.Entity.StoreVersion = version;
+            return DataResponse<TEntity>.Saved(request.Entity);
         }
     }
 }

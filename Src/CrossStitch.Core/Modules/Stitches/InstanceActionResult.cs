@@ -1,14 +1,15 @@
-﻿using System;
-using CrossStitch.Core.Data.Entities;
+﻿using CrossStitch.Core.Data.Entities;
+using System;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
     public class InstanceActionResult
     {
         public string InstanceId { get; set; }
-        public Instance Instance { get; set; }
+        public StitchInstance StitchInstance { get; set; }
         public bool Success { get; set; }
         public Exception Exception { get; set; }
+        public bool Found { get; set; }
 
         public static InstanceActionResult Failure()
         {

@@ -26,7 +26,7 @@ namespace CrossStitch.Http.NancyFx
 
         public string Name => "Http";
 
-        public void Start(RunningNode context)
+        public void Start(CrossStitchCore context)
         {
             _host.Start();
         }

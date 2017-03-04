@@ -12,7 +12,7 @@ namespace CrossStitch.Core.Modules.Master
     public class MasterModule : IModule
     {
         // Module responsible for maintaining cluster state
-        private RunningNode _runningNode;
+        private CrossStitchCore _runningNode;
         private readonly IClusterNodeManager _nodeManager;
 
         public MasterModule(IClusterNodeManager nodeManager, IMessageBus messageBus)
@@ -40,7 +40,7 @@ namespace CrossStitch.Core.Modules.Master
 
         public string Name => "Master";
 
-        public void Start(RunningNode context)
+        public void Start(CrossStitchCore context)
         {
             _runningNode = context;
             _nodeManager.Start();

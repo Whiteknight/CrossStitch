@@ -12,7 +12,7 @@ namespace CrossStitch.Core.Modules.Backplane
         event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
         event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
 
-        void Start(RunningNode context);
+        void Start(CrossStitchCore context);
         void Stop();
 
         // Responsible for communication between nodes in the cluster

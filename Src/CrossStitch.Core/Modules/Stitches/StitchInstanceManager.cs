@@ -6,7 +6,6 @@ using CrossStitch.Stitch;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -21,26 +20,10 @@ namespace CrossStitch.Core.Modules.Stitches
             _fileSystem = fileSystem;
             // TODO: We need a way to get the unique string name of the node at this point.
             _adaptorFactory = new StitchAdaptorFactory(nodeContext);
+            _adaptors = new ConcurrentDictionary<string, IStitchAdaptor>();
         }
 
         public event EventHandler<StitchProcessEventArgs> StitchStarted;
-
-        public List<InstanceActionResult> StartupActiveInstances(IEnumerable<StitchInstance> instances)
-        {
-            if (_adaptors != null)
-                throw new Exception("InstanceManager already started");
-
-            _adaptors = new ConcurrentDictionary<string, IStitchAdaptor>();
-
-            var results = new List<InstanceActionResult>();
-            foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
-            {
-                var result = Start(instance);
-                results.Add(result);
-            }
-
-            return results;
-        }
 
         public InstanceActionResult Start(StitchInstance stitchInstance)
         {
@@ -49,8 +32,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
             try
             {
-                stitchInstance.State = InstanceStateType.Started;
-
+                stitchInstance.State = InstanceStateType.Stopped;
 
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
@@ -59,6 +41,7 @@ namespace CrossStitch.Core.Modules.Stitches
                     bool added = _adaptors.TryAdd(instanceId, adaptor);
                     if (!added)
                     {
+                        stitchInstance.State = InstanceStateType.Missing;
                         return new InstanceActionResult
                         {
                             InstanceId = instanceId,
@@ -70,6 +53,8 @@ namespace CrossStitch.Core.Modules.Stitches
                 }
 
                 bool started = adaptor.Start();
+                if (started)
+                    stitchInstance.State = InstanceStateType.Started;
                 return new InstanceActionResult
                 {
                     InstanceId = stitchInstance.Id,

@@ -8,15 +8,17 @@ using System.Linq;
 
 namespace CrossStitch.Core.Node
 {
-    // TODO: We need to provide a smaller RunningNodeContext object which will hold things like NodeId 
-    // and NodeName, but won't expose all the other methods from this class.
-    public class RunningNode : IDisposable, CrossStitch.Stitch.IRunningNodeContext
+    public class CrossStitchCore : IDisposable, CrossStitch.Stitch.IRunningNodeContext
     {
         private readonly List<IModule> _modules;
         private readonly List<IModule> _managedModules;
         private SubscriptionCollection _subscriptions;
+        private bool _started;
 
-        public RunningNode(NodeConfiguration nodeConfig, IMessageBus messageBus)
+        // TODO: We shouldn't allow IMessageBus instances to be shared between CrossStitchCore
+        // instances, because it will break a lot of things.
+
+        public CrossStitchCore(NodeConfiguration nodeConfig, IMessageBus messageBus)
         {
             MessageBus = messageBus;
 
@@ -24,11 +26,27 @@ namespace CrossStitch.Core.Node
             _managedModules = new List<IModule>
             {
                 new MessageTimerModule(messageBus),
-                new ApplicationCoordinator()
+                new ApplicationCoordinatorModule()
             };
         }
 
-        public Guid NodeId { get; set; }
+        private Guid _nodeId;
+        public Guid NodeId
+        {
+            get { return _nodeId; }
+            set
+            {
+                string oldName = Name;
+                _nodeId = value;
+                OnNodeIdChanged(Name, oldName);
+            }
+        }
+
+        private void OnNodeIdChanged(string newName, string oldName)
+        {
+            if (_started)
+                MessageBus.Publish(CoreEvent.ChannelNameChanged, new CoreEvent(newName, oldName));
+        }
 
         public string Name => NodeId.ToString();
 
@@ -37,28 +55,33 @@ namespace CrossStitch.Core.Node
         public void AddModule(IModule module)
         {
             _modules.Add(module);
+            if (_started)
+            {
+                module.Start(this);
+                MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(Name, module.Name));
+            }
         }
 
         public void Start()
         {
-            try
-            {
-                _subscriptions = new SubscriptionCollection(MessageBus);
+            if (_started)
+                throw new Exception("Core is already started");
 
-                // Publish the status of the node every 60 seconds
-                _subscriptions.TimerSubscribe(6, b => b
-                    .Invoke(t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()))
-                    .OnWorkerThread());
-                _subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
-            }
-            catch (Exception e)
-            {
+            _subscriptions = new SubscriptionCollection(MessageBus);
 
-            }
+            // Publish the status of the node every 60 seconds
+            _subscriptions.TimerSubscribe(6, b => b
+                .Invoke(t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()))
+                .OnWorkerThread());
+            _subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
+
             foreach (var module in _managedModules)
                 module.Start(this);
             foreach (var module in _modules)
                 module.Start(this);
+
+            _started = true;
+            MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent(Name));
         }
 
         public void Stop()
@@ -70,6 +93,9 @@ namespace CrossStitch.Core.Node
 
             _subscriptions.Dispose();
             _subscriptions = null;
+
+            _started = false;
+            // TODO: Should we publish a Stop event? Is anybody listening at this point?
         }
 
         public NodeStatus GetStatus()

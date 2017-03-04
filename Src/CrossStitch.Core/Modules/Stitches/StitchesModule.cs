@@ -18,7 +18,7 @@ namespace CrossStitch.Core.Modules.Stitches
         private SubscriptionCollection _subscriptions;
         private StitchInstanceManager _stitchInstanceManager;
         private StitchesDataStorage _dataStorage;
-        private RunningNode _node;
+        private CrossStitchCore _node;
         private readonly StitchFileSystem _fileSystem;
 
         public StitchesModule(StitchesConfiguration configuration)
@@ -29,7 +29,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public string Name => "Stitches";
 
-        public void Start(RunningNode context)
+        public void Start(CrossStitchCore context)
         {
             _node = context;
             _messageBus = context.MessageBus;
@@ -47,8 +47,6 @@ namespace CrossStitch.Core.Modules.Stitches
             _dataStorage = new StitchesDataStorage(context.MessageBus);
             _stitchInstanceManager = new StitchInstanceManager(context, _fileSystem);
             _stitchInstanceManager.StitchStarted += StitchInstancesOnStitchStarted;
-
-            StartupInstances();
         }
 
         public void Stop()
@@ -66,32 +64,6 @@ namespace CrossStitch.Core.Modules.Stitches
             _stitchInstanceManager.Dispose();
         }
 
-        private void StartupInstances()
-        {
-            var instances = _dataStorage.GetAllInstances();
-            var results = _stitchInstanceManager.StartupActiveInstances(instances);
-            foreach (var result in results.Where(isr => !isr.Success))
-            {
-                if (result.StitchInstance != null)
-                    _dataStorage.Save(result.StitchInstance);
-                _messageBus.Publish(LogEvent.Error, new LogEvent
-                {
-                    Exception = result.Exception,
-                    Message = "Instance " + result.InstanceId + " failed to start"
-                });
-            }
-            foreach (var result in results.Where(isr => isr.Success))
-            {
-                // We don't need to save the Instance here, because we aren't changing its state/
-                // It is still "Started"
-                _messageBus.Publish(AppInstanceEvent.StartedEventName, new AppInstanceEvent
-                {
-                    InstanceId = result.InstanceId,
-                    NodeId = _node.NodeId
-                });
-            }
-        }
-
         private List<InstanceInformation> GetInstanceInformation(InstanceInformationRequest instanceInformationRequest)
         {
             return _stitchInstanceManager.GetInstanceInformation();
@@ -106,6 +78,7 @@ namespace CrossStitch.Core.Modules.Stitches
             });
         }
 
+        // TODO: Move this into the ApplicationCoordinator
         private PackageFileUploadResponse UploadPackageFile(PackageFileUploadRequest request)
         {
             // Get the application and make sure we have a Component record
@@ -152,6 +125,22 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             var instance = _dataStorage.Get<StitchInstance>(request.Id);
             var result = _stitchInstanceManager.Start(instance);
+            if (result.Success)
+            {
+                _messageBus.Publish(AppInstanceEvent.StartedEventName, new AppInstanceEvent
+                {
+                    InstanceId = result.InstanceId,
+                    NodeId = _node.NodeId
+                });
+            }
+            else
+            {
+                _messageBus.Publish(LogEvent.Error, new LogEvent
+                {
+                    Exception = result.Exception,
+                    Message = "Instance " + result.InstanceId + " failed to start"
+                });
+            }
             return new InstanceResponse
             {
                 Success = result.Success

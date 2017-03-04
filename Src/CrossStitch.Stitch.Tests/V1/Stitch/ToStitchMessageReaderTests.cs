@@ -3,7 +3,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 namespace CrossStitch.Stitch.Tests.V1.Stitch
 {
@@ -22,7 +21,7 @@ namespace CrossStitch.Stitch.Tests.V1.Stitch
         {
             var input = CreateInputStream("{Id: 1}\nend\n");
             var target = new ToStitchMessageReader(input);
-            var result = target.ReadMessage(CancellationToken.None);
+            var result = target.ReadMessage();
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
         }
@@ -37,7 +36,7 @@ namespace CrossStitch.Stitch.Tests.V1.Stitch
             end
             ");
             var target = new ToStitchMessageReader(input);
-            var result = target.ReadMessage(CancellationToken.None);
+            var result = target.ReadMessage();
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
         }
@@ -50,10 +49,10 @@ namespace CrossStitch.Stitch.Tests.V1.Stitch
                 Id: 1,
                 ChannelName: '_heartbeat'
             }
-            end
+            endB
             ");
             var target = new ToStitchMessageReader(input);
-            var result = target.ReadMessage(CancellationToken.None);
+            var result = target.ReadMessage();
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
             result.IsHeartbeatMessage().Should().BeTrue();

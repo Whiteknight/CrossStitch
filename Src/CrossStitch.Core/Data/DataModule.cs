@@ -21,7 +21,7 @@ namespace CrossStitch.Core.Data
 
         public string Name => "Data";
 
-        public void Start(RunningNode context)
+        public void Start(CrossStitchCore context)
         {
             _messageBus = context.MessageBus;
             _workerThreadId = context.MessageBus.ThreadPool.StartDedicatedWorker();

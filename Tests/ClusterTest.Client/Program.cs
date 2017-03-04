@@ -21,7 +21,7 @@ namespace ClusterTest.Client
             messageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
 
             var nodeConfig = NodeConfiguration.GetDefault();
-            using (var node = new RunningNode(nodeConfig, messageBus))
+            using (var node = new CrossStitchCore(nodeConfig, messageBus))
             {
                 node.AddModule(backplaneModule);
                 node.Start();

@@ -13,7 +13,7 @@ namespace StitchStart.Server
         {
             var config = NodeConfiguration.GetDefault();
             var messageBus = new MessageBus();
-            using (var node = new RunningNode(config, messageBus))
+            using (var node = new CrossStitchCore(config, messageBus))
             {
                 var dataConfiguration = DataConfiguration.GetDefault();
                 var dataStorage = new InMemoryDataStorage(dataConfiguration);

@@ -34,7 +34,7 @@ namespace CrossStitch.Core.Modules.Backplane
 
         public string Name => "Backplane";
 
-        public void Start(RunningNode context)
+        public void Start(CrossStitchCore context)
         {
             _messageBus = context.MessageBus;
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();

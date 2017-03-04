@@ -1,5 +1,4 @@
-﻿using System;
-using CrossStitch.Core.Events;
+﻿using CrossStitch.Core.Events;
 using CrossStitch.Core.Modules.Backplane.Events;
 using CrossStitch.Core.Networking;
 using CrossStitch.Core.Networking.NetMq;
@@ -8,6 +7,7 @@ using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Core.Utility.Serialization;
 using NetMQ.Zyre;
 using NetMQ.Zyre.ZyreEvents;
+using System;
 
 namespace CrossStitch.Core.Modules.Backplane
 {
@@ -21,6 +21,8 @@ namespace CrossStitch.Core.Modules.Backplane
 
         public ZyreBackplane(BackplaneConfiguration config, string nodeName, ISerializer serializer)
         {
+            // TODO: The node doesn't have a "name" until we connect to the network. Don't take a
+            // node name here, just use some kind of unique Guid or something.
             _zyre = new Zyre(nodeName);
             _zyre.EnterEvent += ZyreEnterEvent;
             _zyre.StopEvent += ZyreStopEvent;
@@ -52,7 +54,8 @@ namespace CrossStitch.Core.Modules.Backplane
 
         private void ZyreLeaveEvent(object sender, ZyreEventLeave e)
         {
-            ZoneMember.Raise(this, ZoneMemberEvent.LeavingEvent, new ZoneMemberEvent {
+            ZoneMember.Raise(this, ZoneMemberEvent.LeavingEvent, new ZoneMemberEvent
+            {
                 NodeName = e.SenderName,
                 NodeUuid = e.SenderUuid,
                 Zone = e.GroupName
@@ -106,7 +109,7 @@ namespace CrossStitch.Core.Modules.Backplane
             });
         }
 
-        public void Start(RunningNode context)
+        public void Start(CrossStitchCore context)
         {
             if (_connected)
                 throw new Exception("Backplane is already started");
@@ -116,8 +119,10 @@ namespace CrossStitch.Core.Modules.Backplane
                 _zyre.Join(zone);
 
             _uuid = _zyre.Uuid();
+            // TODO: Don't set the context NodeId directly here. Publish a message so all modules
+            // who care about the NodeId/NodeName can be aware of it
             context.NodeId = _uuid;
-            
+
             _connected = true;
         }
 

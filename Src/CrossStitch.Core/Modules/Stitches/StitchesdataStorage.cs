@@ -1,9 +1,6 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data.Entities;
-using CrossStitch.Core.Data.Messages;
 using CrossStitch.Core.Node;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -14,28 +11,12 @@ namespace CrossStitch.Core.Modules.Stitches
         {
         }
 
-        public IEnumerable<StitchInstance> GetAllInstances()
-        {
-            var response = Bus
-                .Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.GetAll());
-            if (response == null)
-                return Enumerable.Empty<StitchInstance>();
-
-            return response.Entities;
-        }
-
         public StitchInstance GetInstance(string id)
         {
             return Get<StitchInstance>(id);
         }
 
-        public bool Save(StitchInstance stitchInstance)
-        {
 
-            var response = Bus
-                .Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.Save(stitchInstance));
-            return response != null;
-        }
 
         public Application GetApplication(string id)
         {

@@ -17,7 +17,7 @@ namespace HttpTest
             var messageBus = new MessageBus();
             var network = new NetMqNetwork();
 
-            using (var runningNode = new RunningNode(nodeConfig, messageBus))
+            using (var runningNode = new CrossStitchCore(nodeConfig, messageBus))
             {
                 var httpConfiguration = HttpConfiguration.GetDefault();
                 var httpServer = new NancyHttpModule(httpConfiguration, messageBus);

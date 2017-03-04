@@ -7,7 +7,7 @@ namespace CrossStitch.Core
     {
         // A top-level module corresponding to the roles and responsibilities of the local node
         string Name { get; }
-        void Start(RunningNode context);
+        void Start(CrossStitchCore context);
         void Stop();
     }
 }

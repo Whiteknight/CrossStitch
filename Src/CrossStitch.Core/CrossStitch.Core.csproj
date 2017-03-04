@@ -96,7 +96,6 @@
     <Compile Include="Data\IDataStorage.cs" />
     <Compile Include="Data\Messages\DataRequest.cs" />
     <Compile Include="MessageBus\MessageBusExtensions.cs" />
-    <Compile Include="Modules\Http\HttpConfiguration.cs" />
     <Compile Include="Logging\Events\LogEvent.cs" />
     <Compile Include="Modules\Master\ClusterPeerNode.cs" />
     <Compile Include="Modules\Backplane\BackplaneConfiguration.cs" />
@@ -127,10 +126,11 @@
     <Compile Include="Modules\Timer\MessageTimerModule.cs" />
     <Compile Include="IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
+    <Compile Include="Node\Messages\CoreEvent.cs" />
     <Compile Include="Node\Messages\NodeStatus.cs" />
     <Compile Include="Node\Messages\NodeStatusRequest.cs" />
     <Compile Include="Node\NodeConfiguration.cs" />
-    <Compile Include="Node\RunningNode.cs" />
+    <Compile Include="Node\CrossStitchCore.cs" />
     <Compile Include="Modules\Master\MasterConfiguration.cs" />
     <Compile Include="Modules\Master\MasterModule.cs" />
     <Compile Include="Modules\Backplane\NodeCommunicationInformation.cs" />
@@ -152,6 +152,7 @@
       <Name>CrossStitch.Stitch</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

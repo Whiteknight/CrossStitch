@@ -1,7 +1,10 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data;
+using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Data.Messages;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Node
 {
@@ -43,6 +46,24 @@ namespace CrossStitch.Core.Node
         {
             var request = DataRequest<TEntity>.Save(id, update);
             return Bus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request)?.Entity;
+        }
+
+        public bool Save<TEntity>(TEntity entity)
+            where TEntity : class, IDataEntity
+        {
+            var response = Bus
+                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Save(entity));
+            return response != null;
+        }
+
+        public IEnumerable<StitchInstance> GetAllInstances()
+        {
+            var response = Bus
+                .Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.GetAll());
+            if (response == null)
+                return Enumerable.Empty<StitchInstance>();
+
+            return response.Entities;
         }
     }
 }

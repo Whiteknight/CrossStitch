@@ -55,6 +55,7 @@
     <Compile Include="Handlers\ApplicationModule.cs" />
     <Compile Include="Handlers\InstanceModule.cs" />
     <Compile Include="Handlers\NodeRequestHandler.cs" />
+    <Compile Include="HttpConfiguration.cs" />
     <Compile Include="HttpModuleBootstrapper.cs" />
     <Compile Include="NancyHttpModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,28 +1,35 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data.Entities;
+using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Node.Messages;
 using System.Linq;
-using CrossStitch.Core.MessageBus;
 
 namespace CrossStitch.Core.Node
 {
-    public class ApplicationCoordinator : IModule
+    public class ApplicationCoordinatorModule : IModule
     {
         private SubscriptionCollection _subscriptions;
-        private RunningNode _node;
+        private CrossStitchCore _node;
         private IMessageBus _messageBus;
         private DataHelperClient _data;
 
         public string Name => "ApplicationCoordinator";
 
-        public void Start(RunningNode context)
+        public void Start(CrossStitchCore context)
         {
             _node = context;
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _messageBus = context.MessageBus;
             _data = new DataHelperClient(_messageBus);
 
+            // On Core initialization, startup all necessary Stitches
+            _subscriptions.Subscribe<CoreEvent>(b => b
+                .WithChannelName(CoreEvent.ChannelInitialized)
+                .Invoke(StartupStitches)
+                .OnWorkerThread());
+
+            // CRUD requests for Application records
             _subscriptions.Listen<ApplicationChangeRequest, Application>(l => l
                 .WithChannelName(ApplicationChangeRequest.Insert)
                 .Invoke(CreateApplication));
@@ -33,12 +40,28 @@ namespace CrossStitch.Core.Node
                 .WithChannelName(ApplicationChangeRequest.Delete)
                 .Invoke(DeleteApplication));
 
+            // CRUD requests for Components
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Insert).Invoke(InsertComponent));
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Update).Invoke(UpdateComponent));
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Delete).Invoke(DeleteComponent));
 
+            // CRUD requests for Stitch Instances
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Delete).Invoke(DeleteInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Clone).Invoke(CloneInstance));
+        }
+
+        // On Core Initialization, get all stitch instances from the data store and start them.
+        private void StartupStitches(CoreEvent obj)
+        {
+            var instances = _data.GetAllInstances();
+            foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
+            {
+                var result = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Start, new InstanceRequest
+                {
+                    Id = instance.Id
+                });
+                _data.Save(instance);
+            }
         }
 
         private GenericResponse DeleteComponent(ComponentChangeRequest arg)

@@ -44,9 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Events\EventHandlerExtensions.cs" />
+    <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="IRunningNodeContext.cs" />
     <Compile Include="V1\Core\CoreMessageManager.cs" />
     <Compile Include="V1\Core\FromStitchMessageReader.cs" />
+    <Compile Include="V1\Stitch\HeartbeatReceivedEventArgs.cs" />
     <Compile Include="V1\Stitch\StitchMessageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V1\FromStitchMessage.cs" />

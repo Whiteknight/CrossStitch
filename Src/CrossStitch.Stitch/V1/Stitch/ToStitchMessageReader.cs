@@ -2,7 +2,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 namespace CrossStitch.Stitch.V1.Stitch
 {
@@ -17,18 +16,12 @@ namespace CrossStitch.Stitch.V1.Stitch
             _stdin = new StreamReader(stdin);
         }
 
-        public ToStitchMessage ReadMessage(CancellationToken cancellationToken)
+        public ToStitchMessage ReadMessage()
         {
-            List<string> lines = new List<string>();
+            var lines = new List<string>();
             while (true)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    return null;
-                var task = _stdin.ReadLineAsync();
-                bool ok = task.Wait(ReadTimeoutMs, cancellationToken);
-                if (!ok)
-                    continue;
-                var s = task.Result;
+                var s = _stdin.ReadLine();
                 if (s.Trim() == "end")
                     break;
                 lines.Add(s);

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿using CrossStitch.Core.Events;
+using System;
 using System.Threading;
 
 namespace CrossStitch.Stitch.V1.Stitch
@@ -9,6 +9,8 @@ namespace CrossStitch.Stitch.V1.Stitch
         private readonly IToStitchMessageProcessor _processor;
         private readonly ToStitchMessageReader _reader;
         private readonly FromStitchMessageSender _sender;
+
+        public event EventHandler<HeartbeatReceivedEventArgs> HeartbeatReceived;
 
         public StitchMessageManager(IToStitchMessageProcessor processor, ToStitchMessageReader reader = null, FromStitchMessageSender sender = null)
         {
@@ -29,7 +31,7 @@ namespace CrossStitch.Stitch.V1.Stitch
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var message = _reader.ReadMessage(cancellationToken);
+                var message = _reader.ReadMessage();
                 if (cancellationToken.IsCancellationRequested)
                     return;
                 if (message == null)
@@ -37,17 +39,25 @@ namespace CrossStitch.Stitch.V1.Stitch
 
                 if (message.IsHeartbeatMessage())
                 {
-                    _sender.SendSync();
+                    OnHeartbeatReceived(message.Id);
                     continue;
                 }
 
-                var responses = _processor.Process(message) ?? Enumerable.Empty<FromStitchMessage>();
-                foreach (var response in responses)
-                {
-                    // TODO: Should we force response.Id = message.Id here?
-                    _sender.SendMessage(response);
-                }
+                var ok = _processor.Process(message);
+                if (ok)
+                    _sender.SendAck(message.Id);
+                else
+                    _sender.SendFail(message.Id);
             }
+        }
+
+        private void OnHeartbeatReceived(long id)
+        {
+            HeartbeatReceived.Raise(this, new HeartbeatReceivedEventArgs
+            {
+                Id = id
+            });
+            _sender.SendSync();
         }
 
         public void Dispose()

@@ -28,9 +28,9 @@ namespace HttpTest
                 var data = new DataModule(dataStorage);
                 runningNode.AddModule(data);
 
-                var appsConfiguration = StitchesConfiguration.GetDefault();
-                var apps = new StitchesModule(appsConfiguration);
-                runningNode.AddModule(apps);
+                var stitchesConfiguration = StitchesConfiguration.GetDefault();
+                var stitches = new StitchesModule(stitchesConfiguration);
+                runningNode.AddModule(stitches);
 
                 runningNode.Start();
                 Console.ReadKey();

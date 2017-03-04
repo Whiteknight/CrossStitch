@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
     <Compile Include="Modules\Stitches\StitchResourceUsage.cs" />
     <Compile Include="Modules\Stitches\StitchesConfiguration.cs" />
@@ -94,8 +95,6 @@
     <Compile Include="Data\IDataEntity.cs" />
     <Compile Include="Data\IDataStorage.cs" />
     <Compile Include="Data\Messages\DataRequest.cs" />
-    <Compile Include="Events\EventHandlerExtensions.cs" />
-    <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="MessageBus\MessageBusExtensions.cs" />
     <Compile Include="Modules\Http\HttpConfiguration.cs" />
     <Compile Include="Logging\Events\LogEvent.cs" />

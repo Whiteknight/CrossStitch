@@ -1,7 +1,7 @@
 ﻿using CrossStitch.Stitch.V1;
 using CrossStitch.Stitch.V1.Stitch;
 using System;
-using System.Collections.Generic;
+using System.IO;
 
 namespace StitchStart.Client
 {
@@ -9,21 +9,38 @@ namespace StitchStart.Client
     {
         static void Main(string[] args)
         {
-            // TODO: Some kind of mechanism to attach Console.KeyAvailable to CancellationSource.Cancel.
-            StitchMessageManager manager = new StitchMessageManager(new MessageProcessor());
-            manager.StartRunLoop();
+            try
+            {
+                Log("Started " + Directory.GetCurrentDirectory());
+                // TODO: Some kind of mechanism to attach Console.KeyAvailable to CancellationSource.Cancel.
+                var manager = new StitchMessageManager(new MessageProcessor());
+                manager.HeartbeatReceived += ManagerHeartbeatReceived;
+                manager.StartRunLoop();
+            }
+            catch (Exception e)
+            {
+                Log(e.ToString());
+            }
+            Log("Stopped");
+        }
+
+        private static void ManagerHeartbeatReceived(object sender, HeartbeatReceivedEventArgs e)
+        {
+            Log("Heartbeat " + e.Id);
+        }
+
+        public static void Log(string s)
+        {
+            File.AppendAllText("C:\\Test\\StitchStart.Client.txt", s + "\n");
         }
     }
 
     public class MessageProcessor : IToStitchMessageProcessor
     {
-        public IEnumerable<FromStitchMessage> Process(ToStitchMessage message)
+        public bool Process(ToStitchMessage message)
         {
-            Console.WriteLine("Received {0} {1}: {2}", message.Id, message.ChannelName, message.Data);
-            return new[]
-            {
-                FromStitchMessage.Ack(message.Id)
-            };
+            Program.Log(string.Format("Received {0} {1}: {2}", message.Id, message.ChannelName, message.Data));
+            return true;
         }
     }
 }

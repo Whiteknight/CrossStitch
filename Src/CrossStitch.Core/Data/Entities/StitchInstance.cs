@@ -17,7 +17,6 @@
         public string FullName { get; set; }
         public string DirectoryPath { get; set; }
         public string ExecutableName { get; set; }
-        public string ApplicationClassName { get; set; }
         public InstanceStateType State { get; set; }
         public int MissedHeartbeats { get; set; }
     }

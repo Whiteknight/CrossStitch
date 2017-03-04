@@ -10,7 +10,7 @@ namespace CrossStitch.Stitch.V1.Core
     public class FromStitchMessageReader : IDisposable
     {
         private readonly StreamReader _stdin;
-        private const int ReadTimeoutMs = 10000;
+        private const int ReadTimeoutMs = 5000;
 
         public FromStitchMessageReader(Stream stdin)
         {
@@ -22,17 +22,28 @@ namespace CrossStitch.Stitch.V1.Core
             _stdin = stdin;
         }
 
+        private const int MaxFailures = 5;
+
         public FromStitchMessage ReadMessage(CancellationToken cancellationToken)
         {
-            List<string> lines = new List<string>();
+            int failures = 0;
+            var lines = new List<string>();
             while (true)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    return null;
+
                 var task = _stdin.ReadLineAsync();
                 bool ok = task.Wait(ReadTimeoutMs, cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                    return null;
                 if (!ok)
+                {
+                    failures++;
+                    if (failures >= MaxFailures)
+                        return null;
                     continue;
+                }
+
+                failures = 0;
                 var s = task.Result;
                 if (s.Trim() == "end")
                     break;

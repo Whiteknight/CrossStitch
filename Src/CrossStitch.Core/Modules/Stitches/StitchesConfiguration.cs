@@ -6,7 +6,7 @@ namespace CrossStitch.Core.Modules.Stitches
     {
         public static StitchesConfiguration GetDefault()
         {
-            return ConfigurationLoader.GetConfiguration<StitchesConfiguration>("apps.json");
+            return ConfigurationLoader.GetConfiguration<StitchesConfiguration>("stitches.json");
         }
 
         public void SetDefaults()

@@ -32,8 +32,8 @@ namespace CrossStitch.Core.Modules.Stitches
 
             _adaptors = new ConcurrentDictionary<string, IStitchAdaptor>();
 
-            List<InstanceActionResult> results = new List<InstanceActionResult>();
-            foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running))
+            var results = new List<InstanceActionResult>();
+            foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
             {
                 var result = Start(instance);
                 results.Add(result);

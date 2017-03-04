@@ -41,14 +41,20 @@ namespace CrossStitch.Core.Node
 
         public void Start()
         {
-            _subscriptions = new SubscriptionCollection(MessageBus);
+            try
+            {
+                _subscriptions = new SubscriptionCollection(MessageBus);
 
-            // Publish the status of the node every 60 seconds
-            _subscriptions.TimerSubscribe(6, b => b
-                .Invoke(t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()))
-                .OnWorkerThread());
-            _subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
+                // Publish the status of the node every 60 seconds
+                _subscriptions.TimerSubscribe(6, b => b
+                    .Invoke(t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()))
+                    .OnWorkerThread());
+                _subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
+            }
+            catch (Exception e)
+            {
 
+            }
             foreach (var module in _managedModules)
                 module.Start(this);
             foreach (var module in _modules)

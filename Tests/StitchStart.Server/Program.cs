@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Acquaintance;
+using CrossStitch.Core.Data;
+using CrossStitch.Core.Data.Entities;
+using CrossStitch.Core.Modules.Stitches;
+using CrossStitch.Core.Node;
+using System;
 
 namespace StitchStart.Server
 {
@@ -10,6 +11,41 @@ namespace StitchStart.Server
     {
         static void Main(string[] args)
         {
+            var config = NodeConfiguration.GetDefault();
+            var messageBus = new MessageBus();
+            using (var node = new RunningNode(config, messageBus))
+            {
+                var dataConfiguration = DataConfiguration.GetDefault();
+                var dataStorage = new InMemoryDataStorage(dataConfiguration);
+
+                dataStorage.Save(new StitchInstance
+                {
+                    Name = "StitchStart.Client",
+                    Application = "StitchStart",
+                    Component = "Client",
+                    Version = "1",
+                    Adaptor = new InstanceAdaptorDetails
+                    {
+                        RunMode = InstanceRunModeType.V1Process
+                    },
+                    FullName = "StitchStart.Client",
+                    DirectoryPath = ".",
+                    ExecutableName = "StitchStart.Client.exe",
+                    State = InstanceStateType.Running,
+                    MissedHeartbeats = 0
+                });
+
+                var data = new DataModule(dataStorage);
+                node.AddModule(data);
+
+                var stitchesConfiguration = StitchesConfiguration.GetDefault();
+                var stitches = new StitchesModule(stitchesConfiguration);
+                node.AddModule(stitches);
+
+                node.Start();
+                Console.ReadKey();
+                node.Stop();
+            }
         }
     }
 }

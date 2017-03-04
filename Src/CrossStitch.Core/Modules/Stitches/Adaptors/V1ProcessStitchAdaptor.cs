@@ -1,13 +1,12 @@
 ﻿using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.Events;
-using CrossStitch.Core.Node;
+using CrossStitch.Stitch;
 using CrossStitch.Stitch.V1;
 using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using CrossStitch.Stitch;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
@@ -36,6 +35,8 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             var executableName = Path.Combine(_stitchInstance.DirectoryPath, _stitchInstance.ExecutableName);
             _process = new Process();
 
+            var workingDir = Directory.GetCurrentDirectory();
+
             _process.EnableRaisingEvents = true;
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.ErrorDialog = false;
@@ -47,7 +48,11 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
             _process.Exited += ProcessOnExited;
-            _process.Start();
+
+            // TODO: We should pass some command-line args to the new program:
+            // node name/id, instance id, some information about the application topology, 
+            // the data directory, etc
+            bool ok = _process.Start();
 
             var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
             var toStitchSender = new ToStitchMessageSender(_process.StandardInput, _nodeContext);
@@ -60,8 +65,16 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
 
         public bool SendHeartbeat(long id)
         {
-            // TODO
-            throw new NotImplementedException();
+            var response = _channel.SendMessage(new ToStitchMessage
+            {
+                Id = id,
+                StitchId = 0,
+                NodeName = _nodeContext.Name,
+                ChannelName = ToStitchMessage.HeartbeatChannelName,
+                Data = ""
+            }, CancellationToken.None);
+
+            return response != null && response.Command == FromStitchMessage.CommandSync;
         }
 
         // TODO: Convert this to take some kind of object instead of all these primitive values

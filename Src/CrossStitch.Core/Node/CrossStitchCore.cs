@@ -1,5 +1,6 @@
 ﻿using Acquaintance;
 using Acquaintance.Timers;
+using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules.Timer;
 using CrossStitch.Core.Node.Messages;
 using System;
@@ -59,6 +60,7 @@ namespace CrossStitch.Core.Node
             {
                 module.Start(this);
                 MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(Name, module.Name));
+                MessageBus.LogInformation("New module added: {0}", module.Name);
             }
         }
 
@@ -82,10 +84,15 @@ namespace CrossStitch.Core.Node
 
             _started = true;
             MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent(Name));
+            MessageBus.LogError("Core initialized");
         }
 
+        // TODO: Break stop down into two-phases. Pre-stop alerts all modules about shutdown and does logging.
+        // Stop will wait for all modules to indicate readiness or, after a timeout, force shutdown.
         public void Stop()
         {
+            MessageBus.LogInformation("Core is shutting down");
+
             foreach (var module in _modules)
                 module.Stop();
             foreach (var module in _managedModules)
@@ -95,6 +102,7 @@ namespace CrossStitch.Core.Node
             _subscriptions = null;
 
             _started = false;
+
             // TODO: Should we publish a Stop event? Is anybody listening at this point?
         }
 

@@ -4,12 +4,18 @@ namespace CrossStitch.Core.Logging.Events
 {
     public class LogEvent
     {
-        public const string Error = "Error";
-        public const string Warning = "Warning";
-        public const string Information = "Information";
-        public const string Debug = "Debug";
+        public const string LevelError = "Error";
+        public const string LevelWarning = "Warning";
+        public const string LevelInformation = "Information";
+        public const string LevelDebug = "Debug";
 
-        public string Message { get; set; }
-        public Exception Exception { get; set; }
+        public LogEvent(string message, Exception exception = null)
+        {
+            Message = message;
+            Exception = exception;
+        }
+
+        public string Message { get; }
+        public Exception Exception { get; }
     }
 }

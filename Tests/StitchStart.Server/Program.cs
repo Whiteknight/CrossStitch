@@ -1,6 +1,7 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Data;
 using CrossStitch.Core.Data.Entities;
+using CrossStitch.Core.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Core.Node;
 using System;
@@ -41,6 +42,9 @@ namespace StitchStart.Server
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();
                 var stitches = new StitchesModule(stitchesConfiguration);
                 node.AddModule(stitches);
+
+                var logging = new LoggingModule();
+                node.AddModule(logging);
 
                 node.Start();
                 Console.ReadKey();

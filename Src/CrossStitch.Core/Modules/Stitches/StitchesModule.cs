@@ -184,7 +184,10 @@ namespace CrossStitch.Core.Modules.Stitches
                     continue;
                 }
                 if (result.Success)
+                {
                     _dataStorage.MarkHeartbeatSync(result.InstanceId);
+                    _log.LogDebug("Heartbeat sync received Id={0}", result.InstanceId);
+                }
                 else
                 {
                     _dataStorage.MarkHeartbeatMissed(result.InstanceId);

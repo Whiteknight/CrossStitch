@@ -12,7 +12,7 @@ namespace CrossStitch.Core.Logging
         private int _threadId;
         private IMessageBus _messageBus;
 
-        public LoggingModule(ILog log = null)
+        public LoggingModule(ILog log)
         {
             _log = log;
         }

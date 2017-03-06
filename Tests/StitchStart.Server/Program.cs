@@ -43,7 +43,8 @@ namespace StitchStart.Server
                 var stitches = new StitchesModule(stitchesConfiguration);
                 node.AddModule(stitches);
 
-                var logging = new LoggingModule();
+                var log = Common.Logging.LogManager.GetLogger("CrossStitch");
+                var logging = new LoggingModule(log);
                 node.AddModule(logging);
 
                 node.Start();

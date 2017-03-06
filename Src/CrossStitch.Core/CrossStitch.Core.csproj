@@ -68,8 +68,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\InMemoryDataStorage.cs" />
-    <Compile Include="Logging\LoggingModule.cs" />
+    <Compile Include="Modules\Data\InMemoryDataStorage.cs" />
+    <Compile Include="Modules\Logging\LoggingModule.cs" />
+    <Compile Include="MessageBus\ModuleLog.cs" />
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
     <Compile Include="Modules\Stitches\StitchResourceUsage.cs" />
     <Compile Include="Modules\Stitches\StitchesConfiguration.cs" />
@@ -91,17 +92,17 @@
     <Compile Include="Modules\Backplane\BackplaneModule.cs" />
     <Compile Include="Modules\Backplane\Events\ClusterMemberEvent.cs" />
     <Compile Include="Modules\Backplane\Events\ZoneMemberEvent.cs" />
-    <Compile Include="Data\DataConfiguration.cs" />
-    <Compile Include="Data\DataModule.cs" />
-    <Compile Include="Data\Entities\Application.cs" />
-    <Compile Include="Data\Entities\StitchInstance.cs" />
-    <Compile Include="Data\Entities\PeerNode.cs" />
-    <Compile Include="Data\FolderDataStorage.cs" />
-    <Compile Include="Data\IDataEntity.cs" />
-    <Compile Include="Data\IDataStorage.cs" />
-    <Compile Include="Data\Messages\DataRequest.cs" />
+    <Compile Include="Modules\Data\DataConfiguration.cs" />
+    <Compile Include="Modules\Data\DataModule.cs" />
+    <Compile Include="Models\Application.cs" />
+    <Compile Include="Models\StitchInstance.cs" />
+    <Compile Include="Models\PeerNode.cs" />
+    <Compile Include="Modules\Data\FolderDataStorage.cs" />
+    <Compile Include="Modules\Data\IDataEntity.cs" />
+    <Compile Include="Modules\Data\IDataStorage.cs" />
+    <Compile Include="Data\DataRequest.cs" />
     <Compile Include="MessageBus\MessageBusExtensions.cs" />
-    <Compile Include="Logging\Events\LogEvent.cs" />
+    <Compile Include="Logging\LogEvent.cs" />
     <Compile Include="Modules\Master\ClusterPeerNode.cs" />
     <Compile Include="Modules\Backplane\BackplaneConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
@@ -125,11 +126,11 @@
     <Compile Include="Networking\NetMq\SingleReceiveChannel.cs" />
     <Compile Include="Networking\TargetType.cs" />
     <Compile Include="Node\ApplicationCoordinator.cs" />
-    <Compile Include="Node\DataHelperClient.cs" />
+    <Compile Include="MessageBus\DataHelperClient.cs" />
     <Compile Include="Node\Messages\ApplicationMessage.cs" />
     <Compile Include="Node\Messages\ComponentChangeRequest.cs" />
     <Compile Include="Modules\Timer\MessageTimerModule.cs" />
-    <Compile Include="IModule.cs" />
+    <Compile Include="Modules\IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
     <Compile Include="Node\Messages\CoreEvent.cs" />
     <Compile Include="Node\Messages\NodeStatus.cs" />

@@ -11,6 +11,7 @@ using System;
 
 namespace CrossStitch.Core.Modules.Backplane
 {
+    // TODO: Move Zyre-related logic into a separate assembly to isolate the dependency
     public sealed class ZyreBackplane : IClusterBackplane
     {
         private readonly BackplaneConfiguration _config;

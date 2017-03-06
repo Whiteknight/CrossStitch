@@ -14,12 +14,15 @@ namespace CrossStitch.Core.Modules.Stitches
     public class StitchesModule : IModule
     {
         private readonly StitchesConfiguration _configuration;
+        private readonly StitchFileSystem _fileSystem;
+
+        // TODO: Move most of this mutable data into a state/context object
         private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
         private StitchInstanceManager _stitchInstanceManager;
         private StitchesDataStorage _dataStorage;
         private CrossStitchCore _node;
-        private readonly StitchFileSystem _fileSystem;
+        private ModuleLog _log;
 
         public StitchesModule(StitchesConfiguration configuration)
         {
@@ -33,6 +36,8 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             _node = context;
             _messageBus = context.MessageBus;
+            _log = new ModuleLog(_messageBus, Name);
+
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(l => l.OnDefaultChannel().Invoke(GetInstanceInformation));
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l.OnDefaultChannel().Invoke(UploadPackageFile));
@@ -47,6 +52,8 @@ namespace CrossStitch.Core.Modules.Stitches
             _dataStorage = new StitchesDataStorage(context.MessageBus);
             _stitchInstanceManager = new StitchInstanceManager(context, _fileSystem);
             _stitchInstanceManager.StitchStarted += StitchInstancesOnStitchStarted;
+
+            _log.LogDebug("Started");
         }
 
         public void Stop()
@@ -56,6 +63,8 @@ namespace CrossStitch.Core.Modules.Stitches
             _stitchInstanceManager = null;
             _subscriptions?.Dispose();
             _subscriptions = null;
+
+            _log.LogDebug("Stopped");
         }
 
         public void Dispose()
@@ -76,7 +85,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 InstanceId = stitchProcessEventArgs.InstanceId,
                 NodeId = _node.NodeId
             });
-            _messageBus.LogInformation("Stitch instance {0} is started", stitchProcessEventArgs.InstanceId);
+            _log.LogInformation("Stitch instance {0} is started", stitchProcessEventArgs.InstanceId);
         }
 
         // TODO: Move this into the ApplicationCoordinator
@@ -94,7 +103,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
             // Update the Application record with the new Version
             _dataStorage.Update<Application>(request.Application, a => a.AddVersion(request.Component, version));
-            _messageBus.LogDebug("Uploaded package file {0}:{1}:{2}", request.Application, request.Component, version);
+            _log.LogDebug("Uploaded package file {0}:{1}:{2}", request.Application, request.Component, version);
             return new PackageFileUploadResponse(true, version);
         }
 
@@ -119,7 +128,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 return null;
             }
             stitchInstance = _dataStorage.Update<StitchInstance>(stitchInstance.Id, i => i.DirectoryPath = result.Path);
-            _messageBus.LogDebug("Stitch instance {0}:{1}:{2} Id={3} created", stitchInstance.Application, stitchInstance.Component, stitchInstance.Version, stitchInstance.Id);
+            _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} created", stitchInstance.Application, stitchInstance.Component, stitchInstance.Version, stitchInstance.Id);
             return stitchInstance;
         }
 
@@ -134,11 +143,11 @@ namespace CrossStitch.Core.Modules.Stitches
                     InstanceId = result.InstanceId,
                     NodeId = _node.NodeId
                 });
-                _messageBus.LogDebug("Stitch instance {0}:{1}:{2} Id={3} started", instance.Application, instance.Component, instance.Version, instance.Id);
+                _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} started", instance.Application, instance.Component, instance.Version, instance.Id);
             }
             else
             {
-                _messageBus.LogError(result.Exception, "Stitch instance {0}:{1}:{2} Id={3} failed to start", instance.Application, instance.Component, instance.Version, instance.Id);
+                _log.LogError(result.Exception, "Stitch instance {0}:{1}:{2} Id={3} failed to start", instance.Application, instance.Component, instance.Version, instance.Id);
             }
             return new InstanceResponse
             {
@@ -154,7 +163,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 return new InstanceResponse { Success = false };
 
             var updateResult = _dataStorage.Update<StitchInstance>(request.Id, i => i.State = InstanceStateType.Stopped);
-            _messageBus.LogDebug("Stitch instance {0}:{1}:{2} Id={3} stopped", instance.Application, instance.Component, instance.Version, instance.Id);
+            _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} stopped", instance.Application, instance.Component, instance.Version, instance.Id);
             return new InstanceResponse { Success = updateResult != null };
         }
 
@@ -162,7 +171,7 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             // TODO: Generate a unique-per-node heartbeat id, preferrably monotonically increasing
             long id = 0;
-            _messageBus.LogDebug("Sending heartbeat {0}", id);
+            _log.LogDebug("Sending heartbeat {0}", id);
             var instances = _dataStorage.GetAllInstances()
                 .Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started)
                 .ToList(); ;
@@ -179,7 +188,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 else
                 {
                     _dataStorage.MarkHeartbeatMissed(result.InstanceId);
-                    _messageBus.LogWarning("Heartbeat missed Id={0}", result.InstanceId);
+                    _log.LogWarning("Heartbeat missed Id={0}", result.InstanceId);
                 }
             }
         }

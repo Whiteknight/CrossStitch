@@ -14,7 +14,7 @@ namespace CrossStitch.Core.Logging
 
         public LoggingModule(ILog log = null)
         {
-            _log = log ?? LogManager.GetLogger("CrossStitch");
+            _log = log;
         }
 
         public string Name => "Logging";

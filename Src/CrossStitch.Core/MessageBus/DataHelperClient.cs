@@ -38,7 +38,11 @@ namespace CrossStitch.Core.Node
         {
             entity.StoreVersion = 0;
             var request = DataRequest<TEntity>.Save(entity);
-            return Bus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request)?.Entity;
+            var response = Bus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request);
+            if (response == null || response.Type != DataResponseType.Success)
+                return null;
+
+            return response.Entity;
         }
 
         public TEntity Update<TEntity>(string id, Action<TEntity> update)

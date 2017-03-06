@@ -9,10 +9,12 @@ namespace CrossStitch.Core.Node
 {
     public class ApplicationCoordinatorModule : IModule
     {
+        // TODO: Move most of this mutable data into a state object.
         private SubscriptionCollection _subscriptions;
         private CrossStitchCore _node;
         private IMessageBus _messageBus;
         private DataHelperClient _data;
+        private ModuleLog _log;
 
         public string Name => "ApplicationCoordinator";
 
@@ -21,6 +23,7 @@ namespace CrossStitch.Core.Node
             _node = context;
             _subscriptions = new SubscriptionCollection(context.MessageBus);
             _messageBus = context.MessageBus;
+            _log = new ModuleLog(_messageBus, Name);
             _data = new DataHelperClient(_messageBus);
 
             // On Core initialization, startup all necessary Stitches
@@ -48,11 +51,14 @@ namespace CrossStitch.Core.Node
             // CRUD requests for Stitch Instances
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Delete).Invoke(DeleteInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Clone).Invoke(CloneInstance));
+
+            _log.LogDebug("Started");
         }
 
         // On Core Initialization, get all stitch instances from the data store and start them.
         private void StartupStitches(CoreEvent obj)
         {
+            _log.LogDebug("Starting startup stitches");
             var instances = _data.GetAllInstances();
             foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
             {
@@ -62,6 +68,7 @@ namespace CrossStitch.Core.Node
                 });
                 _data.Save(instance);
             }
+            _log.LogDebug("Startup stitches started");
         }
 
         private GenericResponse DeleteComponent(ComponentChangeRequest arg)
@@ -124,20 +131,29 @@ namespace CrossStitch.Core.Node
         private Application CreateApplication(ApplicationChangeRequest arg)
         {
             // TODO: Check that an application with the same name doesn't already exist
-            return _data.Insert(new Application
+            var application = _data.Insert(new Application
             {
                 Name = arg.Name,
                 NodeId = _node.NodeId
             });
+            if (application != null)
+                _log.LogInformation("Created application {0}:{1}", application.Id, application.Name);
+            return application;
         }
 
         private InstanceResponse DeleteInstance(InstanceRequest request)
         {
             var stopResponse = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Stop, request);
+            if (!stopResponse.Success)
+                _log.LogError("Instance {0} could not be stopped", request.Id);
             bool deleted = _data.Delete<StitchInstance>(request.Id);
+            if (!deleted)
+                _log.LogError("Instance {0} could not be deleted", request.Id);
+            if (stopResponse.Success && deleted)
+                _log.LogInformation("Instance {0} stopped and deleted successfully", request.Id);
             return new InstanceResponse
             {
-                Success = deleted
+                Success = stopResponse.Success && deleted
             };
         }
 
@@ -147,6 +163,11 @@ namespace CrossStitch.Core.Node
             instance.Id = null;
             instance.StoreVersion = 0;
             instance = _data.Insert(instance);
+            if (instance == null)
+                _log.LogError("Could not clone instance {0}, data could not be saved.", request.Id);
+            else
+                _log.LogInformation("Instance {0} cloned to {1}", request.Id, instance.Id);
+
             return new InstanceResponse
             {
                 Success = true,

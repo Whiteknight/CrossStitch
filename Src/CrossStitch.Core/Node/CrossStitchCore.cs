@@ -15,6 +15,7 @@ namespace CrossStitch.Core.Node
         private readonly List<IModule> _managedModules;
         private SubscriptionCollection _subscriptions;
         private bool _started;
+        private ModuleLog _log;
 
         // TODO: We shouldn't allow IMessageBus instances to be shared between CrossStitchCore
         // instances, because it will break a lot of things.
@@ -29,6 +30,7 @@ namespace CrossStitch.Core.Node
                 new MessageTimerModule(messageBus),
                 new ApplicationCoordinatorModule()
             };
+            _log = new ModuleLog(MessageBus, "Core");
         }
 
         private Guid _nodeId;
@@ -60,7 +62,7 @@ namespace CrossStitch.Core.Node
             {
                 module.Start(this);
                 MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(Name, module.Name));
-                MessageBus.LogInformation("New module added: {0}", module.Name);
+                _log.LogInformation("New module added: {0}", module.Name);
             }
         }
 
@@ -84,14 +86,14 @@ namespace CrossStitch.Core.Node
 
             _started = true;
             MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent(Name));
-            MessageBus.LogError("Core initialized");
+            _log.LogError("Core initialized");
         }
 
         // TODO: Break stop down into two-phases. Pre-stop alerts all modules about shutdown and does logging.
         // Stop will wait for all modules to indicate readiness or, after a timeout, force shutdown.
         public void Stop()
         {
-            MessageBus.LogInformation("Core is shutting down");
+            _log.LogInformation("Core is shutting down");
 
             foreach (var module in _modules)
                 module.Stop();

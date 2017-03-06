@@ -34,6 +34,10 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 stitchInstance.State = InstanceStateType.Stopped;
 
+                // TODO: On Stitch start, we should send it information about the application topology
+                // TODO: We should also send application topology change notifications to every Stitch 
+                // involved in the affected application.
+
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
                 {

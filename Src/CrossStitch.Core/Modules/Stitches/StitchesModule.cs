@@ -8,6 +8,7 @@ using CrossStitch.Core.Modules.Timer;
 using CrossStitch.Core.Node;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -23,6 +24,7 @@ namespace CrossStitch.Core.Modules.Stitches
         private StitchesDataStorage _dataStorage;
         private CrossStitchCore _node;
         private ModuleLog _log;
+        private long _heartbeatId;
 
         public StitchesModule(StitchesConfiguration configuration)
         {
@@ -169,8 +171,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         private void SendScheduledHeartbeat()
         {
-            // TODO: Generate a unique-per-node heartbeat id, preferrably monotonically increasing
-            long id = 0;
+            long id = Interlocked.Increment(ref _heartbeatId);
             _log.LogDebug("Sending heartbeat {0}", id);
             var instances = _dataStorage.GetAllInstances()
                 .Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started)

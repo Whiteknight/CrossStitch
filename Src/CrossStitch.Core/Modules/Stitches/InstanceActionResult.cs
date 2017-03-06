@@ -1,5 +1,5 @@
-﻿using System;
-using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Models;
+using System;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -11,16 +11,33 @@ namespace CrossStitch.Core.Modules.Stitches
         public Exception Exception { get; set; }
         public bool Found { get; set; }
 
-        public static InstanceActionResult Failure()
+        public static InstanceActionResult NotFound(string instanceId)
         {
-            return new InstanceActionResult { Success = false };
+            return new InstanceActionResult
+            {
+                InstanceId = instanceId,
+                Success = false,
+                Found = false
+            };
         }
 
-        public static InstanceActionResult Failure(Exception e)
+        public static InstanceActionResult Result(string instanceId, bool ok)
+        {
+            return new InstanceActionResult
+            {
+                Found = true,
+                InstanceId = instanceId,
+                Success = ok
+            };
+        }
+
+        public static InstanceActionResult Failure(string instanceId, bool found, Exception e)
         {
             return new InstanceActionResult
             {
                 Success = false,
+                Found = found,
+                InstanceId = instanceId,
                 Exception = e
             };
         }

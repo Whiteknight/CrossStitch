@@ -1,69 +1,148 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
-using CrossStitch.Stitch.Events;
 
 namespace CrossStitch.Stitch.V1.Stitch
 {
     public class StitchMessageManager : IDisposable
     {
-        private readonly IToStitchMessageProcessor _processor;
+        private const int CoreCheckIntervalMs = 5000;
+        private const int ExitBecauseOfCoreDisappearance = 1;
+        private const int MessageReadTimeoutMs = 10000;
+
         private readonly ToStitchMessageReader _reader;
         private readonly FromStitchMessageSender _sender;
+        private readonly int? _corePid;
+        private Thread _readerThread;
+        private Thread _coreMonitorThread;
+        private readonly BlockingCollection<ToStitchMessage> _incomingMessages;
 
-        public event EventHandler<HeartbeatReceivedEventArgs> HeartbeatReceived;
+        public bool ReceiveHeartbeats { get; set; }
 
-        public StitchMessageManager(IToStitchMessageProcessor processor, ToStitchMessageReader reader = null, FromStitchMessageSender sender = null)
+        public StitchMessageManager(string[] processArgs, ToStitchMessageReader reader = null, FromStitchMessageSender sender = null)
         {
-            if (processor == null)
-                throw new ArgumentNullException(nameof(processor));
+            if (processArgs != null)
+            {
+                var args = processArgs.Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0], s => s[1]);
+                if (args.ContainsKey("CorePID"))
+                    _corePid = int.Parse(args["CorePID"]);
+            }
 
-            _processor = processor;
             _reader = reader ?? new ToStitchMessageReader(Console.OpenStandardInput());
             _sender = sender ?? new FromStitchMessageSender(Console.OpenStandardOutput());
+            _incomingMessages = new BlockingCollection<ToStitchMessage>();
         }
 
-        public void StartRunLoop()
+        public void Start()
         {
-            StartRunLoop(CancellationToken.None);
+            if (_corePid.HasValue)
+            {
+                var coreProcess = Process.GetProcessById(_corePid.Value);
+                _coreMonitorThread = new Thread(CoreCheckerThreadFunction);
+                _coreMonitorThread.Start(coreProcess);
+            }
+
+            _readerThread = new Thread(ReaderThreadFunction);
+            _readerThread.Start();
         }
 
-        public void StartRunLoop(CancellationToken cancellationToken)
+        public void Stop()
         {
-            while (!cancellationToken.IsCancellationRequested)
+            if (_readerThread != null)
+            {
+                _readerThread.Abort();
+                _readerThread.Join();
+                _readerThread = null;
+            }
+
+            if (_coreMonitorThread != null)
+            {
+                _coreMonitorThread.Abort();
+                _coreMonitorThread.Join();
+                _coreMonitorThread = null;
+            }
+        }
+
+        public ToStitchMessage GetNextMessage()
+        {
+            ToStitchMessage message;
+            bool ok = _incomingMessages.TryTake(out message, MessageReadTimeoutMs);
+            if (!ok || message == null)
+                return null;
+            return message;
+        }
+
+        public void SendLogs(string[] logs)
+        {
+            _sender.SendMessage(FromStitchMessage.LogMessage(logs));
+        }
+
+        public void SyncHeartbeat(long id)
+        {
+            _sender.SendMessage(FromStitchMessage.Sync(id));
+        }
+
+        public void AckMessage(long id)
+        {
+            _sender.SendMessage(FromStitchMessage.Ack(id));
+        }
+
+        public void FailMessage(long id)
+        {
+            _sender.SendMessage(FromStitchMessage.Fail(id));
+        }
+
+        public void Dispose()
+        {
+            Stop();
+            _reader.Dispose();
+            _sender.Dispose();
+        }
+
+        private void ReaderThreadFunction()
+        {
+            while (true)
             {
                 var message = _reader.ReadMessage();
-                if (cancellationToken.IsCancellationRequested)
-                    return;
                 if (message == null)
                     continue;
 
                 if (message.IsHeartbeatMessage())
                 {
-                    OnHeartbeatReceived(message.Id);
+                    if (ReceiveHeartbeats)
+                        _incomingMessages.Add(message);
+                    else
+                        _sender.SendSync(message.Id);
+
                     continue;
                 }
 
-                var ok = _processor.Process(message);
-                if (ok)
-                    _sender.SendAck(message.Id);
-                else
-                    _sender.SendFail(message.Id);
+                _incomingMessages.Add(message);
             }
         }
 
-        private void OnHeartbeatReceived(long id)
+        private void CoreCheckerThreadFunction(object coreProcessObject)
         {
-            HeartbeatReceived.Raise(this, new HeartbeatReceivedEventArgs
+            var coreProcess = coreProcessObject as Process;
+            if (coreProcess == null)
+                return;
+
+            while (true)
             {
-                Id = id
-            });
-            _sender.SendSync();
+                if (coreProcess.HasExited)
+                {
+                    OnCoreDisappeared();
+                    return;
+                }
+                Thread.Sleep(CoreCheckIntervalMs);
+            }
         }
 
-        public void Dispose()
+        private void OnCoreDisappeared()
         {
-            _reader.Dispose();
-            _sender.Dispose();
+            Environment.Exit(ExitBecauseOfCoreDisappearance);
         }
     }
 }

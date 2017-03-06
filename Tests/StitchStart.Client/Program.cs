@@ -7,15 +7,32 @@ namespace StitchStart.Client
 {
     class Program
     {
+        private static StitchMessageManager _manager;
         static void Main(string[] args)
         {
+            _manager = new StitchMessageManager(args);
+            _manager.ReceiveHeartbeats = true;
             try
             {
-                Log("Started " + Directory.GetCurrentDirectory());
-                // TODO: Some kind of mechanism to attach Console.KeyAvailable to CancellationSource.Cancel.
-                var manager = new StitchMessageManager(new MessageProcessor());
-                manager.HeartbeatReceived += ManagerHeartbeatReceived;
-                manager.StartRunLoop();
+                _manager.Start();
+                while (true)
+                {
+                    var msg = _manager.GetNextMessage();
+                    if (msg == null)
+                        continue;
+
+                    if (msg.IsHeartbeatMessage())
+                    {
+                        _manager.SyncHeartbeat(msg.Id);
+                        ManagerHeartbeatReceived(msg);
+                    }
+                    else
+                    {
+                        // TODO: Real processing.
+                        Log($"Message received {msg.ChannelName}, {msg.Id}");
+                        _manager.AckMessage(msg.Id);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -24,23 +41,15 @@ namespace StitchStart.Client
             Log("Stopped");
         }
 
-        private static void ManagerHeartbeatReceived(object sender, HeartbeatReceivedEventArgs e)
+        private static void ManagerHeartbeatReceived(ToStitchMessage heartbeat)
         {
-            Log("Heartbeat " + e.Id);
+            Log("Heartbeat " + heartbeat.Id);
         }
 
         public static void Log(string s)
         {
-            File.AppendAllText("C:\\Test\\StitchStart.Client.txt", s + "\n");
-        }
-    }
-
-    public class MessageProcessor : IToStitchMessageProcessor
-    {
-        public bool Process(ToStitchMessage message)
-        {
-            Program.Log(string.Format("Received {0} {1}: {2}", message.Id, message.ChannelName, message.Data));
-            return true;
+            _manager.SendLogs(new[] { s });
+            File.AppendAllText("D:\\Test\\StitchStart.Client.txt", s + "\n");
         }
     }
 }

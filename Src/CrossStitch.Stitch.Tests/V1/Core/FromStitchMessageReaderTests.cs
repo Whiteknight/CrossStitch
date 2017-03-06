@@ -22,7 +22,7 @@ namespace CrossStitch.Stitch.Tests.V1.Core
         {
             var input = CreateInputStream("{Id: 1, Command: 'Ack'}\nend\n");
             var target = new FromStitchMessageReader(input);
-            var result = target.ReadMessage(CancellationToken.None);
+            var result = target.ReadMessage();
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
         }
@@ -38,7 +38,7 @@ namespace CrossStitch.Stitch.Tests.V1.Core
             end
             ");
             var target = new FromStitchMessageReader(input);
-            var result = target.ReadMessage(CancellationToken.None);
+            var result = target.ReadMessage();
             result.Should().NotBeNull();
             result.Id.Should().Be(1);
             result.Command.Should().Be("Ack");

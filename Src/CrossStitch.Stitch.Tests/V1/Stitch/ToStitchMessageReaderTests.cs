@@ -49,7 +49,7 @@ namespace CrossStitch.Stitch.Tests.V1.Stitch
                 Id: 1,
                 ChannelName: '_heartbeat'
             }
-            endB
+            end
             ");
             var target = new ToStitchMessageReader(input);
             var result = target.ReadMessage();

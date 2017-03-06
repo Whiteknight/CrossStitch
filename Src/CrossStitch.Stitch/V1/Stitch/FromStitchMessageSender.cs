@@ -34,9 +34,9 @@ namespace CrossStitch.Stitch.V1.Stitch
             SendMessage(msg);
         }
 
-        public void SendSync()
+        public void SendSync(long heartbeatId)
         {
-            var msg = FromStitchMessage.Sync();
+            var msg = FromStitchMessage.Sync(heartbeatId);
             SendMessage(msg);
         }
 

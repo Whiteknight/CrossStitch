@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 namespace CrossStitch.Stitch.V1.Core
 {
@@ -7,40 +6,75 @@ namespace CrossStitch.Stitch.V1.Core
     // should be once instance of this for every stitch.
     public class CoreMessageManager : IDisposable
     {
+        private readonly CoreStitchContext _stitchContext;
         private readonly FromStitchMessageReader _reader;
         private readonly ToStitchMessageSender _sender;
+        private FromStitchReaderThread _readerThread;
 
-        public CoreMessageManager(IRunningNodeContext nodeContext, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
+        public CoreMessageManager(IRunningNodeContext nodeContext, CoreStitchContext stitchContext, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
         {
+            if (nodeContext == null)
+                throw new ArgumentNullException(nameof(nodeContext));
+            if (stitchContext == null)
+                throw new ArgumentNullException(nameof(stitchContext));
+
+            _stitchContext = stitchContext;
             _reader = reader ?? new FromStitchMessageReader(Console.OpenStandardInput());
             _sender = sender ?? new ToStitchMessageSender(Console.OpenStandardOutput(), nodeContext);
         }
 
-        // TODO: Redo this all to be async. SendMessage should send and not return a value immediately.
-        // _reader should be reading at all times in a tight loop, and putting received messages in
-        // an output queue or other storage. When _reader returns a message we parse it and raise one of a
-        // number of events
+        public EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
+        public EventHandler<RequestResponseReceivedEventArgs> RequestResponseReceived;
+        public EventHandler<LogsReceivedEventArgs> LogsReceived;
 
-        // TODO: The Stitch should be able to send data (addressed to any other stitch in the same application)
-        // or log messages (addressed to the core) without the Core sending a request first. This communication
-        // should be fully bi-directional, not request/response.
-
-        public FromStitchMessage SendMessage(ToStitchMessage message, CancellationToken cancellation)
+        public void Start()
         {
-            _sender.SendMessage(message);
-            return _reader.ReadMessage(cancellation);
+            _readerThread = new FromStitchReaderThread(_reader);
+            _readerThread.MessageReceived += ReaderThreadOnMessageReceived;
+            _readerThread.Start();
         }
 
-        public FromStitchMessage SendHeartbeat(long id, CancellationToken cancellation)
+        public void SendMessage(ToStitchMessage message)
         {
-            _sender.SendHeartbeat(id);
-            return _reader.ReadMessage(cancellation);
+            if (message == null)
+                throw new ArgumentNullException(nameof(message));
+            _sender.SendMessage(message);
         }
 
         public void Dispose()
         {
             _reader.Dispose();
             _sender.Dispose();
+        }
+
+        private void ReaderThreadOnMessageReceived(object sender, FromStitchMessageReceivedEventArgs eventArgs)
+        {
+            if (string.IsNullOrEmpty(eventArgs?.Message?.Command))
+                return;
+
+            var message = eventArgs.Message;
+            switch (message.Command)
+            {
+                case FromStitchMessage.CommandSync:
+                    _stitchContext.ReceiveHeartbeat(message.Id);
+                    break;
+                case FromStitchMessage.CommandAck:
+                    _stitchContext.ReceiveResponse(message.Id, true);
+                    break;
+                case FromStitchMessage.CommandFail:
+                    _stitchContext.ReceiveResponse(message.Id, false);
+                    break;
+                case FromStitchMessage.CommandData:
+                    // TODO: This
+                    _stitchContext.ReceiveData();
+                    break;
+                case FromStitchMessage.CommandLogs:
+                    _stitchContext.ReceiveLogs(message.Logs);
+                    break;
+                default:
+                    // TODO: Log that we have received a weird error
+                    break;
+            }
         }
     }
 }

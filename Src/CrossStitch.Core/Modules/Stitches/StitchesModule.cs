@@ -1,17 +1,21 @@
 ﻿using Acquaintance;
 using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Modules.Stitches.Versions;
-using CrossStitch.Core.Modules.Timer;
 using CrossStitch.Core.Node;
+using CrossStitch.Stitch.V1.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
+    // TODO: Some kind of request/response to get the current heartbeat ID, so we can calculate
+    // if a stitch instance is running behind.
+    // TODO: Some kind of process to check the status of stitches, see how their LastHeartbeatId
+    // compares to the current value, and send out alerts if things are looking unhealthy.
     public class StitchesModule : IModule
     {
         private readonly StitchesConfiguration _configuration;
@@ -48,12 +52,16 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Start).Invoke(StartInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Stop).Invoke(StopInstance));
 
-            int timerTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / MessageTimerModule.TimerIntervalSeconds;
+            //int timerTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / MessageTimerModule.TimerIntervalSeconds;
+            int timerTickMultiple = 1;
             _subscriptions.TimerSubscribe(timerTickMultiple, b => b.Invoke(e => SendScheduledHeartbeat()));
 
             _dataStorage = new StitchesDataStorage(context.MessageBus);
             _stitchInstanceManager = new StitchInstanceManager(context, _fileSystem);
-            _stitchInstanceManager.StitchStarted += StitchInstancesOnStitchStarted;
+            _stitchInstanceManager.StitchStateChange += StitchInstancesOnStitchStateChanged;
+            _stitchInstanceManager.HeartbeatReceived += StitchInstanceManagerOnHeartbeatReceived;
+            _stitchInstanceManager.LogsReceived += StitchInstanceManagerOnLogsReceived;
+            _stitchInstanceManager.RequestResponseReceived += StitchInstanceManagerOnRequestResponseReceived;
 
             _log.LogDebug("Started");
         }
@@ -80,14 +88,32 @@ namespace CrossStitch.Core.Modules.Stitches
             return _stitchInstanceManager.GetInstanceInformation();
         }
 
-        private void StitchInstancesOnStitchStarted(object sender, StitchProcessEventArgs stitchProcessEventArgs)
+        private void StitchInstancesOnStitchStateChanged(object sender, StitchProcessEventArgs e)
         {
             _messageBus.Publish("Started", new AppInstanceEvent
             {
-                InstanceId = stitchProcessEventArgs.InstanceId,
+                InstanceId = e.InstanceId,
                 NodeId = _node.NodeId
             });
-            _log.LogInformation("Stitch instance {0} is started", stitchProcessEventArgs.InstanceId);
+            _log.LogInformation("Stitch instance {0} is {1}", e.InstanceId, e.IsRunning ? "started" : "stopped");
+        }
+
+        private void StitchInstanceManagerOnRequestResponseReceived(object sender, RequestResponseReceivedEventArgs e)
+        {
+            // TODO: How to report errors here?
+        }
+
+        private void StitchInstanceManagerOnLogsReceived(object sender, LogsReceivedEventArgs e)
+        {
+            // TODO: Should get the StitchInstance from the data store and enrich this message?
+            foreach (var s in e.Logs)
+                _log.LogInformation("Stitch Id={0} Mesage; {1}", e.StitchInstanceId, s);
+        }
+
+        private void StitchInstanceManagerOnHeartbeatReceived(object sender, HeartbeatSyncReceivedEventArgs e)
+        {
+            _log.LogDebug("Stitch Id={0} Heartbeat sync received: {1}", e.StitchInstanceId, e.Id);
+            _dataStorage.MarkHeartbeatSync(e.StitchInstanceId, e.Id);
         }
 
         // TODO: Move this into the ApplicationCoordinator
@@ -97,7 +123,7 @@ namespace CrossStitch.Core.Modules.Stitches
             var application = _dataStorage.GetApplication(request.Application);
             if (application == null)
                 return new PackageFileUploadResponse(false, null);
-            if (!application.Components.Any(c => c.Name == request.Component))
+            if (application.Components.All(c => c.Name != request.Component))
                 return new PackageFileUploadResponse(false, null);
 
             // Save the file and generate a unique Version name
@@ -183,16 +209,6 @@ namespace CrossStitch.Core.Modules.Stitches
                 {
                     _dataStorage.Update<StitchInstance>(result.InstanceId, si => si.State = InstanceStateType.Missing);
                     continue;
-                }
-                if (result.Success)
-                {
-                    _dataStorage.MarkHeartbeatSync(result.InstanceId);
-                    _log.LogDebug("Heartbeat sync received Id={0}", result.InstanceId);
-                }
-                else
-                {
-                    _dataStorage.MarkHeartbeatMissed(result.InstanceId);
-                    _log.LogWarning("Heartbeat missed Id={0}", result.InstanceId);
                 }
             }
         }

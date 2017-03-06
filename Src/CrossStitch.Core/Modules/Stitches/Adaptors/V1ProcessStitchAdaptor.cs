@@ -1,41 +1,33 @@
-﻿using CrossStitch.Stitch;
+﻿using CrossStitch.Core.Models;
+using CrossStitch.Stitch;
 using CrossStitch.Stitch.V1;
 using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
-using CrossStitch.Core.Models;
-using CrossStitch.Stitch.Events;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
     public class V1ProcessStitchAdaptor : IStitchAdaptor
     {
         private readonly StitchInstance _stitchInstance;
+        public CoreStitchContext StitchContext { get; }
         private readonly IRunningNodeContext _nodeContext;
         private Process _process;
         private CoreMessageManager _channel;
 
-        public event EventHandler<StitchProcessEventArgs> StitchInitialized;
-        public event EventHandler<StitchProcessEventArgs> StitchExited;
-
-        public V1ProcessStitchAdaptor(StitchInstance stitchInstance, IRunningNodeContext nodeContext)
+        public V1ProcessStitchAdaptor(StitchInstance stitchInstance, CoreStitchContext stitchContext, IRunningNodeContext nodeContext)
         {
             _stitchInstance = stitchInstance;
+            StitchContext = stitchContext;
             _nodeContext = nodeContext;
         }
 
-        // TODO: This whole thing needs to be synchronized so we don't attempt to send a new message
-        // to the process before the previous message returns a response. We can use a dedicated thread
-        // or a queue
-
         public bool Start()
         {
+            int parentPid = Process.GetCurrentProcess().Id;
             var executableName = Path.Combine(_stitchInstance.DirectoryPath, _stitchInstance.ExecutableName);
             _process = new Process();
-
-            var workingDir = Directory.GetCurrentDirectory();
 
             _process.EnableRaisingEvents = true;
             _process.StartInfo.CreateNoWindow = true;
@@ -47,6 +39,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             _process.StartInfo.RedirectStandardError = true;
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
+            _process.StartInfo.Arguments = $"CorePID={parentPid}";
             _process.Exited += ProcessOnExited;
 
             // TODO: We should pass some command-line args to the new program:
@@ -56,43 +49,37 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
 
             var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
             var toStitchSender = new ToStitchMessageSender(_process.StandardInput, _nodeContext);
-            _channel = new CoreMessageManager(_nodeContext, fromStitchReader, toStitchSender);
+            _channel = new CoreMessageManager(_nodeContext, StitchContext, fromStitchReader, toStitchSender);
+            _channel.Start();
 
-            StitchInitialized.Raise(this, new StitchProcessEventArgs(_stitchInstance.Id, true));
+            StitchContext.RaiseProcessEvent(true, true);
 
             return true;
         }
 
-        public bool SendHeartbeat(long id)
+        public void SendHeartbeat(long id)
         {
-            var response = _channel.SendMessage(new ToStitchMessage
+            _channel.SendMessage(new ToStitchMessage
             {
                 Id = id,
                 StitchId = 0,
                 NodeName = _nodeContext.Name,
                 ChannelName = ToStitchMessage.HeartbeatChannelName,
                 Data = ""
-            }, CancellationToken.None);
-
-            return response != null && response.Command == FromStitchMessage.CommandSync;
+            });
         }
 
         // TODO: Convert this to take some kind of object instead of all these primitive values
-        // TODO: This should maybe return something more intesting than just a bool. We might want to know
-        // how long the round-trip took or other details.
-        public bool SendMessage(long messageId, string channel, string data, string nodeName, long senderId)
+        public void SendMessage(long messageId, string channel, string data, string nodeName, long senderId)
         {
-            var response = _channel.SendMessage(new Stitch.V1.ToStitchMessage
+            _channel.SendMessage(new ToStitchMessage
             {
                 Id = messageId,
                 StitchId = senderId,
                 NodeName = nodeName,
                 ChannelName = channel,
                 Data = data
-            }, CancellationToken.None);
-
-            // TODO: Compare IDs? Other verification? Is there other data we want from the Stitch?
-            return response.Command == FromStitchMessage.CommandAck;
+            });
         }
 
         private void ProcessOnExited(object sender, EventArgs e)
@@ -119,10 +106,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
                 _channel.Dispose();
                 _channel = null;
             }
-            if (!requested)
-            {
-                StitchExited.Raise(this, new StitchProcessEventArgs(_stitchInstance.Id, false));
-            }
+            StitchContext.RaiseProcessEvent(false, requested);
         }
 
         public StitchResourceUsage GetResources()

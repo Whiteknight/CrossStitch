@@ -1,17 +1,18 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Modules.Stitches
+namespace CrossStitch.Stitch.V1.Core
 {
     public class StitchProcessEventArgs : EventArgs
     {
-        // TODO: Do we want more than just the instance ID here? Is there any other information?
-        public StitchProcessEventArgs(string instanceId, bool isRunning)
+        public StitchProcessEventArgs(string instanceId, bool isRunning, bool changeRequested)
         {
             InstanceId = instanceId;
             IsRunning = isRunning;
+            ChangeRequested = changeRequested;
         }
 
         public string InstanceId { get; private set; }
         public bool IsRunning { get; set; }
+        public bool ChangeRequested { get; set; }
     }
 }

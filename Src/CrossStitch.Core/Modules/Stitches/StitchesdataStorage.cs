@@ -1,7 +1,6 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -17,22 +16,18 @@ namespace CrossStitch.Core.Modules.Stitches
             return Get<StitchInstance>(id);
         }
 
-
-
         public Application GetApplication(string id)
         {
             return Get<Application>(id);
         }
 
-        public void MarkHeartbeatSync(string id)
+        public void MarkHeartbeatSync(string id, long heartbeatId)
         {
-            Update<StitchInstance>(id, si => si.MissedHeartbeats = 0);
-        }
-
-        public void MarkHeartbeatMissed(string id)
-        {
-            // TODO: Should we threshold here and set the status, or do that calculation later?
-            Update<StitchInstance>(id, si => si.MissedHeartbeats++);
+            Update<StitchInstance>(id, si =>
+            {
+                if (si.LastHeartbeatReceived < heartbeatId)
+                    si.LastHeartbeatReceived = heartbeatId;
+            });
         }
     }
 }

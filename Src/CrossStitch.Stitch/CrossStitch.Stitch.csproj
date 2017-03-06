@@ -48,7 +48,14 @@
     <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="IRunningNodeContext.cs" />
     <Compile Include="V1\Core\CoreMessageManager.cs" />
+    <Compile Include="V1\Core\CoreStitchContext.cs" />
     <Compile Include="V1\Core\FromStitchMessageReader.cs" />
+    <Compile Include="V1\Core\FromStitchMessageReceivedEventArgs.cs" />
+    <Compile Include="V1\Core\FromStitchReaderThread.cs" />
+    <Compile Include="V1\Core\HeartbeatSyncReceivedEventArgs.cs" />
+    <Compile Include="V1\Core\LogsReceivedEventArgs.cs" />
+    <Compile Include="V1\Core\RequestResponseReceivedEventArgs.cs" />
+    <Compile Include="V1\Core\StitchProcessEventArgs.cs" />
     <Compile Include="V1\Stitch\HeartbeatReceivedEventArgs.cs" />
     <Compile Include="V1\Stitch\StitchMessageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

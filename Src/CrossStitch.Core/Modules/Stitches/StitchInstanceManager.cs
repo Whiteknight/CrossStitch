@@ -1,11 +1,12 @@
-﻿using CrossStitch.Core.Modules.Stitches.Adaptors;
+﻿using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Stitch;
+using CrossStitch.Stitch.Events;
+using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using CrossStitch.Core.Models;
-using CrossStitch.Stitch.Events;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -23,7 +24,10 @@ namespace CrossStitch.Core.Modules.Stitches
             _adaptors = new ConcurrentDictionary<string, IStitchAdaptor>();
         }
 
-        public event EventHandler<StitchProcessEventArgs> StitchStarted;
+        public event EventHandler<StitchProcessEventArgs> StitchStateChange;
+        public event EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
+        public event EventHandler<RequestResponseReceivedEventArgs> RequestResponseReceived;
+        public event EventHandler<LogsReceivedEventArgs> LogsReceived;
 
         public InstanceActionResult Start(StitchInstance stitchInstance)
         {
@@ -33,50 +37,54 @@ namespace CrossStitch.Core.Modules.Stitches
             try
             {
                 stitchInstance.State = InstanceStateType.Stopped;
+                adaptor = GetStitchAdaptor(stitchInstance);
+                if (adaptor == null)
+                    return InstanceActionResult.NotFound(instanceId);
 
                 // TODO: On Stitch start, we should send it information about the application topology
                 // TODO: We should also send application topology change notifications to every Stitch 
                 // involved in the affected application.
 
-                bool found = _adaptors.TryGetValue(instanceId, out adaptor);
-                if (!found)
-                {
-                    adaptor = _adaptorFactory.Create(stitchInstance);
-                    bool added = _adaptors.TryAdd(instanceId, adaptor);
-                    if (!added)
-                    {
-                        stitchInstance.State = InstanceStateType.Missing;
-                        return new InstanceActionResult
-                        {
-                            InstanceId = instanceId,
-                            Success = false,
-                            Found = false
-                        };
-                    }
-                    adaptor.StitchInitialized += AdaptorOnStitchInitialized;
-                }
-
                 bool started = adaptor.Start();
                 if (started)
                     stitchInstance.State = InstanceStateType.Started;
-                return new InstanceActionResult
-                {
-                    InstanceId = stitchInstance.Id,
-                    Success = started,
-                    Found = true
-                };
+
+                return InstanceActionResult.Result(instanceId, started);
             }
             catch (Exception e)
             {
                 stitchInstance.State = InstanceStateType.Error;
-                return new InstanceActionResult
-                {
-                    InstanceId = stitchInstance.Id,
-                    Success = false,
-                    Exception = e,
-                    Found = adaptor != null
-                };
+                return InstanceActionResult.Failure(stitchInstance.Id, adaptor != null, e);
             }
+        }
+
+        private IStitchAdaptor GetStitchAdaptor(StitchInstance stitchInstance)
+        {
+            IStitchAdaptor adaptor;
+            bool found = _adaptors.TryGetValue(stitchInstance.Id, out adaptor);
+            if (found)
+                return adaptor;
+
+            adaptor = CreateStitchAdaptor(stitchInstance);
+            if (adaptor != null)
+                return adaptor;
+
+            stitchInstance.State = InstanceStateType.Missing;
+            return null;
+        }
+
+
+        private IStitchAdaptor CreateStitchAdaptor(StitchInstance stitchInstance)
+        {
+            var adaptor = _adaptorFactory.Create(stitchInstance);
+            bool added = _adaptors.TryAdd(stitchInstance.Id, adaptor);
+            if (!added)
+                return null;
+            adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
+            adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
+            adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;
+            adaptor.StitchContext.RequestResponseReceived += OnStitchResponseReceived;
+            return adaptor;
         }
 
         public InstanceActionResult Stop(string instanceId)
@@ -181,16 +189,6 @@ namespace CrossStitch.Core.Modules.Stitches
             _adaptors = null;
         }
 
-        private void AdaptorOnStitchInitialized(object sender, StitchProcessEventArgs stitchProcessEventArgs)
-        {
-            //ComponentInstance instance;
-            //bool found = _instances.TryGetValue(appStartedEventArgs.InstanceId, out instance);
-            //if (!found)
-            //    return;
-            //instance.State = InstanceStateType.Running;
-            StitchStarted.Raise(this, stitchProcessEventArgs);
-        }
-
         public List<InstanceInformation> GetInstanceInformation()
         {
             throw new NotImplementedException();
@@ -214,16 +212,36 @@ namespace CrossStitch.Core.Modules.Stitches
                     continue;
                 }
 
-                bool ok = adaptor.SendHeartbeat(id);
+                adaptor.SendHeartbeat(id);
                 results.Add(new InstanceActionResult
                 {
                     StitchInstance = instance,
                     InstanceId = instance.Id,
                     Found = true,
-                    Success = ok
+                    Success = true
                 });
             }
             return results;
+        }
+
+        private void OnStitchStateChange(object sender, StitchProcessEventArgs stitchProcessEventArgs)
+        {
+            StitchStateChange.Raise(this, stitchProcessEventArgs);
+        }
+
+        private void OnStitchLogsReceived(object sender, LogsReceivedEventArgs e)
+        {
+            LogsReceived.Raise(this, e);
+        }
+
+        private void OnStitchHeartbeatSyncReceived(object sender, HeartbeatSyncReceivedEventArgs e)
+        {
+            HeartbeatReceived.Raise(this, e);
+        }
+
+        private void OnStitchResponseReceived(object sender, RequestResponseReceivedEventArgs e)
+        {
+            RequestResponseReceived.Raise(this, e);
         }
     }
 }

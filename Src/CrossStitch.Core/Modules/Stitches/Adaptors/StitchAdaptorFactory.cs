@@ -1,6 +1,7 @@
-﻿using CrossStitch.Stitch;
+﻿using CrossStitch.Core.Models;
+using CrossStitch.Stitch;
+using CrossStitch.Stitch.V1.Core;
 using System;
-using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
@@ -15,12 +16,13 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
 
         public IStitchAdaptor Create(StitchInstance stitchInstance)
         {
+            var context = new CoreStitchContext(stitchInstance.Id);
             switch (stitchInstance.Adaptor.RunMode)
             {
                 //case InstanceRunModeType.AppDomain:
                 //    return new AppDomainAppAdaptor(instance, _network);
                 case InstanceRunModeType.V1Process:
-                    return new V1ProcessStitchAdaptor(stitchInstance, _nodeContext);
+                    return new V1ProcessStitchAdaptor(stitchInstance, context, _nodeContext);
             }
 
             throw new Exception("Run mode not supported");

@@ -20,7 +20,7 @@ namespace CrossStitch.Core.Models
         public string DirectoryPath { get; set; }
         public string ExecutableName { get; set; }
         public InstanceStateType State { get; set; }
-        public int MissedHeartbeats { get; set; }
+        public long LastHeartbeatReceived { get; set; }
     }
 
     public enum InstanceStateType

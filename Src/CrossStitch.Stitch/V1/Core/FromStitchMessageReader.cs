@@ -2,7 +2,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 namespace CrossStitch.Stitch.V1.Core
 {
@@ -10,7 +9,6 @@ namespace CrossStitch.Stitch.V1.Core
     public class FromStitchMessageReader : IDisposable
     {
         private readonly StreamReader _stdin;
-        private const int ReadTimeoutMs = 5000;
 
         public FromStitchMessageReader(Stream stdin)
         {
@@ -22,30 +20,13 @@ namespace CrossStitch.Stitch.V1.Core
             _stdin = stdin;
         }
 
-        private const int MaxFailures = 5;
-
-        public FromStitchMessage ReadMessage(CancellationToken cancellationToken)
+        public FromStitchMessage ReadMessage()
         {
-            int failures = 0;
             var lines = new List<string>();
             while (true)
             {
-
-                var task = _stdin.ReadLineAsync();
-                bool ok = task.Wait(ReadTimeoutMs, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                    return null;
-                if (!ok)
-                {
-                    failures++;
-                    if (failures >= MaxFailures)
-                        return null;
-                    continue;
-                }
-
-                failures = 0;
-                var s = task.Result;
-                if (s.Trim() == "end")
+                var s = _stdin.ReadLine();
+                if (s == null || s.Trim() == "end")
                     break;
                 lines.Add(s);
             }

@@ -1,10 +1,10 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Modules.Stitches;
-using CrossStitch.Core.Node;
-using System;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Logging;
+using CrossStitch.Core.Modules.Stitches;
+using CrossStitch.Core.Node;
+using System;
 
 namespace StitchStart.Server
 {
@@ -33,7 +33,7 @@ namespace StitchStart.Server
                     DirectoryPath = ".",
                     ExecutableName = "StitchStart.Client.exe",
                     State = InstanceStateType.Running,
-                    MissedHeartbeats = 0
+                    LastHeartbeatReceived = 0
                 });
 
                 var data = new DataModule(dataStorage);

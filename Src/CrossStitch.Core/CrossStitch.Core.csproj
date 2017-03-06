@@ -76,7 +76,6 @@
     <Compile Include="Modules\Stitches\StitchesConfiguration.cs" />
     <Compile Include="Modules\Stitches\StitchesDataStorage.cs" />
     <Compile Include="Modules\Stitches\StitchesModule.cs" />
-    <Compile Include="Modules\Stitches\StitchProcessEventArgs.cs" />
     <Compile Include="Modules\Stitches\Versions\DateTimeVersionManager.cs" />
     <Compile Include="Modules\Stitches\Versions\IVersionManager.cs" />
     <Compile Include="Modules\Stitches\Messages\AppInstanceEvent.cs" />

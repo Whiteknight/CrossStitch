@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrossStitch.Stitch.V1.Core;
+using System;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
@@ -6,11 +7,9 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
     {
         bool Start();
         void Stop();
-        bool SendHeartbeat(long id);
-        bool SendMessage(long messageId, string channel, string data, string nodeName, long senderId);
+        void SendHeartbeat(long id);
+        void SendMessage(long messageId, string channel, string data, string nodeName, long senderId);
         StitchResourceUsage GetResources();
-
-        event EventHandler<StitchProcessEventArgs> StitchInitialized;
-        event EventHandler<StitchProcessEventArgs> StitchExited;
+        CoreStitchContext StitchContext { get; }
     }
 }

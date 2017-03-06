@@ -31,18 +31,6 @@ namespace CrossStitch.Stitch.V1.Core
             _stdout.Flush();
         }
 
-        public void SendHeartbeat(long id)
-        {
-            SendMessage(new ToStitchMessage
-            {
-                ChannelName = ToStitchMessage.HeartbeatChannelName,
-                Data = string.Empty,
-                Id = id,
-                NodeName = _nodeContext.Name,
-                StitchId = 0
-            });
-        }
-
         public void Dispose()
         {
             _stdout.Dispose();

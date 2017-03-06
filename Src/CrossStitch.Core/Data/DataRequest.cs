@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Modules.Data;
 
-namespace CrossStitch.Core.Data.Messages
+namespace CrossStitch.Core.Data
 {
     public enum DataRequestType
     {

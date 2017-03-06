@@ -1,9 +1,9 @@
 ﻿using Acquaintance;
 using Common.Logging;
-using CrossStitch.Core.Logging.Events;
+using CrossStitch.Core.Logging;
 using CrossStitch.Core.Node;
 
-namespace CrossStitch.Core.Logging
+namespace CrossStitch.Core.Modules.Logging
 {
     public class LoggingModule : IModule
     {

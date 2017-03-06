@@ -1,12 +1,12 @@
-﻿using Acquaintance;
-using CrossStitch.Core.Data;
-using CrossStitch.Core.Data.Entities;
-using CrossStitch.Core.Data.Messages;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Acquaintance;
+using CrossStitch.Core.Data;
+using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.Data;
 
-namespace CrossStitch.Core.Node
+namespace CrossStitch.Core.MessageBus
 {
     public class DataHelperClient
     {

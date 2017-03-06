@@ -1,6 +1,6 @@
 ﻿using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Data
+namespace CrossStitch.Core.Modules.Data
 {
     public class DataConfiguration
     {

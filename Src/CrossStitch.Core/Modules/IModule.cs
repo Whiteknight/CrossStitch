@@ -1,7 +1,7 @@
 ﻿using System;
 using CrossStitch.Core.Node;
 
-namespace CrossStitch.Core
+namespace CrossStitch.Core.Modules
 {
     public interface IModule : IDisposable
     {

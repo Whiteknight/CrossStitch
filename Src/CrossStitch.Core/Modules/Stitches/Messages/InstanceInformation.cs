@@ -1,5 +1,5 @@
 ﻿using System;
-using CrossStitch.Core.Data.Entities;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Stitches.Messages
 {

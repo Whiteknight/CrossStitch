@@ -1,10 +1,10 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Data;
-using CrossStitch.Core.Data.Entities;
-using CrossStitch.Core.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Core.Node;
 using System;
+using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.Data;
+using CrossStitch.Core.Modules.Logging;
 
 namespace StitchStart.Server
 {

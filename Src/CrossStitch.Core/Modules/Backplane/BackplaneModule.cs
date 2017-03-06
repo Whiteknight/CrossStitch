@@ -1,10 +1,10 @@
 ﻿using System;
 using Acquaintance;
-using CrossStitch.Core.Events;
 using CrossStitch.Core.Modules.Backplane.Events;
 using CrossStitch.Core.Networking;
 using CrossStitch.Core.Node;
 using CrossStitch.Core.Node.Messages;
+using CrossStitch.Stitch.Events;
 
 namespace CrossStitch.Core.Modules.Backplane
 {

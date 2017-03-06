@@ -1,6 +1,6 @@
-﻿using CrossStitch.Core.Events;
-using System;
+﻿using System;
 using System.Threading;
+using CrossStitch.Stitch.Events;
 
 namespace CrossStitch.Stitch.V1.Stitch
 {

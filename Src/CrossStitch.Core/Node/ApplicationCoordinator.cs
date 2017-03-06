@@ -1,9 +1,10 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Node.Messages;
 using System.Linq;
+using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules;
 
 namespace CrossStitch.Core.Node
 {

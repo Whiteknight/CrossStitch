@@ -3,6 +3,7 @@ using CrossStitch.Core;
 using CrossStitch.Core.Node;
 using Nancy.Hosting.Self;
 using System;
+using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.Http;
 
 namespace CrossStitch.Http.NancyFx

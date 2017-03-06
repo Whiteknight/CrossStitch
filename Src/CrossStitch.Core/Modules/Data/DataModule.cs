@@ -1,9 +1,9 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Data.Entities;
-using CrossStitch.Core.Data.Messages;
+using CrossStitch.Core.Data;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Node;
 
-namespace CrossStitch.Core.Data
+namespace CrossStitch.Core.Modules.Data
 {
     public sealed class DataModule : IModule
     {

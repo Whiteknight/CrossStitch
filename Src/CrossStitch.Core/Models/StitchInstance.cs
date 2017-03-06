@@ -1,4 +1,6 @@
-﻿namespace CrossStitch.Core.Data.Entities
+﻿using CrossStitch.Core.Modules.Data;
+
+namespace CrossStitch.Core.Models
 {
     public class StitchInstance : IDataEntity
     {

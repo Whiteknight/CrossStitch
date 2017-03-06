@@ -1,5 +1,4 @@
-﻿using CrossStitch.Core.Events;
-using CrossStitch.Core.Modules.Backplane.Events;
+﻿using CrossStitch.Core.Modules.Backplane.Events;
 using CrossStitch.Core.Networking;
 using CrossStitch.Core.Networking.NetMq;
 using CrossStitch.Core.Node;
@@ -8,6 +7,7 @@ using CrossStitch.Core.Utility.Serialization;
 using NetMQ.Zyre;
 using NetMQ.Zyre.ZyreEvents;
 using System;
+using CrossStitch.Stitch.Events;
 
 namespace CrossStitch.Core.Modules.Backplane
 {

@@ -1,11 +1,11 @@
-﻿using CrossStitch.Core.Data.Entities;
-using CrossStitch.Core.Events;
-using CrossStitch.Core.Modules.Stitches.Adaptors;
+﻿using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Stitch;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using CrossStitch.Core.Models;
+using CrossStitch.Stitch.Events;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

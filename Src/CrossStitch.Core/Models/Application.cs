@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Modules.Data;
 
-namespace CrossStitch.Core.Data.Entities
+namespace CrossStitch.Core.Models
 {
     public class Application : IDataEntity
     {

@@ -1,6 +1,6 @@
-﻿using CrossStitch.Core.Data.Entities;
-using CrossStitch.Stitch;
+﻿using CrossStitch.Stitch;
 using System;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {

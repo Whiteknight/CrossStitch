@@ -1,5 +1,6 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Data.Entities;
+using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Modules.Stitches

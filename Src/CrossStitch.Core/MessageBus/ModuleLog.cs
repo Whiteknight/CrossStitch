@@ -1,6 +1,6 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Logging.Events;
 using System;
+using CrossStitch.Core.Logging;
 
 namespace CrossStitch.Core.MessageBus
 {

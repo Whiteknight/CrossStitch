@@ -1,6 +1,6 @@
 ﻿using System;
-using CrossStitch.Core.Events;
 using CrossStitch.Core.Utility.Serialization;
+using CrossStitch.Stitch.Events;
 using NetMQ;
 using NetMQ.Sockets;
 

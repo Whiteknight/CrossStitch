@@ -6,6 +6,7 @@ using CrossStitch.Core.Node.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Modules;
 
 namespace CrossStitch.Core.Node
 {

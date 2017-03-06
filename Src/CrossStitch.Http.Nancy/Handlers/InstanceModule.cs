@@ -1,6 +1,6 @@
 using Acquaintance;
-using CrossStitch.Core.Data.Entities;
-using CrossStitch.Core.Data.Messages;
+using CrossStitch.Core.Data;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using Nancy;
 

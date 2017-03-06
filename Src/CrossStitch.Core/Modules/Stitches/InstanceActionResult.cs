@@ -1,5 +1,5 @@
-﻿using CrossStitch.Core.Data.Entities;
-using System;
+﻿using System;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

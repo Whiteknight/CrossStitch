@@ -1,6 +1,5 @@
 ﻿using Acquaintance;
 using Acquaintance.Timers;
-using CrossStitch.Core.Data.Entities;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Modules.Stitches.Versions;
@@ -9,6 +8,7 @@ using CrossStitch.Core.Node;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

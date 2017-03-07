@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Data
+﻿namespace CrossStitch.Core.Messages.Data
 {
     public enum DataRequestType
     {

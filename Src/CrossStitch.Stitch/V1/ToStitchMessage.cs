@@ -12,9 +12,7 @@ namespace CrossStitch.Stitch.V1
         public string NodeName { get; set; }
         public string ChannelName { get; set; }
 
-        // The data, as a string.
-        // TODO: Decide if this is going to be a json-formatted string or if we are going to use 
-        // base64-encoded binary?
+        // The data, as a string. The sender and recipient will decide on the format
         public string Data { get; set; }
 
         public bool IsHeartbeatMessage()

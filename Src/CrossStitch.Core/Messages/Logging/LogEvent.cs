@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Logging
+namespace CrossStitch.Core.Messages.Logging
 {
     public class LogEvent
     {

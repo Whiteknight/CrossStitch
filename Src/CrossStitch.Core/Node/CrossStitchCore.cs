@@ -1,12 +1,12 @@
 ﻿using Acquaintance;
 using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.Timer;
 using CrossStitch.Core.Node.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Modules;
 
 namespace CrossStitch.Core.Node
 {
@@ -16,19 +16,16 @@ namespace CrossStitch.Core.Node
         private readonly List<IModule> _managedModules;
         private SubscriptionCollection _subscriptions;
         private bool _started;
-        private ModuleLog _log;
+        private readonly ModuleLog _log;
 
-        // TODO: We shouldn't allow IMessageBus instances to be shared between CrossStitchCore
-        // instances, because it will break a lot of things.
-
-        public CrossStitchCore(NodeConfiguration nodeConfig, IMessageBus messageBus)
+        public CrossStitchCore(NodeConfiguration nodeConfig)
         {
-            MessageBus = messageBus;
+            MessageBus = new Acquaintance.MessageBus();
 
             _modules = new List<IModule>();
             _managedModules = new List<IModule>
             {
-                new MessageTimerModule(messageBus),
+                new MessageTimerModule(MessageBus),
                 new ApplicationCoordinatorModule()
             };
             _log = new ModuleLog(MessageBus, "Core");

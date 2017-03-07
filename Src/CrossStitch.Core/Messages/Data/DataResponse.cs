@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.Core.Modules.Data;
 
-namespace CrossStitch.Core.Data
+namespace CrossStitch.Core.Messages.Data
 {
     public class DataResponse<TEntity>
         where TEntity : class, IDataEntity

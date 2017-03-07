@@ -26,9 +26,6 @@ namespace CrossStitch.Stitch.V1.Core
 
         public void ReceiveHeartbeat(long id)
         {
-            // TODO: This seems like it might be un-thread-safe, but the consenquence of sending
-            // heartbeats out of order are low, and the data-store thread is sync'd, so our persistance
-            // operation won't have a problem.
             if (id <= LastHeartbeatReceived)
                 return;
             LastHeartbeatReceived = id;

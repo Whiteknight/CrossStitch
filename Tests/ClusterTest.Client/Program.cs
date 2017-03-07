@@ -12,25 +12,24 @@ namespace ClusterTest.Client
         static void Main(string[] args)
         {
             var serializer = new JsonSerializer();
-            var messageBus = new MessageBus();
             var backplaneConfig = BackplaneConfiguration.GetDefault();
             var backplane = new ZyreBackplane(backplaneConfig, "Client", serializer);
             var backplaneModule = new BackplaneModule(backplane);
 
-            messageBus.Subscribe<NodeAddedToClusterEvent>(l => l.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
-            messageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
-
             var nodeConfig = NodeConfiguration.GetDefault();
-            using (var node = new CrossStitchCore(nodeConfig, messageBus))
+            using (var core = new CrossStitchCore(nodeConfig))
             {
-                node.AddModule(backplaneModule);
-                node.Start();
-                Console.WriteLine("Starting CLIENT node {0}", node.NodeId);
+                core.MessageBus.Subscribe<NodeAddedToClusterEvent>(l => l.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
+                core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
+
+                core.AddModule(backplaneModule);
+                core.Start();
+                Console.WriteLine("Starting CLIENT node {0}", core.NodeId);
 
                 Console.ReadKey();
 
-                Console.WriteLine("Stopping node {0}", node.NodeId);
-                node.Stop();
+                Console.WriteLine("Stopping node {0}", core.NodeId);
+                core.Stop();
             }
         }
 

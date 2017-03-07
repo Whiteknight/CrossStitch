@@ -1,7 +1,7 @@
-﻿using CrossStitch.Core.Modules.Data;
-using System;
+﻿using System;
+using CrossStitch.Core.Modules.Data;
 
-namespace CrossStitch.Core.Data
+namespace CrossStitch.Core.Messages.Data
 {
     public class DataRequest<TEntity>
         where TEntity : class, IDataEntity

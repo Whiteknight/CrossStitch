@@ -1,11 +1,9 @@
-﻿using Acquaintance;
+﻿using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Http;
 using CrossStitch.Core.Modules.Stitches;
-using CrossStitch.Core.Networking.NetMq;
 using CrossStitch.Core.Node;
 using CrossStitch.Http.NancyFx;
 using System;
-using CrossStitch.Core.Modules.Data;
 
 namespace HttpTest
 {
@@ -14,27 +12,25 @@ namespace HttpTest
         static void Main(string[] args)
         {
             var nodeConfig = NodeConfiguration.GetDefault();
-            var messageBus = new MessageBus();
-            var network = new NetMqNetwork();
 
-            using (var runningNode = new CrossStitchCore(nodeConfig, messageBus))
+            using (var core = new CrossStitchCore(nodeConfig))
             {
                 var httpConfiguration = HttpConfiguration.GetDefault();
-                var httpServer = new NancyHttpModule(httpConfiguration, messageBus);
-                runningNode.AddModule(httpServer);
+                var httpServer = new NancyHttpModule(httpConfiguration, core.MessageBus);
+                core.AddModule(httpServer);
 
                 var dataConfiguration = DataConfiguration.GetDefault();
                 var dataStorage = new FolderDataStorage(dataConfiguration);
                 var data = new DataModule(dataStorage);
-                runningNode.AddModule(data);
+                core.AddModule(data);
 
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();
                 var stitches = new StitchesModule(stitchesConfiguration);
-                runningNode.AddModule(stitches);
+                core.AddModule(stitches);
 
-                runningNode.Start();
+                core.Start();
                 Console.ReadKey();
-                runningNode.Stop();
+                core.Stop();
             }
         }
     }

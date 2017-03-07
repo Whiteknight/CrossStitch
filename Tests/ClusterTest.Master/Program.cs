@@ -12,32 +12,31 @@ namespace ClusterTest.Master
     {
         static void Main(string[] args)
         {
-            var masterConfig = MasterConfiguration.GetDefault();
-            var serializer = new JsonSerializer();
-            var messageBus = new MessageBus();
-            var backplaneConfig = BackplaneConfiguration.GetDefault();
-            var backplane = new ZyreBackplane(backplaneConfig, "Master", serializer);
-            var backplaneModule = new BackplaneModule(backplane);
-            var nodeManager = new ClusterNodeManager(messageBus);
-            var masterModule = new MasterModule(nodeManager, messageBus);
-
-            messageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
-            messageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
-            //messageBus.Subscribe<ClusterCommandEvent>(ClusterCommandEvent.)
-
             var nodeConfig = NodeConfiguration.GetDefault();
-            using (var node = new CrossStitchCore(nodeConfig, messageBus))
+            using (var core = new CrossStitchCore(nodeConfig))
             {
-                node.AddModule(backplaneModule);
-                node.AddModule(masterModule);
+                var masterConfig = MasterConfiguration.GetDefault();
+                var serializer = new JsonSerializer();
+                var backplaneConfig = BackplaneConfiguration.GetDefault();
+                var backplane = new ZyreBackplane(backplaneConfig, "Master", serializer);
+                var backplaneModule = new BackplaneModule(backplane);
+                var nodeManager = new ClusterNodeManager(core.MessageBus);
+                var masterModule = new MasterModule(nodeManager, core.MessageBus);
 
-                node.Start();
-                Console.WriteLine("Started MASTER node {0}", node.NodeId);
+                core.MessageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
+                core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
+                //messageBus.Subscribe<ClusterCommandEvent>(ClusterCommandEvent.)
+
+                core.AddModule(backplaneModule);
+                core.AddModule(masterModule);
+
+                core.Start();
+                Console.WriteLine("Started MASTER node {0}", core.NodeId);
 
                 Console.ReadKey();
 
-                Console.WriteLine("Stopping node {0}", node.NodeId);
-                node.Stop();
+                Console.WriteLine("Stopping node {0}", core.NodeId);
+                core.Stop();
             }
         }
 

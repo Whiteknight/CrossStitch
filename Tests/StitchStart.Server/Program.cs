@@ -1,5 +1,4 @@
-﻿using Acquaintance;
-using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
@@ -13,8 +12,7 @@ namespace StitchStart.Server
         static void Main(string[] args)
         {
             var config = NodeConfiguration.GetDefault();
-            var messageBus = new MessageBus();
-            using (var node = new CrossStitchCore(config, messageBus))
+            using (var node = new CrossStitchCore(config))
             {
                 var dataConfiguration = DataConfiguration.GetDefault();
                 var dataStorage = new InMemoryDataStorage(dataConfiguration);

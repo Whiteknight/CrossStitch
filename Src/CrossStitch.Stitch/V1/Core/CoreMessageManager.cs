@@ -20,7 +20,7 @@ namespace CrossStitch.Stitch.V1.Core
 
             _stitchContext = stitchContext;
             _reader = reader ?? new FromStitchMessageReader(Console.OpenStandardInput());
-            _sender = sender ?? new ToStitchMessageSender(Console.OpenStandardOutput(), nodeContext);
+            _sender = sender ?? new ToStitchMessageSender(Console.OpenStandardOutput());
         }
 
         public EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;

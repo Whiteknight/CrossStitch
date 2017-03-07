@@ -142,6 +142,8 @@ namespace CrossStitch.Stitch.V1.Stitch
 
         private void OnCoreDisappeared()
         {
+            // TODO: Communicate with the rest of the stitch, it may want to gracefully finish
+            // some processing work first.
             Environment.Exit(ExitBecauseOfCoreDisappearance);
         }
     }

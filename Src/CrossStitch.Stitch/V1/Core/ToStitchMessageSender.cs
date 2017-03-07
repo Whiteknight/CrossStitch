@@ -7,20 +7,16 @@ namespace CrossStitch.Stitch.V1.Core
     // Message sender to send a message from the Core to the Stitch
     public class ToStitchMessageSender : IDisposable
     {
-        private readonly IRunningNodeContext _nodeContext;
         private readonly StreamWriter _stdout;
 
-        public ToStitchMessageSender(Stream stdout, IRunningNodeContext nodeContext)
+        public ToStitchMessageSender(Stream stdout)
         {
-            _nodeContext = nodeContext;
-
             _stdout = new StreamWriter(stdout);
         }
 
-        public ToStitchMessageSender(StreamWriter stdout, IRunningNodeContext nodeContext)
+        public ToStitchMessageSender(StreamWriter stdout)
         {
             _stdout = stdout;
-            _nodeContext = nodeContext;
         }
 
         public void SendMessage(ToStitchMessage message)

@@ -1,7 +1,6 @@
 ﻿using CrossStitch.Stitch.V1;
 using CrossStitch.Stitch.V1.Stitch;
 using System;
-using System.IO;
 
 namespace StitchStart.Client
 {
@@ -49,7 +48,7 @@ namespace StitchStart.Client
         public static void Log(string s)
         {
             _manager.SendLogs(new[] { s });
-            File.AppendAllText("D:\\Test\\StitchStart.Client.txt", s + "\n");
+            //File.AppendAllText("D:\\Test\\StitchStart.Client.txt", s + "\n");
         }
     }
 }

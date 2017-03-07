@@ -68,6 +68,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\Data\DataRequestType.cs" />
+    <Compile Include="Messages\Data\DataResponse.cs" />
+    <Compile Include="Messages\Data\DataResponseType.cs" />
     <Compile Include="Modules\Data\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
     <Compile Include="MessageBus\ModuleLog.cs" />
@@ -99,9 +102,9 @@
     <Compile Include="Modules\Data\FolderDataStorage.cs" />
     <Compile Include="Modules\Data\IDataEntity.cs" />
     <Compile Include="Modules\Data\IDataStorage.cs" />
-    <Compile Include="Data\DataRequest.cs" />
+    <Compile Include="Messages\Data\DataRequest.cs" />
     <Compile Include="MessageBus\MessageBusExtensions.cs" />
-    <Compile Include="Logging\LogEvent.cs" />
+    <Compile Include="Messages\Logging\LogEvent.cs" />
     <Compile Include="Modules\Master\ClusterPeerNode.cs" />
     <Compile Include="Modules\Backplane\BackplaneConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
@@ -110,7 +113,7 @@
     <Compile Include="Modules\Master\Events\NodeAddedToClusterEvent.cs" />
     <Compile Include="Modules\Master\Events\NodeRemovedFromCluster.cs" />
     <Compile Include="Modules\Master\IClusterNodeManager.cs" />
-    <Compile Include="MessageBus\GenericResponse.cs" />
+    <Compile Include="Messages\GenericResponse.cs" />
     <Compile Include="Networking\INetwork.cs" />
     <Compile Include="Networking\IReceiveChannel.cs" />
     <Compile Include="Networking\ISendChannel.cs" />

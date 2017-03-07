@@ -39,6 +39,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             _process.StartInfo.RedirectStandardError = true;
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
+            // TODO: What other values should we pass to the new process?
             _process.StartInfo.Arguments = $"CorePID={parentPid}";
             _process.Exited += ProcessOnExited;
 
@@ -48,7 +49,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             bool ok = _process.Start();
 
             var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
-            var toStitchSender = new ToStitchMessageSender(_process.StandardInput, _nodeContext);
+            var toStitchSender = new ToStitchMessageSender(_process.StandardInput);
             _channel = new CoreMessageManager(_nodeContext, StitchContext, fromStitchReader, toStitchSender);
             _channel.Start();
 
@@ -84,6 +85,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
 
         private void ProcessOnExited(object sender, EventArgs e)
         {
+            // TODO: Can we get any information about why/how the process exited?
             Cleanup(false);
         }
 

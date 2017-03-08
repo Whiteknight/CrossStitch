@@ -1,14 +1,18 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.MessageBus;
-using CrossStitch.Core.Modules.Stitches.Messages;
-using CrossStitch.Core.Node.Messages;
-using System.Linq;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules;
+using CrossStitch.Core.Modules.Stitches.Messages;
+using CrossStitch.Core.Node.Messages;
+using System.Linq;
 
 namespace CrossStitch.Core.Node
 {
+    // TODO: This one needs a better name
+    // TODO: Move this to a Modules/ subdirectory, with readme
+    // This module receives commands from the user and coordinates actions between the Data module
+    // and the Stitches module.
     public class ApplicationCoordinatorModule : IModule
     {
         // TODO: Move most of this mutable data into a state object.

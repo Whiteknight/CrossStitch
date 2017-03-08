@@ -105,7 +105,7 @@
     <Compile Include="Modules\Master\Events\NodeRemovedFromCluster.cs" />
     <Compile Include="Modules\Master\IClusterNodeManager.cs" />
     <Compile Include="Messages\GenericResponse.cs" />
-    <Compile Include="Node\ApplicationCoordinator.cs" />
+    <Compile Include="Node\ApplicationCoordinatorModule.cs" />
     <Compile Include="MessageBus\DataHelperClient.cs" />
     <Compile Include="Node\Messages\ApplicationMessage.cs" />
     <Compile Include="Node\Messages\ComponentChangeRequest.cs" />

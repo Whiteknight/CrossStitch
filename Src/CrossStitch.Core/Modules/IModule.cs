@@ -1,5 +1,4 @@
 ﻿using System;
-using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Modules
 {

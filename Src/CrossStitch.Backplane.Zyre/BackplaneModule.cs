@@ -1,9 +1,9 @@
 ﻿using Acquaintance;
 using CrossStitch.Backplane.Zyre.Networking;
+using CrossStitch.Core;
+using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
-using CrossStitch.Core.Node;
-using CrossStitch.Core.Node.Messages;
 using CrossStitch.Stitch.Events;
 using System;
 

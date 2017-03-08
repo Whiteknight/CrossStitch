@@ -1,7 +1,7 @@
-﻿using System;
+﻿using CrossStitch.Core.Modules.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Modules.Data;
 
 namespace CrossStitch.Core.Models
 {
@@ -18,22 +18,37 @@ namespace CrossStitch.Core.Models
         public Guid NodeId { get; set; }
         public List<ApplicationComponent> Components { get; set; }
 
+        public bool AddComponent(string name)
+        {
+            var component = Components.FirstOrDefault(c => c.Name == name);
+            if (component != null)
+                return false;
+
+            Components.Add(new ApplicationComponent
+            {
+                Name = name,
+                FullName = Name + "." + name
+            });
+            return true;
+        }
+
+        public bool RemoveComponent(string name)
+        {
+            Components = Components.Where(c => c.Name != name).ToList();
+            return true;
+        }
+
         public void AddVersion(string componentName, string versionName)
         {
             var component = Components.FirstOrDefault(c => c.Name == componentName);
-            if (component == null)
-                return;
 
-            component.AddVersion(versionName);
+            component?.AddVersion(versionName);
         }
 
         public bool HasVersion(string componentName, string versionName)
         {
             var component = Components.FirstOrDefault(c => c.Name == componentName);
-            if (component == null)
-                return false;
-
-            return component.HasVersion(versionName);
+            return component != null && component.HasVersion(versionName);
         }
     }
 
@@ -45,6 +60,8 @@ namespace CrossStitch.Core.Models
         }
 
         public string Name { get; set; }
+        public string FullName { get; set; }
+
         public List<ApplicationComponentVersion> Versions { get; set; }
 
         public void AddVersion(string versionId)
@@ -58,13 +75,14 @@ namespace CrossStitch.Core.Models
 
             Versions.Add(new ApplicationComponentVersion
             {
-                Version = versionId
+                Version = versionId,
+                FullName = FullName + "." + versionId
             });
         }
 
         public bool HasVersion(string version)
         {
-            if (Versions == null || !Versions.Any(v => v.Version == version))
+            if (Versions == null || Versions.All(v => v.Version != version))
                 return false;
             return true;
         }
@@ -73,5 +91,6 @@ namespace CrossStitch.Core.Models
     public class ApplicationComponentVersion
     {
         public string Version { get; set; }
+        public string FullName { get; set; }
     }
 }

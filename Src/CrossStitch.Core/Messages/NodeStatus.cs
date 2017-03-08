@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CrossStitch.Core.Modules.Stitches.Messages;
+using System;
 using System.Collections.Generic;
-using CrossStitch.Core.Modules.Stitches.Messages;
 
-namespace CrossStitch.Core.Node.Messages
+namespace CrossStitch.Core.Messages
 {
     public class NodeStatus
     {

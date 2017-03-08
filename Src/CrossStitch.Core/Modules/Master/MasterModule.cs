@@ -1,6 +1,4 @@
-﻿using CrossStitch.Core.Node;
-
-namespace CrossStitch.Core.Modules.Master
+﻿namespace CrossStitch.Core.Modules.Master
 {
     // The Master module coordinates multipart-commands across the cluster.
     public class MasterModule : IModule
@@ -18,7 +16,11 @@ namespace CrossStitch.Core.Modules.Master
         // running stitches, so we can know which nodes to deploy stitches to.
 
         // TODO: We need to be storing, through the Data Module, state instance of all nodes in the
-        // cluster, including the current running node. 
+        // cluster, including the current running node.
+
+        // TODO: We need a model class that can represent the node with status, along with an array
+        // of application.component.version/StitchId running on that node. We can pass this model 
+        // over the network and store in the data module for usage here.
 
         /* Commands to support:
          * 1) Create N instances of a Stitch version, with automatic balancing across the cluster to nodes with space
@@ -82,4 +84,14 @@ namespace CrossStitch.Core.Modules.Master
             Stop();
         }
     }
+
+    //public static class HardwareScoreCalculator
+    //{
+    //    public static int Calculate()
+    //    {
+    //        // TODO: Need to get the amount of RAM available, in whole-numbers of GB (rounded) and
+    //        // include that in the score somehow.
+    //        return Environment.ProcessorCount;
+    //    }
+    //}
 }

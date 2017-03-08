@@ -1,5 +1,6 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Node.Messages;
+using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.CoordinatedRequests;
 using Nancy;
 
 namespace CrossStitch.Http.NancyFx.Handlers

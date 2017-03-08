@@ -1,7 +1,6 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Modules.Data
 {

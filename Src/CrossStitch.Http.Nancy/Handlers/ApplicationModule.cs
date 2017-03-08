@@ -1,10 +1,10 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Node.Messages;
 using Nancy;
 using Nancy.ModelBinding;
 using System.Linq;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.CoordinatedRequests;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Messages;

@@ -1,15 +1,16 @@
 ﻿using Acquaintance;
 using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
+using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Modules.Timer;
-using CrossStitch.Core.Node.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CrossStitch.Core.Node
+namespace CrossStitch.Core
 {
     public class CrossStitchCore : IDisposable, CrossStitch.Stitch.IRunningNodeContext
     {
@@ -30,7 +31,7 @@ namespace CrossStitch.Core.Node
             _managedModules = new List<IModule>
             {
                 new MessageTimerModule(MessageBus),
-                new ApplicationCoordinatorModule()
+                new RequestCoordinatorModule()
             };
             _log = new ModuleLog(MessageBus, "Core");
         }
@@ -82,12 +83,15 @@ namespace CrossStitch.Core.Node
 
             _started = true;
             MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent());
-            _log.LogError("Core initialized");
+
+            // TODO: Report version? Other details?
+            _log.LogInformation("Core initialized Id={0}", NodeId);
         }
 
         private void OnNetworkNodeIdChanged(BackplaneEvent backplaneEvent)
         {
             NetworkNodeId = backplaneEvent.Data;
+            _log.LogInformation("Network Node ID set. NetworkId=" + NetworkNodeId);
         }
 
         // TODO: Break stop down into two-phases. Pre-stop alerts all modules about shutdown and does logging.

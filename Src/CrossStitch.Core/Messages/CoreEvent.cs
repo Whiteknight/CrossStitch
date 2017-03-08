@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Node.Messages
+﻿namespace CrossStitch.Core.Messages
 {
     public class CoreEvent
     {

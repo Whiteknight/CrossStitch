@@ -4,7 +4,6 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Modules.Stitches.Versions;
-using CrossStitch.Core.Node;
 using CrossStitch.Stitch.V1.Core;
 using System.Collections.Generic;
 using System.Linq;

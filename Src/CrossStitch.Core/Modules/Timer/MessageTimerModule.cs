@@ -1,5 +1,4 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Node;
 using System;
 
 namespace CrossStitch.Core.Modules.Timer

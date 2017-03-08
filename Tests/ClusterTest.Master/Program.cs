@@ -1,8 +1,8 @@
 ﻿using Acquaintance;
 using CrossStitch.Backplane.Zyre;
+using CrossStitch.Core;
 using CrossStitch.Core.Modules.Master;
 using CrossStitch.Core.Modules.Master.Events;
-using CrossStitch.Core.Node;
 using CrossStitch.Core.Utility.Serialization;
 using System;
 

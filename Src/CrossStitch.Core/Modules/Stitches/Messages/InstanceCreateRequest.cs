@@ -14,5 +14,13 @@
     {
         public string Id { get; set; }
         public bool Success { get; set; }
+
+        public static InstanceResponse Failure()
+        {
+            return new InstanceResponse
+            {
+                Success = false
+            };
+        }
     }
 }

@@ -1,19 +1,18 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.CoordinatedRequests;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.Stitches.Messages;
-using CrossStitch.Core.Node.Messages;
 using System.Linq;
 
-namespace CrossStitch.Core.Node
+namespace CrossStitch.Core.Modules.RequestCoordinator
 {
-    // TODO: This one needs a better name
+
     // TODO: Move this to a Modules/ subdirectory, with readme
     // This module receives commands from the user and coordinates actions between the Data module
     // and the Stitches module.
-    public class ApplicationCoordinatorModule : IModule
+    public class RequestCoordinatorModule : IModule
     {
         // TODO: Move most of this mutable data into a state object.
         private SubscriptionCollection _subscriptions;
@@ -72,20 +71,25 @@ namespace CrossStitch.Core.Node
                 {
                     Id = instance.Id
                 });
+                // TODO: Do something with the result?
                 _data.Save(instance);
             }
             _log.LogDebug("Startup stitches started");
         }
 
+        // TODO: Break these listeners out into per-type handler classes
+
         private GenericResponse DeleteComponent(ComponentChangeRequest arg)
         {
             Application application = _data.Update<Application>(arg.Application, a =>
             {
-                a.Components = a.Components.Where(c => c.Name != arg.Name).ToList();
+                a.RemoveComponent(arg.Name);
             });
             return new GenericResponse(application != null);
         }
 
+        // TODO: This method doesn't make sense. We wouldn't change the name of a Component.
+        // Remove this if there is no other use-case.
         private GenericResponse UpdateComponent(ComponentChangeRequest arg)
         {
             bool updated = false;
@@ -107,15 +111,7 @@ namespace CrossStitch.Core.Node
             bool updated = false;
             Application application = _data.Update<Application>(arg.Application, a =>
             {
-                updated = false;
-                var component = a.Components.FirstOrDefault(c => c.Name == arg.Name);
-                if (component == null)
-                {
-                    a.Components.Add(new ApplicationComponent
-                    {
-                        Name = arg.Name
-                    });
-                }
+                updated = a.AddComponent(arg.Name);
             });
             return new GenericResponse(application != null && updated);
         }
@@ -166,14 +162,21 @@ namespace CrossStitch.Core.Node
         private InstanceResponse CloneInstance(InstanceRequest request)
         {
             var instance = _data.Get<StitchInstance>(request.Id);
+            if (instance == null)
+            {
+                _log.LogError("Could not clone instance {0}, instance does not exist.", request.Id);
+                return InstanceResponse.Failure();
+            }
             instance.Id = null;
             instance.StoreVersion = 0;
             instance = _data.Insert(instance);
             if (instance == null)
+            {
                 _log.LogError("Could not clone instance {0}, data could not be saved.", request.Id);
-            else
-                _log.LogInformation("Instance {0} cloned to {1}", request.Id, instance.Id);
+                return InstanceResponse.Failure();
+            }
 
+            _log.LogInformation("Instance {0} cloned to {1}", request.Id, instance.Id);
             return new InstanceResponse
             {
                 Success = true,

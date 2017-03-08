@@ -1,7 +1,6 @@
 ﻿using Acquaintance;
 using Common.Logging;
 using CrossStitch.Core.Messages.Logging;
-using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Modules.Logging
 {

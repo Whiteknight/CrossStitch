@@ -1,9 +1,9 @@
 ﻿using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Http;
 using CrossStitch.Core.Modules.Stitches;
-using CrossStitch.Core.Node;
 using CrossStitch.Http.NancyFx;
 using System;
+using CrossStitch.Core;
 using CrossStitch.Core.Modules.Data.Folders;
 
 namespace HttpTest

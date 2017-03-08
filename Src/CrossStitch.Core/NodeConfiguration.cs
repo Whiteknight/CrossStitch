@@ -1,6 +1,6 @@
 ﻿using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Node
+namespace CrossStitch.Core
 {
     public class NodeConfiguration
     {

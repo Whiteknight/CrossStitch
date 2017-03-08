@@ -10,9 +10,9 @@ namespace CrossStitch.Core.Modules.Data
     // so we don't have to hit disk for every get
     public class FolderDataStorage : IDataStorage
     {
-        private readonly DataConfiguration _config;
+        private readonly Configuration _config;
 
-        public FolderDataStorage(DataConfiguration config)
+        public FolderDataStorage(Configuration config)
         {
             _config = config;
             if (!Directory.Exists(config.DataPath))

@@ -1,19 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace CrossStitch.Core.Modules.Data
 {
-
     public class InMemoryDataStorage : IDataStorage
     {
-        private readonly DataConfiguration _config;
         private readonly Dictionary<string, string> _allData;
 
-        public InMemoryDataStorage(DataConfiguration config)
+        public InMemoryDataStorage()
         {
-            _config = config;
             _allData = new Dictionary<string, string>();
         }
 

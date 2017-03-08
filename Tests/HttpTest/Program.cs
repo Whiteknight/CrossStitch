@@ -19,7 +19,7 @@ namespace HttpTest
                 var httpServer = new NancyHttpModule(httpConfiguration, core.MessageBus);
                 core.AddModule(httpServer);
 
-                var dataConfiguration = DataConfiguration.GetDefault();
+                var dataConfiguration = Configuration.GetDefault();
                 var dataStorage = new FolderDataStorage(dataConfiguration);
                 var data = new DataModule(dataStorage);
                 core.AddModule(data);

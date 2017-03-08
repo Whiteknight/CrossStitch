@@ -66,7 +66,8 @@
     <Compile Include="Messages\Backplane\ClusterMemberEvent.cs" />
     <Compile Include="Messages\Backplane\ZoneMemberEvent.cs" />
     <Compile Include="Models\NodeCommunicationInformation.cs" />
-    <Compile Include="Modules\Data\InMemoryDataStorage.cs" />
+    <Compile Include="Modules\Data\DataCache.cs" />
+    <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
     <Compile Include="MessageBus\ModuleLog.cs" />
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
@@ -86,12 +87,12 @@
     <Compile Include="Modules\Stitches\Messages\InstanceInformationRequest.cs" />
     <Compile Include="Modules\Stitches\Messages\PackageFileUploadRequest.cs" />
     <Compile Include="Modules\Stitches\Adaptors\V1ProcessStitchAdaptor.cs" />
-    <Compile Include="Modules\Data\DataConfiguration.cs" />
+    <Compile Include="Modules\Data\Folders\DataConfiguration.cs" />
     <Compile Include="Modules\Data\DataModule.cs" />
     <Compile Include="Models\Application.cs" />
     <Compile Include="Models\StitchInstance.cs" />
     <Compile Include="Models\PeerNode.cs" />
-    <Compile Include="Modules\Data\FolderDataStorage.cs" />
+    <Compile Include="Modules\Data\Folders\FolderDataStorage.cs" />
     <Compile Include="Modules\Data\IDataEntity.cs" />
     <Compile Include="Modules\Data\IDataStorage.cs" />
     <Compile Include="Messages\Data\DataRequest.cs" />
@@ -135,9 +136,7 @@
       <Name>CrossStitch.Stitch</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\Backplane\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

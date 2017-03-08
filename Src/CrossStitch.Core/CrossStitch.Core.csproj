@@ -43,14 +43,6 @@
       <HintPath>..\..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetMQ, Version=4.0.0.0, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NetMQ.4.0.0-rc5\lib\net40\NetMQ.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NetMQ.Zyre, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NetMQ.Zyre.1.0.0-rc1\lib\net40\NetMQ.Zyre.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -71,6 +63,9 @@
     <Compile Include="Messages\Data\DataRequestType.cs" />
     <Compile Include="Messages\Data\DataResponse.cs" />
     <Compile Include="Messages\Data\DataResponseType.cs" />
+    <Compile Include="Messages\Backplane\ClusterMemberEvent.cs" />
+    <Compile Include="Messages\Backplane\ZoneMemberEvent.cs" />
+    <Compile Include="Models\NodeCommunicationInformation.cs" />
     <Compile Include="Modules\Data\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
     <Compile Include="MessageBus\ModuleLog.cs" />
@@ -91,9 +86,6 @@
     <Compile Include="Modules\Stitches\Messages\InstanceInformationRequest.cs" />
     <Compile Include="Modules\Stitches\Messages\PackageFileUploadRequest.cs" />
     <Compile Include="Modules\Stitches\Adaptors\V1ProcessStitchAdaptor.cs" />
-    <Compile Include="Modules\Backplane\BackplaneModule.cs" />
-    <Compile Include="Modules\Backplane\Events\ClusterMemberEvent.cs" />
-    <Compile Include="Modules\Backplane\Events\ZoneMemberEvent.cs" />
     <Compile Include="Modules\Data\DataConfiguration.cs" />
     <Compile Include="Modules\Data\DataModule.cs" />
     <Compile Include="Models\Application.cs" />
@@ -106,27 +98,12 @@
     <Compile Include="MessageBus\MessageBusExtensions.cs" />
     <Compile Include="Messages\Logging\LogEvent.cs" />
     <Compile Include="Modules\Master\ClusterPeerNode.cs" />
-    <Compile Include="Modules\Backplane\BackplaneConfiguration.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
     <Compile Include="Configuration\ConfigurationLoader.cs" />
-    <Compile Include="Modules\Backplane\IClusterBackplane.cs" />
     <Compile Include="Modules\Master\Events\NodeAddedToClusterEvent.cs" />
     <Compile Include="Modules\Master\Events\NodeRemovedFromCluster.cs" />
     <Compile Include="Modules\Master\IClusterNodeManager.cs" />
     <Compile Include="Messages\GenericResponse.cs" />
-    <Compile Include="Networking\INetwork.cs" />
-    <Compile Include="Networking\IReceiveChannel.cs" />
-    <Compile Include="Networking\ISendChannel.cs" />
-    <Compile Include="Networking\MessageEnvelope.cs" />
-    <Compile Include="Networking\MessageHeader.cs" />
-    <Compile Include="Networking\MessagePayloadType.cs" />
-    <Compile Include="Networking\MessageReceivedEventArgs.cs" />
-    <Compile Include="Networking\NetMq\MultiReceiveChannel.cs" />
-    <Compile Include="Networking\NetMq\NetMqMessageMapper.cs" />
-    <Compile Include="Networking\NetMq\Network.cs" />
-    <Compile Include="Networking\NetMq\SendChannel.cs" />
-    <Compile Include="Networking\NetMq\SingleReceiveChannel.cs" />
-    <Compile Include="Networking\TargetType.cs" />
     <Compile Include="Node\ApplicationCoordinator.cs" />
     <Compile Include="MessageBus\DataHelperClient.cs" />
     <Compile Include="Node\Messages\ApplicationMessage.cs" />
@@ -141,9 +118,7 @@
     <Compile Include="Node\CrossStitchCore.cs" />
     <Compile Include="Modules\Master\MasterConfiguration.cs" />
     <Compile Include="Modules\Master\MasterModule.cs" />
-    <Compile Include="Modules\Backplane\NodeCommunicationInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Modules\Backplane\ZyreBackplane.cs" />
     <Compile Include="Modules\Master\ClusterNodeManager.cs" />
     <Compile Include="Modules\Timer\MessageTimerEvent.cs" />
     <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
@@ -160,7 +135,9 @@
       <Name>CrossStitch.Stitch</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Modules\Backplane\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

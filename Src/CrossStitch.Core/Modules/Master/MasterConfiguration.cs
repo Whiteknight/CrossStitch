@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using CrossStitch.Core.Configuration;
-using CrossStitch.Core.Modules.Backplane;
+﻿using CrossStitch.Core.Configuration;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -20,6 +18,6 @@ namespace CrossStitch.Core.Modules.Master
         public int ListenPort { get; set; }
         public NodeDetectionType NodeDetection { get; set; }
         public double PingTimeoutMs { get; set; }
-        public List<NodeCommunicationInformation> NodeList { get; set; }
+        //public List<NodeCommunicationInformation> NodeList { get; set; }
     }
 }

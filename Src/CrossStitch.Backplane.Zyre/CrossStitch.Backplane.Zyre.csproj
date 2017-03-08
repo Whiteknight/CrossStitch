@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4FCBE339-B357-4F32-937D-4AB1D1196B67}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CrossStitch.Backplane.Zyre</RootNamespace>
+    <AssemblyName>CrossStitch.Backplane.Zyre</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Acquaintance, Version=0.6.6229.2037, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Acquaintance.1.0.0-rc1\lib\net45\Acquaintance.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AsyncIO, Version=0.1.18.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AsyncIO.0.1.18.0\lib\net40\AsyncIO.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetMQ, Version=4.0.0.0, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NetMQ.4.0.0.0-beta\lib\net40\NetMQ.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetMQ.Zyre, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NetMQ.Zyre.1.0.0-rc1\lib\net40\NetMQ.Zyre.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BackplaneConfiguration.cs" />
+    <Compile Include="BackplaneModule.cs" />
+    <Compile Include="IClusterBackplane.cs" />
+    <Compile Include="Networking\INetwork.cs" />
+    <Compile Include="Networking\IReceiveChannel.cs" />
+    <Compile Include="Networking\ISendChannel.cs" />
+    <Compile Include="Networking\MessageEnvelope.cs" />
+    <Compile Include="Networking\MessageHeader.cs" />
+    <Compile Include="Networking\MessagePayloadType.cs" />
+    <Compile Include="Networking\MessageReceivedEventArgs.cs" />
+    <Compile Include="Networking\NetMq\MultiReceiveChannel.cs" />
+    <Compile Include="Networking\NetMq\NetMqMessageMapper.cs" />
+    <Compile Include="Networking\NetMq\Network.cs" />
+    <Compile Include="Networking\NetMq\SendChannel.cs" />
+    <Compile Include="Networking\NetMq\SingleReceiveChannel.cs" />
+    <Compile Include="Networking\TargetType.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ZyreBackplane.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CrossStitch.Core\CrossStitch.Core.csproj">
+      <Project>{a9a30edf-7047-4d0f-a756-816eb85d0384}</Project>
+      <Name>CrossStitch.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CrossStitch.Stitch\CrossStitch.Stitch.csproj">
+      <Project>{4bd40e13-2f9a-41c9-aed4-dc160b3d48a6}</Project>
+      <Name>CrossStitch.Stitch</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -60,6 +60,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Src\CrossStitch.Backplane.Zyre\CrossStitch.Backplane.Zyre.csproj">
+      <Project>{4fcbe339-b357-4f32-937d-4ab1d1196b67}</Project>
+      <Name>CrossStitch.Backplane.Zyre</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Src\CrossStitch.Core\CrossStitch.Core.csproj">
       <Project>{a9a30edf-7047-4d0f-a756-816eb85d0384}</Project>
       <Name>CrossStitch.Core</Name>

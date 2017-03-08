@@ -1,6 +1,4 @@
-﻿using System;
-using Acquaintance;
-using CrossStitch.Core.Networking;
+﻿using Acquaintance;
 using CrossStitch.Core.Node;
 
 namespace CrossStitch.Core.Modules.Master
@@ -19,24 +17,24 @@ namespace CrossStitch.Core.Modules.Master
         {
             _nodeManager = nodeManager;
 
-            messageBus.Subscribe<MessageEnvelope>(s => s
-                .WithChannelName(MessageEnvelope.SendEventName)
-                .Invoke(ResolveAppInstanceNodeIdAndSend)
-                .OnWorkerThread()
-                .WithFilter(IsMessageAddressedToAppInstance)
-            );
+            //messageBus.Subscribe<MessageEnvelope>(s => s
+            //    .WithChannelName(MessageEnvelope.SendEventName)
+            //    .Invoke(ResolveAppInstanceNodeIdAndSend)
+            //    .OnWorkerThread()
+            //    .WithFilter(IsMessageAddressedToAppInstance)
+            //);
         }
 
-        private static bool IsMessageAddressedToAppInstance(MessageEnvelope arg)
-        {
-            return arg.Header.ToType == TargetType.AppInstance;
-        }
+        //private static bool IsMessageAddressedToAppInstance(MessageEnvelope arg)
+        //{
+        //    return arg.Header.ToType == TargetType.AppInstance;
+        //}
 
-        private void ResolveAppInstanceNodeIdAndSend(MessageEnvelope obj)
-        {
-            throw new NotImplementedException();
-            // TODO: Resolve the NodeId for the message and publish again.
-        }
+        //private void ResolveAppInstanceNodeIdAndSend(MessageEnvelope obj)
+        //{
+        //    throw new NotImplementedException();
+        //    // TODO: Resolve the NodeId for the message and publish again.
+        //}
 
         public string Name => "Master";
 

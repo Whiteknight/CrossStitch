@@ -64,20 +64,20 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             {
                 Id = id,
                 StitchId = 0,
-                NodeName = _nodeContext.Name,
+                NodeId = _nodeContext.NodeId,
                 ChannelName = ToStitchMessage.HeartbeatChannelName,
                 Data = ""
             });
         }
 
         // TODO: Convert this to take some kind of object instead of all these primitive values
-        public void SendMessage(long messageId, string channel, string data, string nodeName, long senderId)
+        public void SendMessage(long messageId, string channel, string data, Guid nodeId, long senderId)
         {
             _channel.SendMessage(new ToStitchMessage
             {
                 Id = messageId,
                 StitchId = senderId,
-                NodeName = nodeName,
+                NodeId = nodeId,
                 ChannelName = channel,
                 Data = data
             });

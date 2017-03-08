@@ -4,7 +4,7 @@ namespace CrossStitch.Stitch
 {
     public interface IRunningNodeContext
     {
-        Guid NodeId { get; set; }
-        string Name { get; }
+        Guid NodeId { get; }
+        string NetworkNodeId { get; }
     }
 }

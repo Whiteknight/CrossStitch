@@ -31,11 +31,11 @@ namespace ClusterTest.Master
                 core.AddModule(masterModule);
 
                 core.Start();
-                Console.WriteLine("Started MASTER node {0}", core.NodeId);
+                Console.WriteLine("Started MASTER node {0}", core.NetworkNodeId);
 
                 Console.ReadKey();
 
-                Console.WriteLine("Stopping node {0}", core.NodeId);
+                Console.WriteLine("Stopping node {0}", core.NetworkNodeId);
                 core.Stop();
             }
         }

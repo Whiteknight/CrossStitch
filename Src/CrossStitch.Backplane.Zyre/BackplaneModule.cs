@@ -1,11 +1,11 @@
-﻿using System;
-using Acquaintance;
+﻿using Acquaintance;
 using CrossStitch.Backplane.Zyre.Networking;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
 using CrossStitch.Core.Node;
 using CrossStitch.Core.Node.Messages;
 using CrossStitch.Stitch.Events;
+using System;
 
 namespace CrossStitch.Backplane.Zyre
 {
@@ -54,9 +54,8 @@ namespace CrossStitch.Backplane.Zyre
             _backplane.ClusterMember += ClusterMemberHandler;
             _backplane.ZoneMember += ZoneMemberHandler;
 
-            // _backplane.Start fills in Context.NodeId
-            _backplane.Start(context);
-            _nodeId = context.NodeId;
+            _nodeId = _backplane.Start();
+            _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeId.ToString() });
         }
 
         public void Stop()
@@ -78,6 +77,8 @@ namespace CrossStitch.Backplane.Zyre
             _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
         }
 
+        // TODO: These event types are very Zyre-specific. Come up with new event types which are
+        // more agnostic to the backplane implementation.
         private void ZoneMemberHandler(object sender, PayloadEventArgs<ZoneMemberEvent> e)
         {
             _messageBus?.Publish(e);

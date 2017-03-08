@@ -41,6 +41,8 @@ namespace CrossStitch.Core.Modules.Master
         // TODO: A Job should have an ability to be rolled-back, by issuing a sequence of inverse 
         // commands.
 
+        // TODO: Method to lookup NodeId by NetworkNodeId and vice-versa
+
         //private static bool IsMessageAddressedToAppInstance(MessageEnvelope arg)
         //{
         //    return arg.Header.ToType == TargetType.AppInstance;

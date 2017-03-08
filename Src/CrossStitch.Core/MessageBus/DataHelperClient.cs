@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Acquaintance;
+﻿using Acquaintance;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.MessageBus
 {
@@ -60,6 +60,10 @@ namespace CrossStitch.Core.MessageBus
             return response != null;
         }
 
+        // TODO: We need to be get all stitch instances by:
+        // 1) All stitches under a given application
+        // 2) All stitches under a given application.component
+        // 3) All stitches under a given application.component.version
         public IEnumerable<StitchInstance> GetAllInstances()
         {
             var response = Bus

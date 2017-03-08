@@ -1,12 +1,11 @@
-﻿using System;
-using CrossStitch.Backplane.Zyre.Networking;
+﻿using CrossStitch.Backplane.Zyre.Networking;
 using CrossStitch.Backplane.Zyre.Networking.NetMq;
 using CrossStitch.Core.Messages.Backplane;
-using CrossStitch.Core.Node;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Core.Utility.Serialization;
 using CrossStitch.Stitch.Events;
 using NetMQ.Zyre.ZyreEvents;
+using System;
 
 namespace CrossStitch.Backplane.Zyre
 {
@@ -109,7 +108,7 @@ namespace CrossStitch.Backplane.Zyre
             });
         }
 
-        public void Start(CrossStitchCore context)
+        public Guid Start()
         {
             if (_connected)
                 throw new Exception("Backplane is already started");
@@ -119,11 +118,9 @@ namespace CrossStitch.Backplane.Zyre
                 _zyre.Join(zone);
 
             _uuid = _zyre.Uuid();
-            // TODO: Don't set the context NodeId directly here. Publish a message so all modules
-            // who care about the NodeId/NodeName can be aware of it
-            context.NodeId = _uuid;
 
             _connected = true;
+            return _uuid;
         }
 
         public void Stop()

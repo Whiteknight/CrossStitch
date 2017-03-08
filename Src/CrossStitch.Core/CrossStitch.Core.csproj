@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\Backplane\NetworkEvent.cs" />
     <Compile Include="Messages\Data\DataRequestType.cs" />
     <Compile Include="Messages\Data\DataResponse.cs" />
     <Compile Include="Messages\Data\DataResponseType.cs" />

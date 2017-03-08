@@ -1,6 +1,7 @@
 ﻿using Acquaintance;
 using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.Timer;
 using CrossStitch.Core.Node.Messages;
@@ -20,6 +21,9 @@ namespace CrossStitch.Core.Node
 
         public CrossStitchCore(NodeConfiguration nodeConfig)
         {
+            // TODO: Should store the current NodeId in a Node file somewhere, so we can get the 
+            // same ID on service restart.
+            NodeId = Guid.NewGuid();
             MessageBus = new Acquaintance.MessageBus();
 
             _modules = new List<IModule>();
@@ -31,25 +35,12 @@ namespace CrossStitch.Core.Node
             _log = new ModuleLog(MessageBus, "Core");
         }
 
-        private Guid _nodeId;
-        public Guid NodeId
-        {
-            get { return _nodeId; }
-            set
-            {
-                string oldName = Name;
-                _nodeId = value;
-                OnNodeIdChanged(Name, oldName);
-            }
-        }
+        // TODO: Need to differentiate between NodeId (Guid) and NetworkNodeId (string?)
 
-        private void OnNodeIdChanged(string newName, string oldName)
-        {
-            if (_started)
-                MessageBus.Publish(CoreEvent.ChannelNameChanged, new CoreEvent(newName, oldName));
-        }
 
-        public string Name => NodeId.ToString();
+        public string NetworkNodeId { get; private set; }
+
+        public Guid NodeId { get; }
 
         public IMessageBus MessageBus { get; }
 
@@ -59,7 +50,7 @@ namespace CrossStitch.Core.Node
             if (_started)
             {
                 module.Start(this);
-                MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(Name, module.Name));
+                MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(module.Name));
                 _log.LogInformation("New module added: {0}", module.Name);
             }
         }
@@ -75,7 +66,14 @@ namespace CrossStitch.Core.Node
             _subscriptions.TimerSubscribe(6, b => b
                 .Invoke(t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()))
                 .OnWorkerThread());
-            _subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
+
+            // TODO: Move this to the master node, where we can either query the live status of the
+            // current node or query the last-known status of the requested node.
+            // Also, be clear whether we are querying by NodeId or NetworkNodeId (the former is
+            // more likely)
+            //_subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
+
+            _subscriptions.Subscribe<BackplaneEvent>(b => b.WithChannelName(BackplaneEvent.ChannelNetworkIdChanged).Invoke(OnNetworkNodeIdChanged));
 
             foreach (var module in _managedModules)
                 module.Start(this);
@@ -83,8 +81,13 @@ namespace CrossStitch.Core.Node
                 module.Start(this);
 
             _started = true;
-            MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent(Name));
+            MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent());
             _log.LogError("Core initialized");
+        }
+
+        private void OnNetworkNodeIdChanged(BackplaneEvent backplaneEvent)
+        {
+            NetworkNodeId = backplaneEvent.Data;
         }
 
         // TODO: Break stop down into two-phases. Pre-stop alerts all modules about shutdown and does logging.
@@ -115,23 +118,16 @@ namespace CrossStitch.Core.Node
             };
         }
 
-        private NodeStatus GetStatus(Guid nodeId)
-        {
-            if (nodeId == NodeId)
-                return GetStatus();
-
-            // TODO: RunningNode needs to keep a list of statuses of all known nodes here for querying
-            // TODO: RunningNode needs to broadcast its status to the backplane periodically (every minute?) so all nodes can have an up-to-date list of node statuses.
-            throw new NotImplementedException();
-        }
-
         public void Dispose()
         {
             _subscriptions?.Dispose();
+
             foreach (var module in _managedModules)
                 module.Dispose();
             foreach (var module in _modules)
                 module.Dispose();
+
+            MessageBus.Dispose();
         }
     }
 }

@@ -24,11 +24,11 @@ namespace ClusterTest.Client
 
                 core.AddModule(backplaneModule);
                 core.Start();
-                Console.WriteLine("Starting CLIENT node {0}", core.NodeId);
+                Console.WriteLine("Starting CLIENT node {0}", core.NetworkNodeId);
 
                 Console.ReadKey();
 
-                Console.WriteLine("Stopping node {0}", core.NodeId);
+                Console.WriteLine("Stopping node {0}", core.NetworkNodeId);
                 core.Stop();
             }
         }

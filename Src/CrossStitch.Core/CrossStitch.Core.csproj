@@ -130,6 +130,7 @@
   <ItemGroup>
     <None Include="Modules\Data\README.md" />
     <None Include="Modules\Logging\README.md" />
+    <None Include="Modules\Master\README.md" />
     <None Include="Modules\Stitches\README.md" />
     <None Include="Modules\Timer\README.md" />
     <None Include="packages.config" />

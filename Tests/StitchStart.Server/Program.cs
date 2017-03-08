@@ -14,8 +14,7 @@ namespace StitchStart.Server
             var config = NodeConfiguration.GetDefault();
             using (var node = new CrossStitchCore(config))
             {
-                var dataConfiguration = Configuration.GetDefault();
-                var dataStorage = new InMemoryDataStorage(dataConfiguration);
+                var dataStorage = new InMemoryDataStorage();
 
                 dataStorage.Save(new StitchInstance
                 {

@@ -21,7 +21,7 @@ namespace ClusterTest.Master
                 var backplane = new ZyreBackplane(backplaneConfig, "Master", serializer);
                 var backplaneModule = new BackplaneModule(backplane);
                 var nodeManager = new ClusterNodeManager(core.MessageBus);
-                var masterModule = new MasterModule(nodeManager, core.MessageBus);
+                var masterModule = new MasterModule(nodeManager);
 
                 core.MessageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
                 core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));

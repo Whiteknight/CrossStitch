@@ -1,11 +1,11 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Modules.Backplane;
-using CrossStitch.Core.Modules.Backplane.Events;
 using CrossStitch.Core.Modules.Master.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Messages.Backplane;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Master
 {

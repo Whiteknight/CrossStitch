@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Networking
+﻿namespace CrossStitch.Backplane.Zyre.Networking
 {
     public interface INetwork
     {

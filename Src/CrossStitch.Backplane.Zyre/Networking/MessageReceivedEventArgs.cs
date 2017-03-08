@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Networking
+namespace CrossStitch.Backplane.Zyre.Networking
 {
     public class MessageReceivedEventArgs : EventArgs
     {

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace CrossStitch.Core.Modules.Data
+namespace CrossStitch.Core.Modules.Data.Folders
 {
     // TODO: The DataModule is operating on a single dedicated thread. We should have a cache here
     // so we don't have to hit disk for every get

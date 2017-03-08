@@ -3,7 +3,7 @@ using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
 using NetMQ.Sockets;
 
-namespace CrossStitch.Core.Networking.NetMq
+namespace CrossStitch.Backplane.Zyre.Networking.NetMq
 {
     public class SendChannel : ISendChannel
     {

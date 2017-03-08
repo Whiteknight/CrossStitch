@@ -1,12 +1,13 @@
 ﻿using System;
 using Acquaintance;
-using CrossStitch.Core.Modules.Backplane.Events;
-using CrossStitch.Core.Networking;
+using CrossStitch.Backplane.Zyre.Networking;
+using CrossStitch.Core.Messages.Backplane;
+using CrossStitch.Core.Modules;
 using CrossStitch.Core.Node;
 using CrossStitch.Core.Node.Messages;
 using CrossStitch.Stitch.Events;
 
-namespace CrossStitch.Core.Modules.Backplane
+namespace CrossStitch.Backplane.Zyre
 {
     public sealed class BackplaneModule : IModule
     {

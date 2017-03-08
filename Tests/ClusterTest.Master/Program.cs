@@ -1,5 +1,5 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Modules.Backplane;
+using CrossStitch.Backplane.Zyre;
 using CrossStitch.Core.Modules.Master;
 using CrossStitch.Core.Modules.Master.Events;
 using CrossStitch.Core.Node;

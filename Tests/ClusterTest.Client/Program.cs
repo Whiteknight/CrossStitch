@@ -1,9 +1,9 @@
 ﻿using Acquaintance;
-using CrossStitch.Core.Modules.Backplane;
 using CrossStitch.Core.Modules.Master.Events;
 using CrossStitch.Core.Node;
 using CrossStitch.Core.Utility.Serialization;
 using System;
+using CrossStitch.Backplane.Zyre;
 
 namespace ClusterTest.Client
 {

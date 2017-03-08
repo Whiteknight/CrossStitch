@@ -1,6 +1,6 @@
 ﻿using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Modules.Data
+namespace CrossStitch.Core.Modules.Data.Folders
 {
     public class Configuration
     {

@@ -4,6 +4,7 @@ using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Core.Node;
 using CrossStitch.Http.NancyFx;
 using System;
+using CrossStitch.Core.Modules.Data.Folders;
 
 namespace HttpTest
 {

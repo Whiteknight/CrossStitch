@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
-namespace CrossStitch.Core.Modules.Data
+namespace CrossStitch.Core.Modules.Data.InMemory
 {
     public class InMemoryDataStorage : IDataStorage
     {

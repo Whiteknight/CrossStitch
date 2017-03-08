@@ -4,7 +4,7 @@ using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
 
-namespace CrossStitch.Core.Networking.NetMq
+namespace CrossStitch.Backplane.Zyre.Networking.NetMq
 {
     public class NetMqMessageMapper : IMapper<NetMQMessage, MessageEnvelope>, IMapper<MessageEnvelope, NetMQMessage>
     {

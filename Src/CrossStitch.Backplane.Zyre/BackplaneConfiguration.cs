@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Modules.Backplane
+namespace CrossStitch.Backplane.Zyre
 {
     public class BackplaneConfiguration
     {

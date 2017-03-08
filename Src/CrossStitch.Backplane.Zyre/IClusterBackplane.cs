@@ -1,10 +1,10 @@
 ﻿using System;
-using CrossStitch.Core.Modules.Backplane.Events;
-using CrossStitch.Core.Networking;
+using CrossStitch.Backplane.Zyre.Networking;
+using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Node;
 using CrossStitch.Stitch.Events;
 
-namespace CrossStitch.Core.Modules.Backplane
+namespace CrossStitch.Backplane.Zyre
 {
     public interface IClusterBackplane : IDisposable
     {

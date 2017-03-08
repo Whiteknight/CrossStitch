@@ -1,8 +1,8 @@
-﻿using CrossStitch.Core.Modules.Backplane;
-using CrossStitch.Core.Modules.Stitches.Messages;
+﻿using CrossStitch.Core.Modules.Stitches.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Master
 {

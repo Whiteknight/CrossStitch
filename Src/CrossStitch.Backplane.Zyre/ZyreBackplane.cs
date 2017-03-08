@@ -1,21 +1,20 @@
-﻿using CrossStitch.Core.Modules.Backplane.Events;
-using CrossStitch.Core.Networking;
-using CrossStitch.Core.Networking.NetMq;
+﻿using System;
+using CrossStitch.Backplane.Zyre.Networking;
+using CrossStitch.Backplane.Zyre.Networking.NetMq;
+using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Node;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Core.Utility.Serialization;
-using NetMQ.Zyre;
-using NetMQ.Zyre.ZyreEvents;
-using System;
 using CrossStitch.Stitch.Events;
+using NetMQ.Zyre.ZyreEvents;
 
-namespace CrossStitch.Core.Modules.Backplane
+namespace CrossStitch.Backplane.Zyre
 {
     // TODO: Move Zyre-related logic into a separate assembly to isolate the dependency
     public sealed class ZyreBackplane : IClusterBackplane
     {
         private readonly BackplaneConfiguration _config;
-        private readonly Zyre _zyre;
+        private readonly NetMQ.Zyre.Zyre _zyre;
         private readonly NetMqMessageMapper _mapper;
         private Guid _uuid;
         private bool _connected;
@@ -24,7 +23,7 @@ namespace CrossStitch.Core.Modules.Backplane
         {
             // TODO: The node doesn't have a "name" until we connect to the network. Don't take a
             // node name here, just use some kind of unique Guid or something.
-            _zyre = new Zyre(nodeName);
+            _zyre = new NetMQ.Zyre.Zyre(nodeName);
             _zyre.EnterEvent += ZyreEnterEvent;
             _zyre.StopEvent += ZyreStopEvent;
             _zyre.ExitEvent += ZyreExitEvent;

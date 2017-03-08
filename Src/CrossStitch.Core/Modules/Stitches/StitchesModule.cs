@@ -52,8 +52,8 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Start).Invoke(StartInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Stop).Invoke(StopInstance));
 
-            //int timerTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / MessageTimerModule.TimerIntervalSeconds;
-            int timerTickMultiple = 1;
+            int timerTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
+            //int timerTickMultiple = 1;
             _subscriptions.TimerSubscribe(timerTickMultiple, b => b.Invoke(e => SendScheduledHeartbeat()));
 
             _dataStorage = new StitchesDataStorage(context.MessageBus);
@@ -80,7 +80,6 @@ namespace CrossStitch.Core.Modules.Stitches
         public void Dispose()
         {
             Stop();
-            _stitchInstanceManager.Dispose();
         }
 
         private List<InstanceInformation> GetInstanceInformation(InstanceInformationRequest instanceInformationRequest)

@@ -7,12 +7,9 @@ using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
-
     public class StitchesModule : IModule
     {
         private readonly StitchFileSystem _fileSystem;
-
-        // TODO: Move most of this mutable data into a state/context object
         private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
         private StitchInstanceManager _stitchInstanceManager;

@@ -74,10 +74,10 @@
     <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
     <Compile Include="MessageBus\ModuleLog.cs" />
+    <Compile Include="Modules\ModuleNames.cs" />
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
     <Compile Include="Modules\Stitches\StitchResourceUsage.cs" />
     <Compile Include="Modules\Stitches\StitchesConfiguration.cs" />
-    <Compile Include="Modules\Stitches\StitchesDataStorage.cs" />
     <Compile Include="Modules\Stitches\StitchesModule.cs" />
     <Compile Include="Modules\Stitches\Versions\DateTimeVersionManager.cs" />
     <Compile Include="Modules\Stitches\Versions\IVersionManager.cs" />
@@ -126,7 +126,6 @@
     <Compile Include="Modules\Master\MasterModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Modules\Master\ClusterNodeManager.cs" />
-    <Compile Include="Modules\Timer\MessageTimerEvent.cs" />
     <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Utility\IMapper.cs" />
     <Compile Include="Utility\Serialization\ISerializer.cs" />

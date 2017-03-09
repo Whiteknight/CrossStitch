@@ -8,7 +8,7 @@ namespace CrossStitch.Core.Modules.Master
         DynamicBroadcast
     }
 
-    public class MasterConfiguration
+    public class MasterConfiguration : IModuleConfiguration
     {
         public static MasterConfiguration GetDefault()
         {
@@ -19,5 +19,8 @@ namespace CrossStitch.Core.Modules.Master
         public NodeDetectionType NodeDetection { get; set; }
         public double PingTimeoutMs { get; set; }
         //public List<NodeCommunicationInformation> NodeList { get; set; }
+        public void ValidateAndSetDefaults()
+        {
+        }
     }
 }

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using CrossStitch.Core.Configuration;
+﻿using CrossStitch.Core.Configuration;
+using System.Collections.Generic;
 
 namespace CrossStitch.Backplane.Zyre
 {
-    public class BackplaneConfiguration
+    public class BackplaneConfiguration : IModuleConfiguration
     {
         public static BackplaneConfiguration GetDefault()
         {
@@ -13,5 +13,11 @@ namespace CrossStitch.Backplane.Zyre
         public int ListenPort { get; set; }
         public double SendTimeoutMs { get; set; }
         public List<string> Zones { get; set; }
+        public void ValidateAndSetDefaults()
+        {
+            // TODO: Default ListenPort
+            if (Zones == null)
+                Zones = new List<string>();
+        }
     }
 }

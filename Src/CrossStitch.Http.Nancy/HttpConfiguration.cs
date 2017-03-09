@@ -1,8 +1,8 @@
 ﻿using CrossStitch.Core.Configuration;
 
-namespace CrossStitch.Core.Modules.Http
+namespace CrossStitch.Http.NancyFx
 {
-    public class HttpConfiguration
+    public class HttpConfiguration : IModuleConfiguration
     {
         public static HttpConfiguration GetDefault()
         {
@@ -10,5 +10,10 @@ namespace CrossStitch.Core.Modules.Http
         }
 
         public int Port { get; set; }
+        public void ValidateAndSetDefaults()
+        {
+            if (Port <= 0)
+                Port = 8080;
+        }
     }
 }

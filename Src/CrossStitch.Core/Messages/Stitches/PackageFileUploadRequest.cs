@@ -1,10 +1,14 @@
 ﻿using System.IO;
+using CrossStitch.Core.Models;
 
-namespace CrossStitch.Core.Modules.Stitches.Messages
+namespace CrossStitch.Core.Messages.Stitches
 {
     public class PackageFileUploadRequest
     {
-        public string Application { get; set; }
+        public const string ChannelUpload = "Upload";
+
+        public string ApplicationId { get; set; }
+        public Application Application { get; set; }
         public string Component { get; set; }
         public Stream Contents { get; set; }
     }

@@ -35,9 +35,9 @@ namespace CrossStitch.Backplane.Zyre
 
         public string Name => "Backplane";
 
-        public void Start(CrossStitchCore context)
+        public void Start(CrossStitchCore core)
         {
-            _messageBus = context.MessageBus;
+            _messageBus = core.MessageBus;
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(_messageBus);
             _subscriptions.Subscribe<MessageEnvelope>(s => s

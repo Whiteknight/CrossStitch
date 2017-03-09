@@ -58,9 +58,9 @@
 
         public string Name => "Master";
 
-        public void Start(CrossStitchCore context)
+        public void Start(CrossStitchCore core)
         {
-            _runningNode = context;
+            _runningNode = core;
             _nodeManager.Start();
 
             //messageBus.Subscribe<MessageEnvelope>(s => s

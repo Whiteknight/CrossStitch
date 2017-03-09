@@ -22,6 +22,7 @@ namespace CrossStitch.Core.Configuration
         }
 
         public static TConfig GetConfiguration<TConfig>(string fileName)
+            where TConfig : IModuleConfiguration
         {
             string fullPath = FindConfigFile(fileName);
             // TODO: If the file can't be found, we should show some kind of warning but
@@ -30,7 +31,9 @@ namespace CrossStitch.Core.Configuration
                 throw new ConfigurationException("Could not find configuration file " + fileName);
 
             string json = File.ReadAllText(fullPath);
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<TConfig>(json);
+            var config = Newtonsoft.Json.JsonConvert.DeserializeObject<TConfig>(json);
+            config.ValidateAndSetDefaults();
+            return config;
         }
     }
 }

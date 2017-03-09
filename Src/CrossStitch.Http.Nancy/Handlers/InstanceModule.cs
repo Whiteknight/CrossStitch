@@ -1,7 +1,7 @@
 using Acquaintance;
 using CrossStitch.Core.Messages.Data;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.Stitches.Messages;
 using Nancy;
 
 namespace CrossStitch.Http.NancyFx.Handlers
@@ -24,7 +24,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
             };
             Post["/{Instance}/start"] = _ =>
             {
-                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Start, new InstanceRequest
+                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
                 {
                     Id = _.Instance.ToString()
                 });
@@ -32,7 +32,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
 
             Post["/{Instance}/stop"] = _ =>
             {
-                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Stop, new InstanceRequest
+                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, new InstanceRequest
                 {
                     Id = _.Instance.ToString()
                 });
@@ -40,7 +40,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
 
             Post["/{Instance}/clone"] = _ =>
             {
-                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Clone, new InstanceRequest
+                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelClone, new InstanceRequest
                 {
                     Id = _.Instance.ToString()
                 });
@@ -48,7 +48,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
 
             Delete["/{Instance}"] = _ =>
             {
-                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Delete, new InstanceRequest
+                return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelDelete, new InstanceRequest
                 {
                     Id = _.Instance.ToString()
                 });

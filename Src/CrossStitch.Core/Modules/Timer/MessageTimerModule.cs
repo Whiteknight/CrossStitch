@@ -25,7 +25,7 @@ namespace CrossStitch.Core.Modules.Timer
 
         public string Name => "Timer";
 
-        public void Start(CrossStitchCore context)
+        public void Start(CrossStitchCore core)
         {
             if (_token != null)
                 return;

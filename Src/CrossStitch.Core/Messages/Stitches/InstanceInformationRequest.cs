@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Modules.Stitches.Messages
+﻿namespace CrossStitch.Core.Messages.Stitches
 {
     public class InstanceInformationRequest 
     {

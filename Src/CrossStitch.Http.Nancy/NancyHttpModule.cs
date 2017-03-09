@@ -3,7 +3,6 @@ using CrossStitch.Core;
 using Nancy.Hosting.Self;
 using System;
 using CrossStitch.Core.Modules;
-using CrossStitch.Core.Modules.Http;
 
 namespace CrossStitch.Http.NancyFx
 {
@@ -26,7 +25,7 @@ namespace CrossStitch.Http.NancyFx
 
         public string Name => "Http";
 
-        public void Start(CrossStitchCore context)
+        public void Start(CrossStitchCore core)
         {
             _host.Start();
         }

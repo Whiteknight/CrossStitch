@@ -4,7 +4,7 @@ namespace CrossStitch.Core.Models
 {
     public class StitchInstance : IDataEntity
     {
-        public const string CreateEvent = "Create";
+        public const string ChannelCreate = "Create";
 
         public string Id { get; set; }
         public string Name { get; set; }

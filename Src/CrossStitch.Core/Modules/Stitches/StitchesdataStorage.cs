@@ -15,19 +15,5 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             return Get<StitchInstance>(id);
         }
-
-        public Application GetApplication(string id)
-        {
-            return Get<Application>(id);
-        }
-
-        public void MarkHeartbeatSync(string id, long heartbeatId)
-        {
-            Update<StitchInstance>(id, si =>
-            {
-                if (si.LastHeartbeatReceived < heartbeatId)
-                    si.LastHeartbeatReceived = heartbeatId;
-            });
-        }
     }
 }

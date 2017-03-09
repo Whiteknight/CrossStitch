@@ -1,12 +1,12 @@
 ﻿using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
-using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Stitch;
 using CrossStitch.Stitch.Events;
 using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -194,34 +194,28 @@ namespace CrossStitch.Core.Modules.Stitches
             throw new NotImplementedException();
         }
 
-        public List<InstanceActionResult> SendHeartbeats(long id, IEnumerable<StitchInstance> instances)
+        public InstanceActionResult SendHeartbeat(long heartbeatId, StitchInstance instance)
         {
-            var results = new List<InstanceActionResult>();
-            foreach (var instance in instances)
+            IStitchAdaptor adaptor;
+            bool found = _adaptors.TryGetValue(instance.Id, out adaptor);
+            if (!found)
             {
-                IStitchAdaptor adaptor;
-                bool found = _adaptors.TryGetValue(instance.Id, out adaptor);
-                if (!found)
+                return new InstanceActionResult
                 {
-                    results.Add(new InstanceActionResult
-                    {
-                        Found = false,
-                        InstanceId = instance.Id,
-                        Success = false
-                    });
-                    continue;
-                }
-
-                adaptor.SendHeartbeat(id);
-                results.Add(new InstanceActionResult
-                {
-                    StitchInstance = instance,
+                    Found = false,
                     InstanceId = instance.Id,
-                    Found = true,
-                    Success = true
-                });
+                    Success = false
+                };
             }
-            return results;
+
+            adaptor.SendHeartbeat(heartbeatId);
+            return new InstanceActionResult
+            {
+                StitchInstance = instance,
+                InstanceId = instance.Id,
+                Found = true,
+                Success = true
+            };
         }
 
         private void OnStitchStateChange(object sender, StitchProcessEventArgs stitchProcessEventArgs)

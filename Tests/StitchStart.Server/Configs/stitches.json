@@ -1,6 +1,5 @@
 ﻿{
   "DataBasePath": ".\\AppData",
   "AppLibraryBasePath": ".\\AppLibrary",
-  "RunningAppBasePath": ".\\RunningApps",
-  "HeartbeatIntervalMinutes":  "1"
+  "RunningAppBasePath": ".\\RunningApps"
 }

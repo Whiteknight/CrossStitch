@@ -18,12 +18,12 @@ namespace CrossStitch.Core.Modules.Logging
 
         public string Name => "Logging";
 
-        public void Start(CrossStitchCore context)
+        public void Start(CrossStitchCore core)
         {
-            _messageBus = context.MessageBus;
-            _subscriptions = new SubscriptionCollection(context.MessageBus);
+            _messageBus = core.MessageBus;
+            _subscriptions = new SubscriptionCollection(core.MessageBus);
 
-            _threadId = context.MessageBus.ThreadPool.StartDedicatedWorker();
+            _threadId = core.MessageBus.ThreadPool.StartDedicatedWorker();
 
             _subscriptions.Subscribe<LogEvent>(b => b
                 .WithChannelName(LogEvent.LevelDebug)

@@ -2,32 +2,27 @@
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.CoordinatedRequests;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.Stitches.Messages;
 using System.Linq;
 
 namespace CrossStitch.Core.Modules.RequestCoordinator
 {
-
-    // TODO: Move this to a Modules/ subdirectory, with readme
-    // This module receives commands from the user and coordinates actions between the Data module
-    // and the Stitches module.
     public class RequestCoordinatorModule : IModule
     {
-        // TODO: Move most of this mutable data into a state object.
         private SubscriptionCollection _subscriptions;
         private CrossStitchCore _node;
         private IMessageBus _messageBus;
         private DataHelperClient _data;
         private ModuleLog _log;
 
-        public string Name => "ApplicationCoordinator";
+        public string Name => "RequestCoordinator";
 
-        public void Start(CrossStitchCore context)
+        public void Start(CrossStitchCore core)
         {
-            _node = context;
-            _subscriptions = new SubscriptionCollection(context.MessageBus);
-            _messageBus = context.MessageBus;
+            _node = core;
+            _subscriptions = new SubscriptionCollection(core.MessageBus);
+            _messageBus = core.MessageBus;
             _log = new ModuleLog(_messageBus, Name);
             _data = new DataHelperClient(_messageBus);
 
@@ -48,16 +43,32 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 .WithChannelName(ApplicationChangeRequest.Delete)
                 .Invoke(DeleteApplication));
 
-            // CRUD requests for Components
+            // CRUD requests for Components, which are all updates on Application records
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Insert).Invoke(InsertComponent));
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Update).Invoke(UpdateComponent));
             _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Delete).Invoke(DeleteComponent));
 
             // CRUD requests for Stitch Instances
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Delete).Invoke(DeleteInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.Clone).Invoke(CloneInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelCreate).Invoke(CreateNewInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelDelete).Invoke(DeleteInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelClone).Invoke(CloneInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStart).Invoke(StartInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStop).Invoke(StopInstance));
+
+            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l.OnDefaultChannel().Invoke(UploadPackageFile));
 
             _log.LogDebug("Started");
+        }
+
+        public void Stop()
+        {
+            _subscriptions?.Dispose();
+            _subscriptions = null;
+        }
+
+        public void Dispose()
+        {
+            Stop();
         }
 
         // On Core Initialization, get all stitch instances from the data store and start them.
@@ -67,20 +78,21 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             var instances = _data.GetAllInstances();
             foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
             {
-                var result = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Start, new InstanceRequest
+                var result = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
                 {
                     Id = instance.Id
                 });
-                // TODO: Do something with the result?
-                _data.Save(instance);
+                // TODO: Do something with the result? The updated instance is already saved by the
+                // Stitches module at this point
             }
             _log.LogDebug("Startup stitches started");
         }
 
-        // TODO: Break these listeners out into per-type handler classes
-
         private GenericResponse DeleteComponent(ComponentChangeRequest arg)
         {
+            // TODO: Should we delete all stitches of this component? If so, we need to get a list
+            // of all stitches in this component, stop and delete each, and then update our record
+            // here.
             Application application = _data.Update<Application>(arg.Application, a =>
             {
                 a.RemoveComponent(arg.Name);
@@ -118,6 +130,9 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
 
         private GenericResponse DeleteApplication(ApplicationChangeRequest arg)
         {
+            // TODO: Should we delete stitches from this application? If so, we'll need to get a 
+            // list of all stitches from the Data module and stop all of them, delete them,
+            // and then delete the application.
             bool ok = _data.Delete<Application>(arg.Id);
             return new GenericResponse(ok);
         }
@@ -128,7 +143,8 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
         }
 
         // TODO: We also need to broadcast these messages out over the backplane so other nodes keep
-        // track of applications.
+        // track of applications. Actually, this might be included with node status broadcasts.
+        // Investigate further.
 
         private Application CreateApplication(ApplicationChangeRequest arg)
         {
@@ -145,54 +161,156 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
 
         private InstanceResponse DeleteInstance(InstanceRequest request)
         {
-            var stopResponse = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.Stop, request);
-            if (!stopResponse.Success)
+            // Tell the Stitches module to stop the Stitch
+            var stopResponse = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, request);
+            if (!stopResponse.IsSuccess)
                 _log.LogError("Instance {0} could not be stopped", request.Id);
+
+            // Delete the record from the Data module
             bool deleted = _data.Delete<StitchInstance>(request.Id);
             if (!deleted)
                 _log.LogError("Instance {0} could not be deleted", request.Id);
-            if (stopResponse.Success && deleted)
+
+            // TODO: Update the Core status object to remove this from the list of running stitches.
+
+            if (stopResponse.IsSuccess && deleted)
                 _log.LogInformation("Instance {0} stopped and deleted successfully", request.Id);
             return new InstanceResponse
             {
-                Success = stopResponse.Success && deleted
+                IsSuccess = stopResponse.IsSuccess && deleted
             };
         }
 
         private InstanceResponse CloneInstance(InstanceRequest request)
         {
+            // Get a copy of the instance data from the Data module
             var instance = _data.Get<StitchInstance>(request.Id);
             if (instance == null)
             {
                 _log.LogError("Could not clone instance {0}, instance does not exist.", request.Id);
-                return InstanceResponse.Failure();
+                return InstanceResponse.Failure(request);
             }
+
+            // Update the model to be fresh
             instance.Id = null;
             instance.StoreVersion = 0;
+
+            // Insert the fresh version to the Data module
             instance = _data.Insert(instance);
             if (instance == null)
             {
                 _log.LogError("Could not clone instance {0}, data could not be saved.", request.Id);
-                return InstanceResponse.Failure();
+                return InstanceResponse.Failure(request);
             }
 
+            // Report success
             _log.LogInformation("Instance {0} cloned to {1}", request.Id, instance.Id);
-            return new InstanceResponse
+            return InstanceResponse.Success(request);
+        }
+
+        private PackageFileUploadResponse UploadPackageFile(PackageFileUploadRequest request)
+        {
+            // Get the application and make sure we have a Component record
+            var application = _data.Get<Application>(request.ApplicationId);
+            if (application == null)
+                return new PackageFileUploadResponse(false, null);
+            if (application.Components.All(c => c.Name != request.Component))
+                return new PackageFileUploadResponse(false, null);
+            request.Application = application;
+
+            // Save the file and generate a unique Version name
+            var response = _messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelUpload, request);
+            if (!response.Success)
             {
-                Success = true,
-                Id = instance.Id
-            };
+                _log.LogDebug("Package file upload  {0}:{1} failed", request.ApplicationId, request.Component);
+                return new PackageFileUploadResponse(false, null);
+            }
+
+            // Update the Application record with the new Version
+            _data.Update<Application>(request.ApplicationId, a => a.AddVersion(request.Component, response.Version));
+            _log.LogDebug("Uploaded package file {0}:{1}:{2}", request.ApplicationId, request.Component, response.Version);
+            return new PackageFileUploadResponse(true, response.Version);
         }
 
-        public void Stop()
+        private InstanceResponse CreateNewInstance(InstanceRequest request)
         {
-            _subscriptions?.Dispose();
-            _subscriptions = null;
+            if (request == null || request.Instance == null || string.IsNullOrEmpty(request.Instance.Application))
+                return InstanceResponse.Failure(request);
+            // Check to make sure we have a record for this version.
+            Application application = _data.Get<Application>(request.Instance.Application);
+            if (application == null)
+                return InstanceResponse.Failure(request);
+            if (!application.HasVersion(request.Instance.Component, request.Instance.Version))
+                return InstanceResponse.Failure(request);
+
+            // Insert the new instance to the data module
+            request.Instance.Id = null;
+            request.Instance.StoreVersion = 0;
+            request.Instance = _data.Insert(request.Instance);
+
+            // Perform the actual create logic in the Stitches module
+            var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreateVerified, request);
+            if (!response.IsSuccess)
+            {
+                _log.LogDebug("Stitch instance {0}:{1} could ot be created", request.Instance.Application, request.Instance.Component);
+                _data.Delete<StitchInstance>(request.Instance.Id);
+                return InstanceResponse.Failure(request);
+            }
+
+            // Update the stitch record in the Data module, log, and return
+            var directoryPath = response.Data;
+            var instance = _data.Update<StitchInstance>(request.Instance.Id, i => i.DirectoryPath = directoryPath);
+            _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} created", request.Instance.Application, request.Instance.Component, request.Instance.Version, request.Instance.Id);
+            return InstanceResponse.Success(request);
         }
 
-        public void Dispose()
+        private InstanceResponse StartInstance(InstanceRequest request)
         {
-            Stop();
+            var instance = _data.Get<StitchInstance>(request.Id);
+            if (instance == null)
+                return InstanceResponse.Failure(request);
+            request.Instance = instance;
+
+            var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStartVerified, request);
+            if (response.IsSuccess)
+            {
+                _messageBus.Publish(StitchInstanceEvent.ChannelStarted, new StitchInstanceEvent
+                {
+                    InstanceId = request.Id
+                });
+                _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} started", instance.Application, instance.Component, instance.Version, instance.Id);
+            }
+            else
+            {
+                _log.LogError(response.Exception, "Stitch instance {0}:{1}:{2} Id={3} failed to start", instance.Application, instance.Component, instance.Version, instance.Id);
+            }
+
+            // The Stitches module will update status in all cases, so always save
+            _data.Save<StitchInstance>(instance);
+            return response;
+        }
+
+        private InstanceResponse StopInstance(InstanceRequest request)
+        {
+            var instance = _data.Get<StitchInstance>(request.Id);
+            if (instance == null)
+                return InstanceResponse.Failure(request);
+            request.Instance = instance;
+
+            var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStopVerified, request);
+            if (!response.IsSuccess)
+            {
+                _log.LogError("Stitch instance {0}:{1}:{2} Id={3} could not be stopped", instance.Application, instance.Component, instance.Version, instance.Id);
+                return response;
+            }
+
+            _messageBus.Publish(StitchInstanceEvent.ChannelStopped, new StitchInstanceEvent
+            {
+                InstanceId = request.Id
+            });
+            var updateResult = _data.Update<StitchInstance>(request.Id, i => i.State = InstanceStateType.Stopped);
+            _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} stopped", instance.Application, instance.Component, instance.Version, instance.Id);
+            return InstanceResponse.Create(request, updateResult != null);
         }
     }
 }

@@ -6,8 +6,8 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.CoordinatedRequests;
 using CrossStitch.Core.Messages.Data;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.Stitches.Messages;
 using CrossStitch.Core.Utility.Extensions;
 
 namespace CrossStitch.Http.NancyFx.Handlers
@@ -72,7 +72,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
             {
                 var request = new PackageFileUploadRequest
                 {
-                    Application = x.Application,
+                    ApplicationId = x.Application,
                     Component = x.Component,
                     Contents = Request.Files.Single().Value
                 };
@@ -91,7 +91,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 stitchInstance.Component = x.Component.ToString();
                 stitchInstance.Version = x.Version.ToString();
 
-                return messageBus.Request<StitchInstance, StitchInstance>(StitchInstance.CreateEvent, stitchInstance);
+                return messageBus.Request<StitchInstance, StitchInstance>(StitchInstance.ChannelCreate, stitchInstance);
             };
         }
     }

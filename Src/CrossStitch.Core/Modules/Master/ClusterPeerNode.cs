@@ -1,7 +1,7 @@
-﻿using CrossStitch.Core.Modules.Stitches.Messages;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Master

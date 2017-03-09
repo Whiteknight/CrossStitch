@@ -60,12 +60,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\IModuleConfiguration.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />
     <Compile Include="Messages\Data\DataRequestType.cs" />
     <Compile Include="Messages\Data\DataResponse.cs" />
     <Compile Include="Messages\Data\DataResponseType.cs" />
     <Compile Include="Messages\Backplane\ClusterMemberEvent.cs" />
     <Compile Include="Messages\Backplane\ZoneMemberEvent.cs" />
+    <Compile Include="Messages\Stitches\InstanceRequest.cs" />
     <Compile Include="Models\NodeCommunicationInformation.cs" />
     <Compile Include="Modules\Data\DataCache.cs" />
     <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
@@ -78,15 +80,15 @@
     <Compile Include="Modules\Stitches\StitchesModule.cs" />
     <Compile Include="Modules\Stitches\Versions\DateTimeVersionManager.cs" />
     <Compile Include="Modules\Stitches\Versions\IVersionManager.cs" />
-    <Compile Include="Modules\Stitches\Messages\AppInstanceEvent.cs" />
+    <Compile Include="Messages\Stitches\StitchInstanceEvent.cs" />
     <Compile Include="Modules\Stitches\Adaptors\IStitchAdaptor.cs" />
     <Compile Include="Modules\Stitches\InstanceActionResult.cs" />
     <Compile Include="Modules\Stitches\Adaptors\StitchAdaptorFactory.cs" />
     <Compile Include="Modules\Stitches\StitchInstanceManager.cs" />
-    <Compile Include="Modules\Stitches\Messages\InstanceCreateRequest.cs" />
-    <Compile Include="Modules\Stitches\Messages\InstanceInformation.cs" />
-    <Compile Include="Modules\Stitches\Messages\InstanceInformationRequest.cs" />
-    <Compile Include="Modules\Stitches\Messages\PackageFileUploadRequest.cs" />
+    <Compile Include="Messages\Stitches\InstanceResponse.cs" />
+    <Compile Include="Messages\Stitches\InstanceInformation.cs" />
+    <Compile Include="Messages\Stitches\InstanceInformationRequest.cs" />
+    <Compile Include="Messages\Stitches\PackageFileUploadRequest.cs" />
     <Compile Include="Modules\Stitches\Adaptors\V1ProcessStitchAdaptor.cs" />
     <Compile Include="Modules\Data\Folders\DataConfiguration.cs" />
     <Compile Include="Modules\Data\DataModule.cs" />
@@ -110,6 +112,7 @@
     <Compile Include="MessageBus\DataHelperClient.cs" />
     <Compile Include="Messages\CoordinatedRequests\ApplicationMessage.cs" />
     <Compile Include="Messages\CoordinatedRequests\ComponentChangeRequest.cs" />
+    <Compile Include="Modules\StitchMonitor\StitchMonitorModule.cs" />
     <Compile Include="Modules\Timer\MessageTimerModule.cs" />
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
@@ -134,6 +137,7 @@
     <None Include="Modules\Master\README.md" />
     <None Include="Modules\RequestCoordinator\README.md" />
     <None Include="Modules\Stitches\README.md" />
+    <None Include="Modules\StitchMonitor\README.md" />
     <None Include="Modules\Timer\README.md" />
     <None Include="packages.config" />
   </ItemGroup>

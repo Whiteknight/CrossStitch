@@ -5,6 +5,7 @@ using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.RequestCoordinator;
+using CrossStitch.Core.Modules.StitchMonitor;
 using CrossStitch.Core.Modules.Timer;
 using System;
 using System.Collections.Generic;
@@ -28,10 +29,15 @@ namespace CrossStitch.Core
             MessageBus = new Acquaintance.MessageBus();
 
             _modules = new List<IModule>();
+
+            // TODO: Go over the list of _modules and only add these managed modules if they aren't
+            // added already;
+            // TODO: Do this in the Start method, so we know which modules to add
             _managedModules = new List<IModule>
             {
                 new MessageTimerModule(MessageBus),
-                new RequestCoordinatorModule()
+                new RequestCoordinatorModule(),
+                new StitchMonitorModule(nodeConfig)
             };
             _log = new ModuleLog(MessageBus, "Core");
         }
@@ -75,6 +81,10 @@ namespace CrossStitch.Core
             //_subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
 
             _subscriptions.Subscribe<BackplaneEvent>(b => b.WithChannelName(BackplaneEvent.ChannelNetworkIdChanged).Invoke(OnNetworkNodeIdChanged));
+
+            // TODO: Go over the list of modules and warn if important pieces are missing such as
+            // Stitches or Backplane, including details of what the repercussions of missing those
+            // modules will be
 
             foreach (var module in _managedModules)
                 module.Start(this);

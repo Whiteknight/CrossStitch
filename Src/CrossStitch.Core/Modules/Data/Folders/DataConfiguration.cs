@@ -2,7 +2,7 @@
 
 namespace CrossStitch.Core.Modules.Data.Folders
 {
-    public class Configuration
+    public class Configuration : IModuleConfiguration
     {
         public static Configuration GetDefault()
         {
@@ -10,5 +10,9 @@ namespace CrossStitch.Core.Modules.Data.Folders
         }
 
         public string DataPath { get; set; }
+        public void ValidateAndSetDefaults()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

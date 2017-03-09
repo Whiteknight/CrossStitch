@@ -16,7 +16,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
         private DataHelperClient _data;
         private ModuleLog _log;
 
-        public string Name => "RequestCoordinator";
+        public string Name => ModuleNames.RequestCoordinator;
 
         public void Start(CrossStitchCore core)
         {

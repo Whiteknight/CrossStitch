@@ -33,7 +33,7 @@ namespace CrossStitch.Backplane.Zyre
             _backplane.Send(envelope);
         }
 
-        public string Name => "Backplane";
+        public string Name => ModuleNames.Backplane;
 
         public void Start(CrossStitchCore core)
         {

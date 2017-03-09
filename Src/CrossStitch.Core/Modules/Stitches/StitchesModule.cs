@@ -24,7 +24,7 @@ namespace CrossStitch.Core.Modules.Stitches
             _fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
         }
 
-        public string Name => "Stitches";
+        public string Name => ModuleNames.Stitches;
 
         public void Start(CrossStitchCore core)
         {

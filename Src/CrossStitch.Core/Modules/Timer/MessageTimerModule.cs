@@ -23,7 +23,7 @@ namespace CrossStitch.Core.Modules.Timer
             _messageBus = messageBus;
         }
 
-        public string Name => "Timer";
+        public string Name => ModuleNames.Timer;
 
         public void Start(CrossStitchCore core)
         {

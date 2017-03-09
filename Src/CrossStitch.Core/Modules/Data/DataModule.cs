@@ -18,7 +18,7 @@ namespace CrossStitch.Core.Modules.Data
             _storage = storage;
         }
 
-        public string Name => "Data";
+        public string Name => ModuleNames.Data;
 
         public void Start(CrossStitchCore core)
         {

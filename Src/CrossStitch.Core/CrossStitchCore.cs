@@ -4,46 +4,31 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
-using CrossStitch.Core.Modules.RequestCoordinator;
-using CrossStitch.Core.Modules.StitchMonitor;
-using CrossStitch.Core.Modules.Timer;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CrossStitch.Core
 {
     public class CrossStitchCore : IDisposable, CrossStitch.Stitch.IRunningNodeContext
     {
-        private readonly List<IModule> _modules;
-        private readonly List<IModule> _managedModules;
+        public NodeConfiguration Configuration { get; set; }
+        private readonly ModuleCollection _modules;
         private SubscriptionCollection _subscriptions;
         private bool _started;
         private readonly ModuleLog _log;
 
-        public CrossStitchCore(NodeConfiguration nodeConfig)
+        public CrossStitchCore(NodeConfiguration configuration)
         {
+            Configuration = configuration;
             // TODO: Should store the current NodeId in a Node file somewhere, so we can get the 
             // same ID on service restart.
             NodeId = Guid.NewGuid();
             MessageBus = new Acquaintance.MessageBus();
 
-            _modules = new List<IModule>();
+            _modules = new ModuleCollection();
 
-            // TODO: Go over the list of _modules and only add these managed modules if they aren't
-            // added already;
-            // TODO: Do this in the Start method, so we know which modules to add
-            _managedModules = new List<IModule>
-            {
-                new MessageTimerModule(MessageBus),
-                new RequestCoordinatorModule(),
-                new StitchMonitorModule(nodeConfig)
-            };
             _log = new ModuleLog(MessageBus, "Core");
         }
-
-        // TODO: Need to differentiate between NodeId (Guid) and NetworkNodeId (string?)
-
 
         public string NetworkNodeId { get; private set; }
 
@@ -56,6 +41,7 @@ namespace CrossStitch.Core
             _modules.Add(module);
             if (_started)
             {
+                _modules.Add(module);
                 module.Start(this);
                 MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(module.Name));
                 _log.LogInformation("New module added: {0}", module.Name);
@@ -82,14 +68,9 @@ namespace CrossStitch.Core
 
             _subscriptions.Subscribe<BackplaneEvent>(b => b.WithChannelName(BackplaneEvent.ChannelNetworkIdChanged).Invoke(OnNetworkNodeIdChanged));
 
-            // TODO: Go over the list of modules and warn if important pieces are missing such as
-            // Stitches or Backplane, including details of what the repercussions of missing those
-            // modules will be
-
-            foreach (var module in _managedModules)
-                module.Start(this);
-            foreach (var module in _modules)
-                module.Start(this);
+            _modules.AddMissingModules(this);
+            _modules.StartAll(this);
+            _modules.WarnOnMissingModules(_log);
 
             _started = true;
             MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent());
@@ -110,10 +91,7 @@ namespace CrossStitch.Core
         {
             _log.LogInformation("Core is shutting down");
 
-            foreach (var module in _modules)
-                module.Stop();
-            foreach (var module in _managedModules)
-                module.Stop();
+            _modules.StopAll(this);
 
             _subscriptions.Dispose();
             _subscriptions = null;
@@ -128,18 +106,13 @@ namespace CrossStitch.Core
             return new NodeStatus
             {
                 AccessedTime = DateTime.Now,
-                RunningModules = _modules.Select(m => m.Name).ToList()
+                RunningModules = _modules.AddedModules.ToList()
             };
         }
 
         public void Dispose()
         {
-            _subscriptions?.Dispose();
-
-            foreach (var module in _managedModules)
-                module.Dispose();
-            foreach (var module in _modules)
-                module.Dispose();
+            Stop();
 
             MessageBus.Dispose();
         }

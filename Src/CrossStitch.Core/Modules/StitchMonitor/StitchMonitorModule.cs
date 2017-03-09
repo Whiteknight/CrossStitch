@@ -24,7 +24,7 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             _configuration = configuration;
         }
 
-        public string Name => "StitchMonitor";
+        public string Name => ModuleNames.StitchMonitor;
 
         public void Start(CrossStitchCore core)
         {

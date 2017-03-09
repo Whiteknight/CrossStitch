@@ -16,7 +16,7 @@ namespace CrossStitch.Core.Modules.Logging
             _log = log;
         }
 
-        public string Name => "Logging";
+        public string Name => ModuleNames.Log;
 
         public void Start(CrossStitchCore core)
         {

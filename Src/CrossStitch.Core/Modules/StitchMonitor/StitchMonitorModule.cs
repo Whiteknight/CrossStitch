@@ -2,14 +2,13 @@
 using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Stitches;
+using CrossStitch.Core.Messages.StitchMonitor;
 using CrossStitch.Core.Models;
 using System.Linq;
 using System.Threading;
 
 namespace CrossStitch.Core.Modules.StitchMonitor
 {
-    // TODO: Some kind of request/response to get the current heartbeat ID, so we can calculate
-    // if a stitch instance is running behind.
     public class StitchMonitorModule : IModule
     {
         private readonly NodeConfiguration _configuration;
@@ -40,6 +39,8 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             _subscriptions.TimerSubscribe(monitorTickMultiple, b => b.Invoke(e => MonitorStitchStatus()));
 
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b.WithChannelName(StitchInstanceEvent.ChannelSynced).Invoke(StitchSyncReceived));
+
+            _subscriptions.Listen<StitchHealthRequest, StitchHealthResponse>(l => l.OnDefaultChannel().Invoke(GetStitchHealthReport));
         }
 
         public void Stop()
@@ -90,6 +91,21 @@ namespace CrossStitch.Core.Modules.StitchMonitor
         {
             // TODO: Some kind of process to check the status of stitches, see how their LastHeartbeatId
             // compares to the current value, and send out alerts if things are looking unhealthy.
+        }
+
+        private StitchHealthResponse GetStitchHealthReport(StitchHealthRequest arg)
+        {
+            var stitch = _data.Get<StitchInstance>(arg.StitchId);
+            if (stitch == null)
+                return StitchHealthResponse.Create(arg, StitchHealthType.Missing);
+
+            long currentHeartbeat = _heartbeatId;
+            long missedHeartbeats = currentHeartbeat - stitch.LastHeartbeatReceived;
+            if (missedHeartbeats <= 1)
+                return StitchHealthResponse.Create(arg, StitchHealthType.Green);
+            if (missedHeartbeats <= 3)
+                return StitchHealthResponse.Create(arg, StitchHealthType.Yellow);
+            return StitchHealthResponse.Create(arg, StitchHealthType.Red);
         }
     }
 }

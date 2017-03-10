@@ -1,56 +1,67 @@
 using Acquaintance;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Messages.Stitches;
+using CrossStitch.Core.Messages.StitchMonitor;
 using CrossStitch.Core.Models;
 using Nancy;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
-    public class InstanceModule : NancyModule
+    public class StitchNancyModule : NancyModule
     {
-        public InstanceModule(IMessageBus messageBus)
-            : base("/instances")
+        public StitchNancyModule(IMessageBus messageBus)
+            : base("/stitches")
         {
             Get["/"] = _ =>
             {
                 return messageBus.Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.GetAll());
             };
-            Get["/{Instance}"] = _ =>
+
+            Get["/{StitchId}"] = _ =>
             {
-                string instance = _.Instance.ToString();
+                string instance = _.StitchId.ToString();
                 var request = DataRequest<StitchInstance>.Get(instance);
                 var response = messageBus.Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(request);
                 return response.Entity;
             };
-            Post["/{Instance}/start"] = _ =>
+
+            Post["/{StitchId}/start"] = _ =>
             {
                 return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
                 {
-                    Id = _.Instance.ToString()
+                    Id = _.StitchId.ToString()
                 });
             };
 
-            Post["/{Instance}/stop"] = _ =>
+            Post["/{StitchId}/stop"] = _ =>
             {
                 return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, new InstanceRequest
                 {
-                    Id = _.Instance.ToString()
+                    Id = _.StitchId.ToString()
                 });
             };
 
-            Post["/{Instance}/clone"] = _ =>
+            Post["/{StitchId}/clone"] = _ =>
             {
                 return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelClone, new InstanceRequest
                 {
-                    Id = _.Instance.ToString()
+                    Id = _.StitchId.ToString()
                 });
             };
 
-            Delete["/{Instance}"] = _ =>
+            Delete["/{StitchId}"] = _ =>
             {
                 return messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelDelete, new InstanceRequest
                 {
-                    Id = _.Instance.ToString()
+                    Id = _.StitchId.ToString()
+                });
+            };
+
+            Get["/{StitchId}/status"] = _ =>
+            {
+                return messageBus.Request<StitchHealthRequest, StitchHealthResponse>(new StitchHealthRequest
+                {
+                    StitchId = _.StitchId.ToString()
                 });
             };
         }

@@ -5,9 +5,9 @@ using Nancy;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
-    public class NodeModule : NancyModule
+    public class NodeNancyModule : NancyModule
     {
-        public NodeModule(IMessageBus messageBus)
+        public NodeNancyModule(IMessageBus messageBus)
             : base("/node")
         {
             Get["/"] = _ => messageBus.Request<NodeStatusRequest, NodeStatus>(new NodeStatusRequest());

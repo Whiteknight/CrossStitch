@@ -1,20 +1,19 @@
 ﻿using Acquaintance;
-using Nancy;
-using Nancy.ModelBinding;
-using System.Linq;
-using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.CoordinatedRequests;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility.Extensions;
+using Nancy;
+using Nancy.ModelBinding;
+using System.Linq;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
-    public class ApplicationModule : NancyModule
+    public class ApplicationNancyModule : NancyModule
     {
-        public ApplicationModule(IMessageBus messageBus)
+        public ApplicationNancyModule(IMessageBus messageBus)
             : base("/applications")
         {
             Get["/"] = x =>

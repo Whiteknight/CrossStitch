@@ -39,75 +39,6 @@ namespace CrossStitch.Backplane.Zyre
         public event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
         public event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
 
-        private void ZyreShoutEvent(object sender, ZyreEventShout e)
-        {
-            var envelope = _mapper.Map(e.Content);
-            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
-        }
-
-        private void ZyreWhisperEvent(object sender, ZyreEventWhisper e)
-        {
-            var envelope = _mapper.Map(e.Content);
-            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
-        }
-
-        private void ZyreLeaveEvent(object sender, ZyreEventLeave e)
-        {
-            ZoneMember.Raise(this, ZoneMemberEvent.LeavingEvent, new ZoneMemberEvent
-            {
-                NodeName = e.SenderName,
-                NodeUuid = e.SenderUuid,
-                Zone = e.GroupName
-            });
-        }
-
-        private void ZyreJoinEvent(object sender, ZyreEventJoin e)
-        {
-            ZoneMember.Raise(this, ZoneMemberEvent.JoiningEvent, new ZoneMemberEvent
-            {
-                NodeName = e.SenderName,
-                NodeUuid = e.SenderUuid,
-                Zone = e.GroupName
-            });
-        }
-
-        private void ZyreEvasiveEvent(object sender, ZyreEventEvasive e)
-        {
-            // TODO: What to do here?
-        }
-
-        private void ZyreExitEvent(object sender, ZyreEventExit e)
-        {
-            ClusterMember.Raise(this, ClusterMemberEvent.ExitingEvent, new ClusterMemberEvent
-            {
-                NodeName = e.SenderName,
-                NodeUuid = e.SenderUuid
-            });
-        }
-
-        private void ZyreStopEvent(object sender, ZyreEventStop e)
-        {
-            // TODO: What to do here?
-        }
-
-        private void ZyreEnterEvent(object sender, ZyreEventEnter e)
-        {
-            var peers = _zyre.Peers();
-            foreach (var peerUuid in peers)
-            {
-                ClusterMember.Raise(this, ClusterMemberEvent.EnteringEvent, new ClusterMemberEvent
-                {
-                    NodeName = e.SenderName,
-                    NodeUuid = peerUuid
-                });
-            }
-            ClusterMember.Raise(this, ClusterMemberEvent.EnteringEvent, new ClusterMemberEvent
-            {
-                NodeName = e.SenderName,
-                NodeUuid = e.SenderUuid
-            });
-        }
-
         public Guid Start()
         {
             if (_connected)
@@ -159,6 +90,81 @@ namespace CrossStitch.Backplane.Zyre
         {
             Stop();
             _zyre.Dispose();
+        }
+
+        private void ZyreShoutEvent(object sender, ZyreEventShout e)
+        {
+            // Receive a message which is sent to the entire zone/cluster
+            var envelope = _mapper.Map(e.Content);
+            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
+        }
+
+        private void ZyreWhisperEvent(object sender, ZyreEventWhisper e)
+        {
+            // Receive a message which is sent point-to-point from a peer to this node
+            var envelope = _mapper.Map(e.Content);
+            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
+        }
+
+        private void ZyreLeaveEvent(object sender, ZyreEventLeave e)
+        {
+            // This node has left the zone
+            ZoneMember.Raise(this, ZoneMemberEvent.LeavingEvent, new ZoneMemberEvent
+            {
+                NodeName = e.SenderName,
+                NodeUuid = e.SenderUuid,
+                Zone = e.GroupName
+            });
+        }
+
+        private void ZyreJoinEvent(object sender, ZyreEventJoin e)
+        {
+            // This node has joined a zone
+            ZoneMember.Raise(this, ZoneMemberEvent.JoiningEvent, new ZoneMemberEvent
+            {
+                NodeName = e.SenderName,
+                NodeUuid = e.SenderUuid,
+                Zone = e.GroupName
+            });
+        }
+
+        private void ZyreEvasiveEvent(object sender, ZyreEventEvasive e)
+        {
+            // TODO: What to do here?
+        }
+
+        private void ZyreExitEvent(object sender, ZyreEventExit e)
+        {
+            // A peer node has left the cluster
+            ClusterMember.Raise(this, ClusterMemberEvent.ExitingEvent, new ClusterMemberEvent
+            {
+                NodeName = e.SenderName,
+                NodeUuid = e.SenderUuid
+            });
+        }
+
+        private void ZyreStopEvent(object sender, ZyreEventStop e)
+        {
+            // TODO: What to do here?
+        }
+
+        private void ZyreEnterEvent(object sender, ZyreEventEnter e)
+        {
+            // TODO: What does this do?
+            //var peers = _zyre.Peers();
+            //foreach (var peerUuid in peers)
+            //{
+            //    ClusterMember.Raise(this, ClusterMemberEvent.EnteringEvent, new ClusterMemberEvent
+            //    {
+            //        NodeName = e.SenderName,
+            //        NodeUuid = peerUuid
+            //    });
+            //}
+            ClusterMember.Raise(this, ClusterMemberEvent.EnteringEvent, new ClusterMemberEvent
+            {
+                NodeName = e.SenderName,
+                NodeUuid = e.SenderUuid
+            });
         }
     }
 }

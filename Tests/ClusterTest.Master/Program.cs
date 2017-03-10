@@ -1,7 +1,7 @@
 ﻿using Acquaintance;
 using CrossStitch.Backplane.Zyre;
 using CrossStitch.Core;
-using CrossStitch.Core.Modules.Master;
+using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Master.Events;
 using CrossStitch.Core.Utility.Serialization;
 using System;
@@ -15,27 +15,23 @@ namespace ClusterTest.Master
             var nodeConfig = NodeConfiguration.GetDefault();
             using (var core = new CrossStitchCore(nodeConfig))
             {
-                var masterConfig = MasterConfiguration.GetDefault();
                 var serializer = new JsonSerializer();
                 var backplaneConfig = BackplaneConfiguration.GetDefault();
                 var backplane = new ZyreBackplane(backplaneConfig, "Master", serializer);
                 var backplaneModule = new BackplaneModule(backplane);
-                var nodeManager = new ClusterNodeManager(core.MessageBus);
-                var masterModule = new MasterModule(nodeManager);
 
                 core.MessageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
                 core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
-                //messageBus.Subscribe<ClusterCommandEvent>(ClusterCommandEvent.)
 
                 core.AddModule(backplaneModule);
-                core.AddModule(masterModule);
+                core.AddModule(new LoggingModule(Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 core.Start();
-                Console.WriteLine("Started MASTER node {0}", core.NetworkNodeId);
+                core.Log.LogInformation("Started MASTER node {0}", core.NetworkNodeId);
 
                 Console.ReadKey();
 
-                Console.WriteLine("Stopping node {0}", core.NetworkNodeId);
+                core.Log.LogInformation("Stopping node {0}", core.NetworkNodeId);
                 core.Stop();
             }
         }

@@ -7,6 +7,7 @@ using CrossStitch.Core.Modules.StitchMonitor;
 using CrossStitch.Core.Modules.Timer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core
 {
@@ -64,7 +65,15 @@ namespace CrossStitch.Core
 
         public void StartAll(CrossStitchCore core)
         {
-            foreach (var module in _modules.Values)
+            // Start the "Log" module first, to make sure that messages generated during startup
+            // for other modules are logged.
+            // TODO: We should have some kind of mechanism to tag a module with a priority, so we
+            // can start high-priority modules first.
+            // TODO: We definitely want the DataModule to initialize early, in case other modules
+            // need to get stored config/state data
+            foreach (var module in _modules.Values.Where(m => m.Name == ModuleNames.Log))
+                module.Start(core);
+            foreach (var module in _modules.Values.Where(m => m.Name != ModuleNames.Log))
                 module.Start(core);
         }
 

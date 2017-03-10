@@ -11,6 +11,9 @@
             _nodeManager = nodeManager;
         }
 
+        // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
+        // commands only on nodes of certain zones.
+
         // TODO: We need some kind of scoring metric for a node to report, which will take into 
         // account the number of processor cores and available RAM, and reduce by the number of
         // running stitches, so we can know which nodes to deploy stitches to.

@@ -15,7 +15,7 @@ namespace CrossStitch.Core
         private readonly ModuleCollection _modules;
         private SubscriptionCollection _subscriptions;
         private bool _started;
-        private readonly ModuleLog _log;
+        public ModuleLog Log { get; }
 
         public CrossStitchCore(NodeConfiguration configuration)
         {
@@ -27,7 +27,7 @@ namespace CrossStitch.Core
 
             _modules = new ModuleCollection();
 
-            _log = new ModuleLog(MessageBus, "Core");
+            Log = new ModuleLog(MessageBus, "Core");
         }
 
         public string NetworkNodeId { get; private set; }
@@ -44,7 +44,7 @@ namespace CrossStitch.Core
                 _modules.Add(module);
                 module.Start(this);
                 MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(module.Name));
-                _log.LogInformation("New module added: {0}", module.Name);
+                Log.LogInformation("New module added: {0}", module.Name);
             }
         }
 
@@ -70,26 +70,26 @@ namespace CrossStitch.Core
 
             _modules.AddMissingModules(this);
             _modules.StartAll(this);
-            _modules.WarnOnMissingModules(_log);
+            _modules.WarnOnMissingModules(Log);
 
             _started = true;
             MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent());
 
             // TODO: Report version? Other details?
-            _log.LogInformation("Core initialized Id={0}", NodeId);
+            Log.LogInformation("Core initialized Id={0}", NodeId);
         }
 
         private void OnNetworkNodeIdChanged(BackplaneEvent backplaneEvent)
         {
             NetworkNodeId = backplaneEvent.Data;
-            _log.LogInformation("Network Node ID set. NetworkId=" + NetworkNodeId);
+            Log.LogInformation("Network Node ID set. NetworkId=" + NetworkNodeId);
         }
 
         // TODO: Break stop down into two-phases. Pre-stop alerts all modules about shutdown and does logging.
         // Stop will wait for all modules to indicate readiness or, after a timeout, force shutdown.
         public void Stop()
         {
-            _log.LogInformation("Core is shutting down");
+            Log.LogInformation("Core is shutting down");
 
             _modules.StopAll(this);
 

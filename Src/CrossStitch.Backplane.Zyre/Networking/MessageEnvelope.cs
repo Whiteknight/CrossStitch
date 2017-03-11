@@ -161,13 +161,6 @@ namespace CrossStitch.Backplane.Zyre.Networking
             return this;
         }
 
-        public MessageEnvelopeBuilder Local()
-        {
-            _envelope.Header.ToType = TargetType.Local;
-            _envelope.Header.FromType = TargetType.Local;
-            return this;
-        }
-
         public MessageEnvelopeBuilder FromNode()
         {
             _envelope.Header.FromType = TargetType.Node;

@@ -15,7 +15,7 @@ namespace CrossStitch.Backplane.Zyre
         void Stop();
 
         // Responsible for communication between nodes in the cluster
-        void Send(MessageEnvelope message);
+        void Send(MessageEnvelope envelope);
         //TResponse Send<TRequest, TResponse>(NodeCommunicationInformation recipient, TRequest request);
         //Task<TResponse> SendAsync<TRequest, TResponse>(NodeCommunicationInformation recipient, TRequest request, CancellationToken cancellation);
     }

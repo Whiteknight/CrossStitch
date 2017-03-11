@@ -15,8 +15,14 @@ namespace CrossStitch.Core.Models
         public string Id { get; set; }
         public long StoreVersion { get; set; }
         public string Name { get; set; }
+        public string Zone { get; set; }
         public Guid NodeId { get; set; }
         public List<ApplicationComponent> Components { get; set; }
+
+        public static string VersionFullName(string applicationId, string component, string version)
+        {
+            return $"{applicationId}.{component}.{version}";
+        }
 
         public bool AddComponent(string name)
         {

@@ -75,6 +75,7 @@
     <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
     <Compile Include="MessageBus\ModuleLog.cs" />
+    <Compile Include="Modules\Master\Zones.cs" />
     <Compile Include="Modules\ModuleNames.cs" />
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
     <Compile Include="Modules\Stitches\StitchResourceUsage.cs" />

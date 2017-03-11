@@ -1,10 +1,15 @@
-﻿namespace CrossStitch.Core.Modules.Master
+﻿using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Models;
+
+namespace CrossStitch.Core.Modules.Master
 {
     // The Master module coordinates multipart-commands across the cluster.
     public class MasterModule : IModule
     {
         private CrossStitchCore _runningNode;
         private readonly IClusterNodeManager _nodeManager;
+
+        private DataHelperClient _data;
 
         public MasterModule(IClusterNodeManager nodeManager)
         {
@@ -59,12 +64,13 @@
         //    // TODO: Resolve the NodeId for the message and publish again.
         //}
 
-        public string Name => "Master";
+        public string Name => ModuleNames.Master;
 
         public void Start(CrossStitchCore core)
         {
             _runningNode = core;
             _nodeManager.Start();
+
 
             //messageBus.Subscribe<MessageEnvelope>(s => s
             //    .WithChannelName(MessageEnvelope.SendEventName)
@@ -85,6 +91,36 @@
         public void Dispose()
         {
             Stop();
+        }
+
+        private void SendMessageToStitchInstance(string stitchInstanceId, string data)
+        {
+            // 1) Look through all node statuses for the stitch instance ID
+            // 2) create a message for that Node
+            // 3) Send the message to the backplane
+        }
+
+        private void SendMessageToApplication(string applicationId, string data)
+        {
+            var application = _data.Get<Application>(applicationId);
+            if (application == null)
+                return;
+
+            string zone = application.Zone ?? Zones.ZoneAll;
+            // TODO: Create a message, addressed to that zone, with the given data.
+            // Send to the backplane
+        }
+
+        private void SendMessageToStitchesByVersion(string applicationId, string component, string version, string data)
+        {
+            string fullName = Application.VersionFullName(applicationId, component, version);
+            var application = _data.Get<Application>(applicationId);
+            if (application == null)
+                return;
+
+            string zone = application.Zone ?? Zones.ZoneAll;
+            // TODO: Create a message, addressed to that zone, with the given data.
+            // Send to the backplane
         }
     }
 

@@ -9,6 +9,7 @@
         public const string Data = "Data";
         public const string Timer = "Timer";
         public const string Backplane = "Backplane";
+        public const string Master = "Master";
 
     }
 }

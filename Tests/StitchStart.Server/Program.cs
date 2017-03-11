@@ -23,6 +23,7 @@ namespace StitchStart.Server
                     Application = "StitchStart",
                     Component = "Client",
                     Version = "1",
+                    VersionFullName = Application.VersionFullName("StitchStart", "Client", "1"),
                     Adaptor = new InstanceAdaptorDetails
                     {
                         RunMode = InstanceRunModeType.V1Process

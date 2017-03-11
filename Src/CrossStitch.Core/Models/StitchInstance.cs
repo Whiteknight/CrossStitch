@@ -13,10 +13,10 @@ namespace CrossStitch.Core.Models
         public string Application { get; set; }
         public string Component { get; set; }
         public string Version { get; set; }
+        public string VersionFullName { get; set; }
 
         public InstanceAdaptorDetails Adaptor { get; set; }
 
-        public string FullName { get; set; }
         public string DirectoryPath { get; set; }
         public string ExecutableName { get; set; }
         public InstanceStateType State { get; set; }

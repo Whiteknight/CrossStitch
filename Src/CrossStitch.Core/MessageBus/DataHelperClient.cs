@@ -1,6 +1,5 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Messages.Data;
-using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Data;
 using System;
 using System.Collections.Generic;
@@ -64,12 +63,13 @@ namespace CrossStitch.Core.MessageBus
         // 1) All stitches under a given application
         // 2) All stitches under a given application.component
         // 3) All stitches under a given application.component.version
-        public IEnumerable<StitchInstance> GetAllInstances()
+        public IEnumerable<TEntity> GetAll<TEntity>()
+            where TEntity : class, IDataEntity
         {
             var response = Bus
-                .Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.GetAll());
+                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.GetAll());
             if (response == null)
-                return Enumerable.Empty<StitchInstance>();
+                return Enumerable.Empty<TEntity>();
 
             return response.Entities;
         }

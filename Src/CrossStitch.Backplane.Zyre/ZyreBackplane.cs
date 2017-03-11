@@ -2,15 +2,17 @@
 using CrossStitch.Backplane.Zyre.Networking.NetMq;
 using CrossStitch.Core;
 using CrossStitch.Core.Messages.Backplane;
+using CrossStitch.Core.Modules.Master;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Core.Utility.Serialization;
 using CrossStitch.Stitch.Events;
 using NetMQ.Zyre.ZyreEvents;
 using System;
+using System.Linq;
 
 namespace CrossStitch.Backplane.Zyre
 {
-    
+
     public sealed class ZyreBackplane : IClusterBackplane
     {
         private readonly CrossStitchCore _core;
@@ -50,7 +52,8 @@ namespace CrossStitch.Backplane.Zyre
 
             _zyre.Start();
             _uuid = _zyre.Uuid();
-            foreach (string zone in _config.Zones.OrEmptyIfNull())
+            _zyre.Join(Zones.ZoneAll);
+            foreach (string zone in _config.Zones.OrEmptyIfNull().Where(z => z != Zones.ZoneAll))
                 _zyre.Join(zone);
 
             var envelopeFactory = new MessageEnvelopeBuilderFactory(_uuid, _core.NodeId);
@@ -86,14 +89,13 @@ namespace CrossStitch.Backplane.Zyre
             if (envelope.Header.ProxyNodeNetworkId.HasValue)
                 _zyre.Whisper(envelope.Header.ProxyNodeNetworkId.Value, message);
             else if (envelope.Header.ToType == TargetType.Cluster)
-            {
-                // TODO: Is there a better way to send to the whole cluster?
-                foreach (var peer in _zyre.Peers())
-                    _zyre.Whisper(peer, message);
-            }
+                // TODO: Should we send the message to ourselves?
+                _zyre.Shout(Zones.ZoneAll, message);
             else if (envelope.Header.ToType == TargetType.Zone)
+                // TODO: If this node is in the zone, should we send to ourselves?
                 _zyre.Shout(envelope.Header.ZoneName, message);
             else if (envelope.Header.ToType == TargetType.Node)
+                // TODO: If the UUID is this node, should we send to ourselves?
                 _zyre.Whisper(envelope.Header.GetToNetworkUuid(), message);
         }
 

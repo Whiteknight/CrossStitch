@@ -6,8 +6,10 @@ using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
 using CrossStitch.Core.Utility;
+using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.Events;
 using System;
+using System.Linq;
 
 namespace CrossStitch.Backplane.Zyre
 {
@@ -23,9 +25,11 @@ namespace CrossStitch.Backplane.Zyre
         private Guid _nodeNetworkId;
         private ModuleLog _log;
         private MessageEnvelopeBuilderFactory _envelopeFactory;
+        private readonly BackplaneConfiguration _configuration;
 
-        public BackplaneModule(IFactory<IClusterBackplane, CrossStitchCore> backplaneFactory = null)
+        public BackplaneModule(BackplaneConfiguration configuration = null, IFactory<IClusterBackplane, CrossStitchCore> backplaneFactory = null)
         {
+            _configuration = configuration ?? BackplaneConfiguration.GetDefault();
             _backplaneFactory = backplaneFactory ?? new ZyreBackplaneFactory();
         }
 
@@ -56,7 +60,8 @@ namespace CrossStitch.Backplane.Zyre
                 .WithFilter(IsMessageSendable));
             _subscriptions.Subscribe<NodeStatus>(s => s
                 .WithChannelName(NodeStatus.BroadcastEvent)
-                .Invoke(BroadcastNodeStatus));
+                .Invoke(BroadcastNodeStatus)
+                .OnThread(_workerThreadId));
 
             var context = _backplane.Start();
             _nodeNetworkId = context.NodeNetworkId;
@@ -81,11 +86,11 @@ namespace CrossStitch.Backplane.Zyre
         public void Dispose()
         {
             Stop();
-            _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
         }
 
         private void BroadcastNodeStatus(NodeStatus nodeStatus)
         {
+            nodeStatus.Zones = _configuration.Zones.OrEmptyIfNull().ToList();
             var envelope = _envelopeFactory.CreateNew()
                 .ToCluster()
                 .FromNode()
@@ -119,7 +124,49 @@ namespace CrossStitch.Backplane.Zyre
 
         private void MessageReceivedHandler(object sender, PayloadEventArgs<MessageEnvelope> e)
         {
-            _messageBus?.Publish(e);
+            if (_messageBus == null || e == null || e.Payload == null)
+                return;
+
+            string channel = e.Command;
+            switch (e.Payload.Header.PayloadType)
+            {
+                case MessagePayloadType.Object:
+                    PublishPayloadObjects(channel, e.Payload);
+                    break;
+                default:
+                    _log.LogWarning("Received message of unhandled type: " + e.Payload.Header.PayloadType);
+                    break;
+            }
+        }
+
+        private void PublishPayloadObjects(string channel, MessageEnvelope envelope)
+        {
+            if (envelope.PayloadObject == null)
+                return;
+
+            try
+            {
+                // TODO: Move this logic out into a place where we can test it.
+
+                var objectType = envelope.PayloadObject.GetType();
+
+                // Get the  ObjectsReceivedEvent<> object and .Object property
+                var eventType = typeof(ObjectsReceivedEvent<>).MakeGenericType(objectType);
+                var eventObject = Activator.CreateInstance(eventType);
+                var objectsProperty = eventType.GetProperty(nameof(ObjectsReceivedEvent<object>.Object));
+
+                objectsProperty.SetValue(eventObject, envelope.PayloadObject);
+
+                envelope.Header.PopulateReceivedEvent(eventObject as ReceivedEvent);
+
+                _log.LogDebug("Received object message of type " + objectType.Name);
+
+                _messageBus.Publish(channel, eventType, eventObject);
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private static bool IsMessageSendable(MessageEnvelope envelope)

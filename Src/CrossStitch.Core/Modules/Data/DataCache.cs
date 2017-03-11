@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Data
@@ -45,13 +44,13 @@ namespace CrossStitch.Core.Modules.Data
             if (_allData.ContainsKey(key))
             {
                 json = _allData[key];
-                return JsonConvert.DeserializeObject<TEntity>(json);
+                return Stitch.Utility.JsonUtility.Deserialize<TEntity>(json);
             }
 
             var entity = _inner.Get<TEntity>(id);
             if (entity == null)
                 return null;
-            json = JsonConvert.SerializeObject(entity);
+            json = Stitch.Utility.JsonUtility.Serialize(entity);
             _allData.Add(key, json);
             return entity;
         }
@@ -65,12 +64,12 @@ namespace CrossStitch.Core.Modules.Data
             return _inner.GetAll<TEntity>();
         }
 
-        public long Save<TEntity>(TEntity entity)
+        public long Save<TEntity>(TEntity entity, bool force)
             where TEntity : class, IDataEntity
         {
-            long id = _inner.Save<TEntity>(entity);
+            long id = _inner.Save<TEntity>(entity, force);
             string key = GetKey<TEntity>(entity.Id);
-            string json = JsonConvert.SerializeObject(entity);
+            string json = Stitch.Utility.JsonUtility.Serialize(entity);
             _allData.Add(key, json);
             return id;
         }

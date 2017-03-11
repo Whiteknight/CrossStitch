@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using CrossStitch.Stitch.Utility;
 using System;
 using System.IO;
 
@@ -21,7 +21,7 @@ namespace CrossStitch.Stitch.V1.Core
 
         public void SendMessage(ToStitchMessage message)
         {
-            string buffer = JsonConvert.SerializeObject(message);
+            string buffer = JsonUtility.Serialize(message);
             _stdout.Write(buffer);
             _stdout.Write("\nend\n");
             _stdout.Flush();

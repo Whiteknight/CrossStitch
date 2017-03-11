@@ -87,7 +87,7 @@ namespace CrossStitch.Core.Modules.Data
             if (request.Entity == null)
                 return DataResponse<TEntity>.BadRequest();
 
-            var version = _storage.Save(request.Entity);
+            var version = _storage.Save(request.Entity, request.Force);
             if (version == VersionMismatch)
                 return DataResponse<TEntity>.VersionMismatch();
             request.Entity.StoreVersion = version;

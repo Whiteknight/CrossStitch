@@ -69,7 +69,7 @@ namespace CrossStitch.Core.Modules.StitchMonitor
         {
             long id = Interlocked.Increment(ref _heartbeatId);
             _log.LogDebug("Sending heartbeat {0}", id);
-            var instances = _data.GetAllInstances()
+            var instances = _data.GetAll<StitchInstance>()
                 .Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started)
                 .ToList(); ;
 
@@ -99,13 +99,8 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             if (stitch == null)
                 return StitchHealthResponse.Create(arg, StitchHealthType.Missing);
 
-            long currentHeartbeat = _heartbeatId;
-            long missedHeartbeats = currentHeartbeat - stitch.LastHeartbeatReceived;
-            if (missedHeartbeats <= 1)
-                return StitchHealthResponse.Create(arg, StitchHealthType.Green);
-            if (missedHeartbeats <= 3)
-                return StitchHealthResponse.Create(arg, StitchHealthType.Yellow);
-            return StitchHealthResponse.Create(arg, StitchHealthType.Red);
+            var health = StitchHealthResponse.CalculateHealth(_heartbeatId, stitch.LastHeartbeatReceived);
+            return StitchHealthResponse.Create(arg, health);
         }
     }
 }

@@ -51,11 +51,11 @@ namespace CrossStitch.Core.MessageBus
             return Bus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request)?.Entity;
         }
 
-        public bool Save<TEntity>(TEntity entity)
+        public bool Save<TEntity>(TEntity entity, bool force = false)
             where TEntity : class, IDataEntity
         {
             var response = Bus
-                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Save(entity));
+                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Save(entity, force));
             return response != null;
         }
 

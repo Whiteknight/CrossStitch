@@ -1,5 +1,5 @@
-﻿using System;
-using CrossStitch.Core.Modules.Data;
+﻿using CrossStitch.Core.Modules.Data;
+using System;
 
 namespace CrossStitch.Core.Messages.Data
 {
@@ -9,6 +9,7 @@ namespace CrossStitch.Core.Messages.Data
         public DataRequestType Type { get; set; }
         public TEntity Entity { get; set; }
         public string Id { get; set; }
+        public bool Force { get; set; }
 
         // InPlaceUpdate is a delegate which will execute on the Data thread.
         public Action<TEntity> InPlaceUpdate { get; set; }
@@ -47,12 +48,13 @@ namespace CrossStitch.Core.Messages.Data
             };
         }
 
-        public static DataRequest<TEntity> Save(TEntity entity)
+        public static DataRequest<TEntity> Save(TEntity entity, bool force = false)
         {
             return new DataRequest<TEntity>
             {
                 Type = DataRequestType.Save,
-                Entity = entity
+                Entity = entity,
+                Force = force
             };
         }
 

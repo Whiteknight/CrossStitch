@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Acquaintance, Version=0.6.6229.2034, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Acquaintance.1.0.0-rc1\lib\net46\Acquaintance.dll</HintPath>
+    <Reference Include="Acquaintance, Version=1.0.0.23871, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Acquaintance.1.0.0-rc2\lib\net46\Acquaintance.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
@@ -41,10 +41,6 @@
     </Reference>
     <Reference Include="Common.Logging.Core, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -62,11 +58,13 @@
   <ItemGroup>
     <Compile Include="Configuration\IModuleConfiguration.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />
+    <Compile Include="Messages\Backplane\ReceivedEvent.cs" />
     <Compile Include="Messages\Data\DataRequestType.cs" />
     <Compile Include="Messages\Data\DataResponse.cs" />
     <Compile Include="Messages\Data\DataResponseType.cs" />
     <Compile Include="Messages\Backplane\ClusterMemberEvent.cs" />
     <Compile Include="Messages\Backplane\ZoneMemberEvent.cs" />
+    <Compile Include="Messages\Master\StitchDataMessage.cs" />
     <Compile Include="Messages\Stitches\InstanceRequest.cs" />
     <Compile Include="Messages\StitchMonitor\StitchHealthRequest.cs" />
     <Compile Include="Models\NodeCommunicationInformation.cs" />
@@ -120,7 +118,7 @@
     <Compile Include="Modules\IModule.cs" />
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
     <Compile Include="Messages\CoreEvent.cs" />
-    <Compile Include="Messages\NodeStatus.cs" />
+    <Compile Include="Models\NodeStatus.cs" />
     <Compile Include="Messages\CoordinatedRequests\NodeStatusRequest.cs" />
     <Compile Include="NodeConfiguration.cs" />
     <Compile Include="CrossStitchCore.cs" />

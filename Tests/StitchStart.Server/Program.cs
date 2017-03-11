@@ -28,12 +28,11 @@ namespace StitchStart.Server
                     {
                         RunMode = InstanceRunModeType.V1Process
                     },
-                    FullName = "StitchStart.Client",
                     DirectoryPath = ".",
                     ExecutableName = "StitchStart.Client.exe",
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
-                });
+                }, true);
 
                 var data = new DataModule(dataStorage);
                 node.AddModule(data);

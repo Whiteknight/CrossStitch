@@ -75,7 +75,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
         private void StartupStitches(CoreEvent obj)
         {
             _log.LogDebug("Starting startup stitches");
-            var instances = _data.GetAllInstances();
+            var instances = _data.GetAll<StitchInstance>();
             foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
             {
                 var result = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest

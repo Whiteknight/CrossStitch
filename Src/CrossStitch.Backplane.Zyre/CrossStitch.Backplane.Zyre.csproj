@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Acquaintance, Version=0.6.6229.2037, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Acquaintance.1.0.0-rc1\lib\net45\Acquaintance.dll</HintPath>
+    <Reference Include="Acquaintance, Version=1.0.0.23871, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Acquaintance.1.0.0-rc2\lib\net46\Acquaintance.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
@@ -64,6 +64,8 @@
     <Compile Include="IClusterBackplane.cs" />
     <Compile Include="MessageHeaderExtensions.cs" />
     <Compile Include="Networking\MessageEnvelope.cs" />
+    <Compile Include="Networking\MessageEnvelopeBuilder.cs" />
+    <Compile Include="Networking\MessageEnvelopeBuilderFactory.cs" />
     <Compile Include="Networking\MessageHeader.cs" />
     <Compile Include="Networking\MessagePayloadType.cs" />
     <Compile Include="Networking\MessageReceivedEventArgs.cs" />

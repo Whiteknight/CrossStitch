@@ -10,7 +10,7 @@ namespace CrossStitch.Core.Modules.Data
         IEnumerable<TEntity> GetAll<TEntity>()
             where TEntity : class, IDataEntity;
 
-        long Save<TEntity>(TEntity entity)
+        long Save<TEntity>(TEntity entity, bool force)
             where TEntity : class, IDataEntity;
 
         bool Delete<TEntity>(string id)

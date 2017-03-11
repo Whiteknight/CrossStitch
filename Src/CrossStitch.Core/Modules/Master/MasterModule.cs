@@ -1,20 +1,22 @@
-﻿using CrossStitch.Core.MessageBus;
+﻿using Acquaintance;
+using Acquaintance.Timers;
+using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Messages;
 using CrossStitch.Core.Models;
+using System.Linq;
 
 namespace CrossStitch.Core.Modules.Master
 {
     // The Master module coordinates multipart-commands across the cluster.
     public class MasterModule : IModule
     {
-        private CrossStitchCore _runningNode;
         private readonly IClusterNodeManager _nodeManager;
 
+        private CrossStitchCore _core;
         private DataHelperClient _data;
-
-        public MasterModule(IClusterNodeManager nodeManager)
-        {
-            _nodeManager = nodeManager;
-        }
+        private SubscriptionCollection _subscriptions;
+        private IMessageBus _messageBus;
+        private ModuleLog _log;
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
         // commands only on nodes of certain zones.
@@ -68,9 +70,18 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Start(CrossStitchCore core)
         {
-            _runningNode = core;
-            _nodeManager.Start();
+            _core = core;
+            _messageBus = core.MessageBus;
+            _log = new ModuleLog(core.MessageBus, Name);
+            _subscriptions = new SubscriptionCollection(_messageBus);
+            _data = new DataHelperClient(_messageBus);
 
+            // Publish the status of the node every 60 seconds
+            _subscriptions.TimerSubscribe(1, b => b
+                .Invoke(t => PublishNodeStatus())
+                .OnWorkerThread());
+
+            _subscriptions.TimerSubscribe(1, b => b.Invoke(x => _log.LogDebug("Timer tick")));
 
             //messageBus.Subscribe<MessageEnvelope>(s => s
             //    .WithChannelName(MessageEnvelope.SendEventName)
@@ -82,9 +93,9 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Stop()
         {
-            if (_runningNode == null)
+            if (_core == null)
                 return;
-            _runningNode = null;
+            _core = null;
             _nodeManager.Stop();
         }
 
@@ -121,6 +132,37 @@ namespace CrossStitch.Core.Modules.Master
             string zone = application.Zone ?? Zones.ZoneAll;
             // TODO: Create a message, addressed to that zone, with the given data.
             // Send to the backplane
+        }
+
+        private void PublishNodeStatus()
+        {
+            var modules = _core.AllModules.ToList();
+            var stitches = _data.GetAll<StitchInstance>()
+                .Where(si => si.State == InstanceStateType.Running || si.State == InstanceStateType.Started)
+                .ToList();
+
+            var message = new NodeStatus
+            {
+                Id = _core.NodeId.ToString(),
+                Name = _core.NodeId.ToString(),
+                NetworkNodeId = _core.NetworkNodeId,
+                RunningModules = modules,
+                Instances = stitches
+                    .Select(si => new Messages.Stitches.InstanceInformation
+                    {
+                        Id = si.Id,
+                        FullVersionName = si.VersionFullName,
+                        State = si.State
+                    })
+                    .ToList(),
+
+                // This gets enriched in the backplane, for now
+                Zones = null
+            };
+
+            _data.Save(message, true);
+            _messageBus.Publish(NodeStatus.BroadcastEvent, message);
+            _log.LogDebug("Published node status");
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using CrossStitch.Core.Utility;
+﻿using CrossStitch.Core.Messages;
+using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
 using System.Linq;
@@ -25,10 +26,9 @@ namespace CrossStitch.Backplane.Zyre.Networking.NetMq
                 envelope.RawFrames = source.Select(f => f.ToByteArray()).ToList();
             else if (envelope.Header.PayloadType == MessagePayloadType.Object)
             {
-                envelope.PayloadObjects = source
-                    .Select(f => f.ToByteArray())
-                    .Select(b => _serializer.DeserializeObject(b))
-                    .ToList();
+                var bytes = source.FirstOrDefault()?.ToByteArray();
+                if (bytes != null)
+                    envelope.PayloadObject = _serializer.DeserializeObject(bytes);
             }
             else if (envelope.Header.PayloadType == MessagePayloadType.CommandString)
             {
@@ -42,7 +42,7 @@ namespace CrossStitch.Backplane.Zyre.Networking.NetMq
 
         public NetMQMessage Map(MessageEnvelope envelope)
         {
-            NetMQMessage message = new NetMQMessage();
+            var message = new NetMQMessage();
             byte[] headerFrame = _serializer.Serialize(envelope.Header);
             message.Append(headerFrame);
             if (envelope.Header.PayloadType == MessagePayloadType.CommandString)
@@ -53,13 +53,10 @@ namespace CrossStitch.Backplane.Zyre.Networking.NetMq
                     message.Append(bytes);
                 }
             }
-            else if (envelope.Header.PayloadType == MessagePayloadType.Object)
+            if (envelope.Header.PayloadType == MessagePayloadType.Object)
             {
-                foreach (var payload in envelope.PayloadObjects)
-                {
-                    var bytes = _serializer.Serialize(payload);
-                    message.Append(bytes);
-                }
+                var bytes = _serializer.Serialize(new NodeStatus());
+                message.Append(bytes);
             }
             else if (envelope.Header.PayloadType == MessagePayloadType.Raw)
             {

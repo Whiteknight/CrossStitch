@@ -2,6 +2,7 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Data.InMemory;
+using CrossStitch.Core.Modules.Master;
 using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Modules.StitchMonitor;
 using CrossStitch.Core.Modules.Timer;
@@ -45,6 +46,8 @@ namespace CrossStitch.Core
                 Add(new RequestCoordinatorModule());
             if (!_modules.ContainsKey(ModuleNames.StitchMonitor))
                 Add(new StitchMonitorModule(core.Configuration));
+            if (!_modules.ContainsKey(ModuleNames.Master))
+                Add(new MasterModule());
 
             // These modules are necessary for basic operation, but defaulting is not
             // straight-forward, so we need to raise a warning.

@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using CrossStitch.Stitch.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +27,7 @@ namespace CrossStitch.Stitch.V1.Stitch
             }
 
             string buffer = string.Join("\n", lines);
-            return JsonConvert.DeserializeObject<ToStitchMessage>(buffer);
+            return JsonUtility.Deserialize<ToStitchMessage>(buffer);
         }
 
         public void Dispose()

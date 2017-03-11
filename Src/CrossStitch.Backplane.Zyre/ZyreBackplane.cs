@@ -12,7 +12,6 @@ using System.Linq;
 
 namespace CrossStitch.Backplane.Zyre
 {
-
     public sealed class ZyreBackplane : IClusterBackplane
     {
         private readonly CrossStitchCore _core;
@@ -89,13 +88,10 @@ namespace CrossStitch.Backplane.Zyre
             if (envelope.Header.ProxyNodeNetworkId.HasValue)
                 _zyre.Whisper(envelope.Header.ProxyNodeNetworkId.Value, message);
             else if (envelope.Header.ToType == TargetType.Cluster)
-                // TODO: Should we send the message to ourselves?
                 _zyre.Shout(Zones.ZoneAll, message);
             else if (envelope.Header.ToType == TargetType.Zone)
-                // TODO: If this node is in the zone, should we send to ourselves?
                 _zyre.Shout(envelope.Header.ZoneName, message);
             else if (envelope.Header.ToType == TargetType.Node)
-                // TODO: If the UUID is this node, should we send to ourselves?
                 _zyre.Whisper(envelope.Header.GetToNetworkUuid(), message);
         }
 
@@ -107,20 +103,27 @@ namespace CrossStitch.Backplane.Zyre
 
         private void ZyreShoutEvent(object sender, ZyreEventShout e)
         {
+            // Receive a message which is sent to the entire zone/cluster
+            // We do not currently differentiate between messages which are whispered or shouted
             if (_mapper == null)
                 return;
-            // Receive a message which is sent to the entire zone/cluster
+
             var envelope = _mapper.Map(e.Content);
-            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
+            MessageReceived.Raise(this, envelope.GetReceiveEventName(), envelope);
         }
 
         private void ZyreWhisperEvent(object sender, ZyreEventWhisper e)
         {
+            // Receive a message which is sent point-to-point from a peer to this node
+            // We do not currently differentiate between messages which are whispered or shouted
             if (_mapper == null)
                 return;
-            // Receive a message which is sent point-to-point from a peer to this node
+
             var envelope = _mapper.Map(e.Content);
-            MessageReceived.Raise(this, envelope.Header.EventName ?? MessageEnvelope.ReceiveEventName, envelope);
+            // TODO: Handle proxy cases, where we are receiving the message as a proxy, and need
+            // to forward it on to the actual destination.
+
+            MessageReceived.Raise(this, envelope.GetReceiveEventName(), envelope);
         }
 
         private void ZyreJoinEvent(object sender, ZyreEventJoin e)

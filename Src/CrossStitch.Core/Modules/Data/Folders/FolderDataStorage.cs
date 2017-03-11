@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CrossStitch.Stitch.Utility;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace CrossStitch.Core.Modules.Data.Folders
 {
@@ -56,7 +56,7 @@ namespace CrossStitch.Core.Modules.Data.Folders
             return entities;
         }
 
-        public long Save<TEntity>(TEntity entity)
+        public long Save<TEntity>(TEntity entity, bool force)
             where TEntity : class, IDataEntity
         {
             if (string.IsNullOrEmpty(entity.Id))
@@ -66,6 +66,8 @@ namespace CrossStitch.Core.Modules.Data.Folders
             if (stored == null)
                 return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
 
+            if (force)
+                entity.StoreVersion = stored.StoreVersion;
             if (entity.StoreVersion != stored.StoreVersion)
                 return DataModule.VersionMismatch;
 
@@ -82,7 +84,7 @@ namespace CrossStitch.Core.Modules.Data.Folders
             if (File.Exists(filePath))
                 return false;
 
-            string contents = JsonConvert.SerializeObject(entity);
+            string contents = JsonUtility.Serialize(entity);
             File.WriteAllText(filePath, contents);
             return true;
         }
@@ -99,14 +101,14 @@ namespace CrossStitch.Core.Modules.Data.Folders
         {
             entity.StoreVersion++;
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, entity.Id);
-            string contents = JsonConvert.SerializeObject(entity);
+            string contents = JsonUtility.Serialize(entity);
             File.WriteAllText(filePath, contents);
         }
 
         private static TEntity GetEntityFromFile<TEntity>(string filePath)
         {
             string contents = File.ReadAllText(filePath);
-            return JsonConvert.DeserializeObject<TEntity>(contents);
+            return JsonUtility.Deserialize<TEntity>(contents);
         }
 
         private string GetEntityDirectory<TEntity>(string basePath)

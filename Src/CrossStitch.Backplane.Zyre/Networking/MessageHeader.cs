@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrossStitch.Core.Messages.Backplane;
+using System;
 
 namespace CrossStitch.Backplane.Zyre.Networking
 {
@@ -13,7 +14,6 @@ namespace CrossStitch.Backplane.Zyre.Networking
         public Guid FromNodeId { get; set; }
         public string FromNetworkId { get; set; }
 
-
         public TargetType ToType { get; set; }
         public string ToEntityId { get; set; }
         public string ToNetworkId { get; set; }
@@ -21,5 +21,16 @@ namespace CrossStitch.Backplane.Zyre.Networking
 
         public string ZoneName { get; set; }
         public Guid? ProxyNodeNetworkId { get; set; }
+
+        public void PopulateReceivedEvent(ReceivedEvent receivedEvent)
+        {
+            if (receivedEvent == null)
+                return;
+            receivedEvent.FromNetworkId = FromNetworkId;
+            receivedEvent.FromNodeId = FromNodeId;
+            receivedEvent.MessageId = MessageId;
+            receivedEvent.ToNetworkId = ToNetworkId;
+            receivedEvent.ToNodeId = ToNodeId;
+        }
     }
 }

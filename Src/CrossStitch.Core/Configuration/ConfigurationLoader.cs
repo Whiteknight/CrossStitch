@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using CrossStitch.Stitch.Utility;
+using System.Configuration;
 using System.IO;
 
 namespace CrossStitch.Core.Configuration
@@ -31,7 +32,7 @@ namespace CrossStitch.Core.Configuration
                 throw new ConfigurationException("Could not find configuration file " + fileName);
 
             string json = File.ReadAllText(fullPath);
-            var config = Newtonsoft.Json.JsonConvert.DeserializeObject<TConfig>(json);
+            var config = JsonUtility.Deserialize<TConfig>(json);
             config.ValidateAndSetDefaults();
             return config;
         }

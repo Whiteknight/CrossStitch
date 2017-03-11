@@ -1,7 +1,7 @@
-﻿using System;
+﻿using CrossStitch.Stitch.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace CrossStitch.Core.Modules.Data.InMemory
 {
@@ -39,7 +39,7 @@ namespace CrossStitch.Core.Modules.Data.InMemory
                 return null;
 
             string json = _allData[key];
-            return JsonConvert.DeserializeObject<TEntity>(json);
+            return JsonUtility.Deserialize<TEntity>(json);
         }
 
         public IEnumerable<TEntity> GetAll<TEntity>()
@@ -52,11 +52,11 @@ namespace CrossStitch.Core.Modules.Data.InMemory
                 if (kvp.Key.StartsWith(prefix))
                     entities.Add(kvp.Value);
             }
-            var deserialized = entities.Select(s => JsonConvert.DeserializeObject<TEntity>(s));
+            var deserialized = entities.Select(s => JsonUtility.Deserialize<TEntity>(s));
             return deserialized;
         }
 
-        public long Save<TEntity>(TEntity entity)
+        public long Save<TEntity>(TEntity entity, bool force)
             where TEntity : class, IDataEntity
         {
             if (string.IsNullOrEmpty(entity.Id))
@@ -66,6 +66,8 @@ namespace CrossStitch.Core.Modules.Data.InMemory
             if (stored == null)
                 return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
 
+            if (force)
+                entity.StoreVersion = stored.StoreVersion;
             if (entity.StoreVersion != stored.StoreVersion)
                 return DataModule.VersionMismatch;
 
@@ -83,7 +85,7 @@ namespace CrossStitch.Core.Modules.Data.InMemory
             if (_allData.ContainsKey(key))
                 return false;
 
-            string json = JsonConvert.SerializeObject(entity);
+            string json = JsonUtility.Serialize(entity);
             _allData.Add(key, json);
             return true;
         }
@@ -100,7 +102,7 @@ namespace CrossStitch.Core.Modules.Data.InMemory
         {
             entity.StoreVersion++;
             string key = GetKey<TEntity>(entity.Id);
-            _allData[key] = JsonConvert.SerializeObject(entity);
+            _allData[key] = JsonUtility.Serialize(entity);
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Acquaintance;
-using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core
 {
@@ -48,17 +47,14 @@ namespace CrossStitch.Core
             }
         }
 
+        public IEnumerable<string> AllModules => _modules.AddedModules;
+
         public void Start()
         {
             if (_started)
                 throw new Exception("Core is already started");
 
             _subscriptions = new SubscriptionCollection(MessageBus);
-
-            // Publish the status of the node every 60 seconds
-            _subscriptions.TimerSubscribe(6, b => b
-                .Invoke(t => MessageBus.Publish(NodeStatus.BroadcastEvent, GetStatus()))
-                .OnWorkerThread());
 
             // TODO: Move this to the master node, where we can either query the live status of the
             // current node or query the last-known status of the requested node.
@@ -99,15 +95,6 @@ namespace CrossStitch.Core
             _started = false;
 
             // TODO: Should we publish a Stop event? Is anybody listening at this point?
-        }
-
-        public NodeStatus GetStatus()
-        {
-            return new NodeStatus
-            {
-                AccessedTime = DateTime.Now,
-                RunningModules = _modules.AddedModules.ToList()
-            };
         }
 
         public void Dispose()

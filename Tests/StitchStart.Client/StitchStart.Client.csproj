@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Acquaintance, Version=1.0.0.23871, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Acquaintance.1.0.0-rc2\lib\net46\Acquaintance.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj">

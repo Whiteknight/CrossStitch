@@ -12,13 +12,19 @@ namespace CrossStitch.Core.Modules.Stitches
         private readonly StitchFileSystem _fileSystem;
         private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
-        private StitchInstanceManager _stitchInstanceManager;
+        private readonly StitchInstanceManager _stitchInstanceManager;
 
         private ModuleLog _log;
 
         public StitchesModule(StitchesConfiguration configuration)
         {
             _fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
+
+            _stitchInstanceManager = new StitchInstanceManager(_fileSystem);
+            _stitchInstanceManager.StitchStateChange += StitchInstancesOnStitchStateChanged;
+            _stitchInstanceManager.HeartbeatReceived += StitchInstanceManagerOnHeartbeatReceived;
+            _stitchInstanceManager.LogsReceived += StitchInstanceManagerOnLogsReceived;
+            _stitchInstanceManager.RequestResponseReceived += StitchInstanceManagerOnRequestResponseReceived;
         }
 
         public string Name => ModuleNames.Stitches;
@@ -37,12 +43,6 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStopVerified).Invoke(StopInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelSendHeartbeatVerified).Invoke(SendHeartbeat));
 
-            _stitchInstanceManager = new StitchInstanceManager(core, _fileSystem);
-            _stitchInstanceManager.StitchStateChange += StitchInstancesOnStitchStateChanged;
-            _stitchInstanceManager.HeartbeatReceived += StitchInstanceManagerOnHeartbeatReceived;
-            _stitchInstanceManager.LogsReceived += StitchInstanceManagerOnLogsReceived;
-            _stitchInstanceManager.RequestResponseReceived += StitchInstanceManagerOnRequestResponseReceived;
-
             _log.LogDebug("Started");
         }
 
@@ -50,7 +50,6 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             _stitchInstanceManager?.StopAll();
             _stitchInstanceManager?.Dispose();
-            _stitchInstanceManager = null;
             _subscriptions?.Dispose();
             _subscriptions = null;
 

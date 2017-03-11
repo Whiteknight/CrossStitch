@@ -1,12 +1,11 @@
-﻿using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Messages.Stitches;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
-using CrossStitch.Stitch;
 using CrossStitch.Stitch.Events;
 using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -16,11 +15,11 @@ namespace CrossStitch.Core.Modules.Stitches
         private readonly StitchAdaptorFactory _adaptorFactory;
         private ConcurrentDictionary<string, IStitchAdaptor> _adaptors;
 
-        public StitchInstanceManager(IRunningNodeContext nodeContext, StitchFileSystem fileSystem)
+        public StitchInstanceManager(StitchFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             // TODO: We need a way to get the unique string name of the node at this point.
-            _adaptorFactory = new StitchAdaptorFactory(nodeContext);
+            _adaptorFactory = new StitchAdaptorFactory();
             _adaptors = new ConcurrentDictionary<string, IStitchAdaptor>();
         }
 

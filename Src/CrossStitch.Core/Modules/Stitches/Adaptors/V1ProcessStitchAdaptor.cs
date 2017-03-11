@@ -1,5 +1,4 @@
 ﻿using CrossStitch.Core.Models;
-using CrossStitch.Stitch;
 using CrossStitch.Stitch.V1;
 using CrossStitch.Stitch.V1.Core;
 using System;
@@ -12,15 +11,13 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
     {
         private readonly StitchInstance _stitchInstance;
         public CoreStitchContext StitchContext { get; }
-        private readonly IRunningNodeContext _nodeContext;
         private Process _process;
         private CoreMessageManager _channel;
 
-        public V1ProcessStitchAdaptor(StitchInstance stitchInstance, CoreStitchContext stitchContext, IRunningNodeContext nodeContext)
+        public V1ProcessStitchAdaptor(StitchInstance stitchInstance, CoreStitchContext stitchContext)
         {
             _stitchInstance = stitchInstance;
             StitchContext = stitchContext;
-            _nodeContext = nodeContext;
         }
 
         public bool Start()
@@ -50,7 +47,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
 
             var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
             var toStitchSender = new ToStitchMessageSender(_process.StandardInput);
-            _channel = new CoreMessageManager(_nodeContext, StitchContext, fromStitchReader, toStitchSender);
+            _channel = new CoreMessageManager(StitchContext, fromStitchReader, toStitchSender);
             _channel.Start();
 
             StitchContext.RaiseProcessEvent(true, true);
@@ -64,7 +61,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             {
                 Id = id,
                 StitchId = 0,
-                NodeId = _nodeContext.NodeId,
+                //NodeId = _nodeContext.NodeId,
                 ChannelName = ToStitchMessage.HeartbeatChannelName,
                 Data = ""
             });

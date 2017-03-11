@@ -11,10 +11,8 @@ namespace CrossStitch.Stitch.V1.Core
         private readonly ToStitchMessageSender _sender;
         private FromStitchReaderThread _readerThread;
 
-        public CoreMessageManager(IRunningNodeContext nodeContext, CoreStitchContext stitchContext, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
+        public CoreMessageManager(CoreStitchContext stitchContext, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
         {
-            if (nodeContext == null)
-                throw new ArgumentNullException(nameof(nodeContext));
             if (stitchContext == null)
                 throw new ArgumentNullException(nameof(stitchContext));
 

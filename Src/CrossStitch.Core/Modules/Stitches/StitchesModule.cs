@@ -10,10 +10,10 @@ namespace CrossStitch.Core.Modules.Stitches
     public class StitchesModule : IModule
     {
         private readonly StitchFileSystem _fileSystem;
-        private IMessageBus _messageBus;
-        private SubscriptionCollection _subscriptions;
         private readonly StitchInstanceManager _stitchInstanceManager;
 
+        private IMessageBus _messageBus;
+        private SubscriptionCollection _subscriptions;
         private ModuleLog _log;
 
         public StitchesModule(StitchesConfiguration configuration)

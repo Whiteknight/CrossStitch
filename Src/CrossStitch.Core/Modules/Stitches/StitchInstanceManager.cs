@@ -79,6 +79,7 @@ namespace CrossStitch.Core.Modules.Stitches
             bool added = _adaptors.TryAdd(stitchInstance.Id, adaptor);
             if (!added)
                 return null;
+
             adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
             adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
             adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;
@@ -93,31 +94,14 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 bool found = _adaptors.TryGetValue(instanceId, out adaptor);
                 if (!found)
-                {
-                    return new InstanceActionResult
-                    {
-                        InstanceId = instanceId,
-                        Success = false,
-                        Found = false
-                    };
-                }
+                    return InstanceActionResult.NotFound(instanceId);
                 adaptor.Stop();
 
-                return new InstanceActionResult
-                {
-                    Success = true,
-                    InstanceId = instanceId
-                };
+                return InstanceActionResult.Result(instanceId, true);
             }
             catch (Exception e)
             {
-                return new InstanceActionResult
-                {
-                    Success = false,
-                    Found = adaptor != null,
-                    Exception = e,
-                    InstanceId = instanceId
-                };
+                return InstanceActionResult.Failure(instanceId, adaptor != null, e);
             }
         }
 
@@ -162,11 +146,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
             _fileSystem.DeleteRunningInstanceDirectory(instanceId);
             _fileSystem.DeleteDataInstanceDirectory(instanceId);
-            return new InstanceActionResult
-            {
-                InstanceId = instanceId,
-                Success = true
-            };
+            return InstanceActionResult.Result(instanceId, true);
         }
 
         public StitchResourceUsage GetInstanceResources(string instanceId)
@@ -198,23 +178,10 @@ namespace CrossStitch.Core.Modules.Stitches
             IStitchAdaptor adaptor;
             bool found = _adaptors.TryGetValue(instance.Id, out adaptor);
             if (!found)
-            {
-                return new InstanceActionResult
-                {
-                    Found = false,
-                    InstanceId = instance.Id,
-                    Success = false
-                };
-            }
+                return InstanceActionResult.NotFound(instance.Id);
 
             adaptor.SendHeartbeat(heartbeatId);
-            return new InstanceActionResult
-            {
-                StitchInstance = instance,
-                InstanceId = instance.Id,
-                Found = true,
-                Success = true
-            };
+            return InstanceActionResult.Result(instance.Id, true, instance);
         }
 
         private void OnStitchStateChange(object sender, StitchProcessEventArgs stitchProcessEventArgs)

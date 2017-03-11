@@ -5,6 +5,7 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
+using CrossStitch.Core.Utility;
 using CrossStitch.Stitch.Events;
 using System;
 
@@ -14,7 +15,8 @@ namespace CrossStitch.Backplane.Zyre
     // CrossStitch.Core. 
     public sealed class BackplaneModule : IModule
     {
-        private readonly IClusterBackplane _backplane;
+        private readonly IFactory<IClusterBackplane, CrossStitchCore> _backplaneFactory;
+        private IClusterBackplane _backplane;
         private IMessageBus _messageBus;
         private int _workerThreadId;
         private SubscriptionCollection _subscriptions;
@@ -22,9 +24,9 @@ namespace CrossStitch.Backplane.Zyre
         private ModuleLog _log;
         private MessageEnvelopeBuilderFactory _envelopeFactory;
 
-        public BackplaneModule(IClusterBackplane backplane)
+        public BackplaneModule(IFactory<IClusterBackplane, CrossStitchCore> backplaneFactory = null)
         {
-            _backplane = backplane;
+            _backplaneFactory = backplaneFactory ?? new ZyreBackplaneFactory();
         }
 
         public string Name => ModuleNames.Backplane;
@@ -38,6 +40,13 @@ namespace CrossStitch.Backplane.Zyre
             _messageBus = core.MessageBus;
             _log = new ModuleLog(_messageBus, Name);
 
+            _backplane = _backplaneFactory.Create(core);
+            // Forward messages from the backplane to the IMessageBus
+            _backplane.MessageReceived += MessageReceivedHandler;
+            _backplane.ClusterMember += ClusterMemberHandler;
+            _backplane.ZoneMember += ZoneMemberHandler;
+
+            // Setup subscriptsions
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(_messageBus);
             _subscriptions.Subscribe<MessageEnvelope>(s => s
@@ -49,13 +58,9 @@ namespace CrossStitch.Backplane.Zyre
                 .WithChannelName(NodeStatus.BroadcastEvent)
                 .Invoke(BroadcastNodeStatus));
 
-            // Forward messages from the backplane to the IMessageBus
-            _backplane.MessageReceived += MessageReceivedHandler;
-            _backplane.ClusterMember += ClusterMemberHandler;
-            _backplane.ZoneMember += ZoneMemberHandler;
-
-            _nodeNetworkId = _backplane.Start(core);
-            _envelopeFactory = new MessageEnvelopeBuilderFactory(_nodeNetworkId, core.NodeId);
+            var context = _backplane.Start();
+            _nodeNetworkId = context.NodeNetworkId;
+            _envelopeFactory = context.EnvelopeFactory;
             _log.LogInformation("Joined cluster with NetworkNodeId={0}", _nodeNetworkId);
             _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeNetworkId.ToString() });
         }

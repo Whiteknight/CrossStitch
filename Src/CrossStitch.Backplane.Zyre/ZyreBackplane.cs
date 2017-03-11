@@ -10,30 +10,23 @@ using System;
 
 namespace CrossStitch.Backplane.Zyre
 {
+    
     public sealed class ZyreBackplane : IClusterBackplane
     {
+        private readonly CrossStitchCore _core;
         private readonly BackplaneConfiguration _config;
         private readonly ISerializer _serializer;
-        private NetMQ.Zyre.Zyre _zyre;
-        private NetMqMessageMapper _mapper;
+        private readonly NetMQ.Zyre.Zyre _zyre;
 
+        private NetMqMessageMapper _mapper;
         private Guid _uuid;
         private bool _connected;
 
-        public ZyreBackplane(BackplaneConfiguration config = null, ISerializer serializer = null)
+        public ZyreBackplane(CrossStitchCore core, BackplaneConfiguration config = null, ISerializer serializer = null)
         {
+            _core = core;
             _config = config ?? BackplaneConfiguration.GetDefault();
             _serializer = serializer ?? new JsonSerializer();
-        }
-
-        public event EventHandler<PayloadEventArgs<MessageEnvelope>> MessageReceived;
-        public event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
-        public event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
-
-        public Guid Start(CrossStitchCore core)
-        {
-            if (_connected)
-                throw new Exception("Backplane is already started");
 
             _zyre = new NetMQ.Zyre.Zyre(core.NodeId.ToString());
             _zyre.EnterEvent += ZyreEnterEvent;
@@ -44,20 +37,31 @@ namespace CrossStitch.Backplane.Zyre
             _zyre.LeaveEvent += ZyreLeaveEvent;
             _zyre.WhisperEvent += ZyreWhisperEvent;
             _zyre.ShoutEvent += ZyreShoutEvent;
+        }
+
+        public event EventHandler<PayloadEventArgs<MessageEnvelope>> MessageReceived;
+        public event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
+        public event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
+
+        public BackplaneContext Start()
+        {
+            if (_connected)
+                throw new Exception("Backplane is already started");
 
             _zyre.Start();
+            _uuid = _zyre.Uuid();
             foreach (string zone in _config.Zones.OrEmptyIfNull())
                 _zyre.Join(zone);
 
-            _uuid = _zyre.Uuid();
+            var envelopeFactory = new MessageEnvelopeBuilderFactory(_uuid, _core.NodeId);
+            _mapper = new NetMqMessageMapper(_serializer, envelopeFactory);
 
             _connected = true;
-            return _uuid;
-        }
-
-        public void Start2(MessageEnvelopeBuilderFactory envelopeFactory)
-        {
-            _mapper = new NetMqMessageMapper(_serializer, envelopeFactory);
+            return new BackplaneContext
+            {
+                EnvelopeFactory = envelopeFactory,
+                NodeNetworkId = _uuid
+            };
         }
 
         public void Stop()
@@ -69,8 +73,6 @@ namespace CrossStitch.Backplane.Zyre
                 _zyre.Leave(zone);
 
             _zyre.Stop();
-            _zyre.Dispose();
-            _zyre = null;
             _connected = false;
         }
 
@@ -98,6 +100,7 @@ namespace CrossStitch.Backplane.Zyre
         public void Dispose()
         {
             Stop();
+            _zyre.Dispose();
         }
 
         private void ZyreShoutEvent(object sender, ZyreEventShout e)

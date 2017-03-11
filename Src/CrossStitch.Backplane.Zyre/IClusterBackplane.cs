@@ -1,5 +1,4 @@
 ﻿using CrossStitch.Backplane.Zyre.Networking;
-using CrossStitch.Core;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Stitch.Events;
 using System;
@@ -12,8 +11,7 @@ namespace CrossStitch.Backplane.Zyre
         event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
         event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
 
-        Guid Start(CrossStitchCore core);
-        void Start2(MessageEnvelopeBuilderFactory envelopeFactory); // TODO: Fix this
+        BackplaneContext Start();
         void Stop();
 
         // Responsible for communication between nodes in the cluster

@@ -14,12 +14,10 @@ namespace ClusterTest.Client
             var nodeConfig = NodeConfiguration.GetDefault();
             using (var core = new CrossStitchCore(nodeConfig))
             {
-                var backplaneModule = new BackplaneModule(new ZyreBackplane());
-
                 core.MessageBus.Subscribe<NodeAddedToClusterEvent>(l => l.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
                 core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
 
-                core.AddModule(backplaneModule);
+                core.AddModule(new BackplaneModule());
                 core.AddModule(new LoggingModule(Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 core.Start();

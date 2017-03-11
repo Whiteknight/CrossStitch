@@ -1,23 +1,25 @@
-﻿using System.Linq;
-using System.Text;
-using CrossStitch.Core.Utility;
+﻿using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
+using System.Linq;
+using System.Text;
 
 namespace CrossStitch.Backplane.Zyre.Networking.NetMq
 {
     public class NetMqMessageMapper : IMapper<NetMQMessage, MessageEnvelope>, IMapper<MessageEnvelope, NetMQMessage>
     {
         private readonly ISerializer _serializer;
+        private readonly MessageEnvelopeBuilderFactory _envelopeFactory;
 
-        public NetMqMessageMapper(ISerializer serializer)
+        public NetMqMessageMapper(ISerializer serializer, MessageEnvelopeBuilderFactory envelopeFactory)
         {
             _serializer = serializer;
+            _envelopeFactory = envelopeFactory;
         }
 
         public MessageEnvelope Map(NetMQMessage source)
         {
-            var envelope = MessageEnvelope.CreateNew().Envelope;
+            var envelope = _envelopeFactory.CreateNew().Build();
             envelope.Header = _serializer.Deserialize<MessageHeader>(source.Pop().Buffer);
             if (envelope.Header.PayloadType == MessagePayloadType.Raw)
                 envelope.RawFrames = source.Select(f => f.ToByteArray()).ToList();

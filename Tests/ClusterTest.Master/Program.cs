@@ -3,7 +3,6 @@ using CrossStitch.Backplane.Zyre;
 using CrossStitch.Core;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Master.Events;
-using CrossStitch.Core.Utility.Serialization;
 using System;
 
 namespace ClusterTest.Master
@@ -15,9 +14,7 @@ namespace ClusterTest.Master
             var nodeConfig = NodeConfiguration.GetDefault();
             using (var core = new CrossStitchCore(nodeConfig))
             {
-                var serializer = new JsonSerializer();
-                var backplaneConfig = BackplaneConfiguration.GetDefault();
-                var backplane = new ZyreBackplane(backplaneConfig, "Master", serializer);
+                var backplane = new ZyreBackplane();
                 var backplaneModule = new BackplaneModule(backplane);
 
                 core.MessageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));

@@ -18,8 +18,9 @@ namespace CrossStitch.Backplane.Zyre
         private IMessageBus _messageBus;
         private int _workerThreadId;
         private SubscriptionCollection _subscriptions;
-        private Guid _nodeId;
+        private Guid _nodeNetworkId;
         private ModuleLog _log;
+        private MessageEnvelopeBuilderFactory _envelopeFactory;
 
         public BackplaneModule(IClusterBackplane backplane)
         {
@@ -53,9 +54,10 @@ namespace CrossStitch.Backplane.Zyre
             _backplane.ClusterMember += ClusterMemberHandler;
             _backplane.ZoneMember += ZoneMemberHandler;
 
-            _nodeId = _backplane.Start();
-            _log.LogInformation("Joined cluster with NetworkNodeId={0}", _nodeId);
-            _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeId.ToString() });
+            _nodeNetworkId = _backplane.Start(core);
+            _envelopeFactory = new MessageEnvelopeBuilderFactory(_nodeNetworkId, core.NodeId);
+            _log.LogInformation("Joined cluster with NetworkNodeId={0}", _nodeNetworkId);
+            _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeNetworkId.ToString() });
         }
 
         public void Stop()
@@ -79,12 +81,12 @@ namespace CrossStitch.Backplane.Zyre
 
         private void BroadcastNodeStatus(NodeStatus nodeStatus)
         {
-            var envelope = MessageEnvelope.CreateNew()
+            var envelope = _envelopeFactory.CreateNew()
                 .ToCluster()
-                .FromNode(_nodeId)
+                .FromNode()
                 .WithEventName(NodeStatus.BroadcastEvent)
                 .WithObjectPayload(nodeStatus)
-                .Envelope;
+                .Build();
             _backplane.Send(envelope);
         }
 
@@ -119,7 +121,9 @@ namespace CrossStitch.Backplane.Zyre
         {
             return envelope.Header.ToType == TargetType.Node ||
                    envelope.Header.ToType == TargetType.Zone ||
-                   (envelope.Header.ProxyNodeId.HasValue && envelope.Header.ProxyNodeId.Value != Guid.Empty);
+                   // TODO: Need to store the Proxy ID as a string, for consistency
+                   // TODO: Need an extension method to get a Guid from the string.
+                   (envelope.Header.ProxyNodeNetworkId.HasValue && envelope.Header.ProxyNodeNetworkId.Value != Guid.Empty);
         }
     }
 }

@@ -70,6 +70,11 @@
             return Version == otherGroup.Version;
         }
 
+        public bool Contains(string otherGroupName)
+        {
+            return Contains(new StitchGroupName(otherGroupName));
+        }
+
         // TODO: Equality members
     }
 }

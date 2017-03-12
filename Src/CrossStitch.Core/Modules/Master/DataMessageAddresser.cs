@@ -1,6 +1,7 @@
 ﻿using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +28,7 @@ namespace CrossStitch.Core.Modules.Master
             return Enumerable.Empty<StitchDataMessage>();
         }
 
+        // TODO: This is going to be slow without some kind of indexing in the data module
         private IEnumerable<StitchDataMessage> AddressApplicationMessage(StitchDataMessage message)
         {
             var messages = new List<StitchDataMessage>();
@@ -42,8 +44,23 @@ namespace CrossStitch.Core.Modules.Master
                 });
             }
 
-            // TODO: lookup all stitch instances across the cluster node statuses, and address a 
-            // message to each one.
+            // TODO: We need to filter out the current node, and only look at remote nodes
+            var nodes = _data.GetAll<NodeStatus>();
+            foreach (var node in nodes)
+            {
+                var nodeStitchInstances = node.Instances.Where(i => groupName.Contains(i.GroupName));
+                foreach (var stitch in nodeStitchInstances)
+                {
+                    messages.Add(new StitchDataMessage
+                    {
+                        ChannelName = StitchDataMessage.ChannelSendEnriched,
+                        Data = message.Data,
+                        StitchInstanceId = stitch.Id,
+                        ToNodeId = Guid.Parse(node.Id),
+                        ToNetworkId = node.NetworkNodeId
+                    });
+                }
+            }
 
             return messages;
         }
@@ -57,8 +74,23 @@ namespace CrossStitch.Core.Modules.Master
                 return message;
             }
 
-            // TODO: Lookup the stitch instance in the node statuses, get the node ID, address the
-            // message to the appropriate node.
+            // TODO: This is inefficient
+            var nodes = _data.GetAll<NodeStatus>();
+            foreach (var node in nodes)
+            {
+                var remoteInstance = node.Instances.FirstOrDefault(i => i.Id == message.StitchInstanceId);
+                if (remoteInstance != null)
+                {
+                    return new StitchDataMessage
+                    {
+                        ChannelName = StitchDataMessage.ChannelSendEnriched,
+                        Data = message.Data,
+                        StitchInstanceId = message.StitchInstanceId,
+                        ToNodeId = Guid.Parse(node.Id),
+                        ToNetworkId = node.NetworkNodeId
+                    };
+                }
+            }
             return null;
         }
     }

@@ -19,5 +19,6 @@ namespace CrossStitch.Core
 
         public int HeartbeatIntervalMinutes { get; set; }
         public int StitchMonitorIntervalMinutes { get; set; }
+        public int StatusBroadcastIntervalMinutes { get; set; }
     }
 }

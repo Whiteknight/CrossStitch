@@ -17,6 +17,12 @@ namespace CrossStitch.Core.Modules.Master
         private SubscriptionCollection _subscriptions;
         private IMessageBus _messageBus;
         private ModuleLog _log;
+        private readonly NodeConfiguration _configuration;
+
+        public MasterModule(NodeConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
         // commands only on nodes of certain zones.
@@ -77,11 +83,10 @@ namespace CrossStitch.Core.Modules.Master
             _data = new DataHelperClient(_messageBus);
 
             // Publish the status of the node every 60 seconds
+            int timerTickMultiple = (_configuration.StatusBroadcastIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
             _subscriptions.TimerSubscribe(1, b => b
                 .Invoke(t => PublishNodeStatus())
                 .OnWorkerThread());
-
-            _subscriptions.TimerSubscribe(1, b => b.Invoke(x => _log.LogDebug("Timer tick")));
 
             //messageBus.Subscribe<MessageEnvelope>(s => s
             //    .WithChannelName(MessageEnvelope.SendEventName)

@@ -2,6 +2,7 @@
 using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.Backplane;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -82,9 +83,13 @@ namespace CrossStitch.Core.Modules.Master
 
             // Publish the status of the node every 60 seconds
             int timerTickMultiple = (_configuration.StatusBroadcastIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
-            _subscriptions.TimerSubscribe(1, b => b
+            _subscriptions.TimerSubscribe(timerTickMultiple, b => b
                 .Invoke(t => PublishNodeStatus())
                 .OnWorkerThread());
+
+            _subscriptions.Subscribe<ObjectsReceivedEvent<NodeStatus>>(b => b
+                .WithChannelName(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
+                .Invoke(SaveNodeStatus));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .WithChannelName(StitchDataMessage.ChannelSend)
@@ -118,6 +123,16 @@ namespace CrossStitch.Core.Modules.Master
             _data.Save(message, true);
             _messageBus.Publish(NodeStatus.BroadcastEvent, message);
             _log.LogDebug("Published node status");
+        }
+
+        private void SaveNodeStatus(ObjectsReceivedEvent<NodeStatus> eventMessage)
+        {
+            var status = eventMessage.Object;
+            if (status == null)
+                return;
+            // TODO: Make sure the values are filled in.
+            _data.Save(status, true);
+            _log.LogDebug("Received node status from NodeId={0} and saved it", status.Id);
         }
 
         private void EnrichStitchDataMessageWithAddress(StitchDataMessage message)

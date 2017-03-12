@@ -1,5 +1,4 @@
-﻿using CrossStitch.Core.Messages;
-using CrossStitch.Core.Utility;
+﻿using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
 using System.Linq;
@@ -55,7 +54,7 @@ namespace CrossStitch.Backplane.Zyre.Networking.NetMq
             }
             if (envelope.Header.PayloadType == MessagePayloadType.Object)
             {
-                var bytes = _serializer.Serialize(new NodeStatus());
+                var bytes = _serializer.Serialize(envelope.PayloadObject);
                 message.Append(bytes);
             }
             else if (envelope.Header.PayloadType == MessagePayloadType.Raw)

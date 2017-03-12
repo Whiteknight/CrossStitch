@@ -10,6 +10,11 @@ namespace CrossStitch.Core.Messages.Backplane
 
         public string ToNetworkId { get; set; }
         public Guid ToNodeId { get; set; }
+
+        public static string ReceivedEventName(string eventName)
+        {
+            return "Received:" + eventName;
+        }
     }
 
     public class ObjectsReceivedEvent<TPayload> : ReceivedEvent

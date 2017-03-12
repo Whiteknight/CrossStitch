@@ -91,6 +91,7 @@ namespace CrossStitch.Backplane.Zyre
         private void BroadcastNodeStatus(NodeStatus nodeStatus)
         {
             nodeStatus.Zones = _configuration.Zones.OrEmptyIfNull().ToList();
+            nodeStatus.NetworkNodeId = _nodeNetworkId.ToString();
             var envelope = _envelopeFactory.CreateNew()
                 .ToCluster()
                 .FromNode()
@@ -146,26 +147,14 @@ namespace CrossStitch.Backplane.Zyre
 
             try
             {
-                // TODO: Move this logic out into a place where we can test it.
+                var message = new PayloadObjectDecoder().DecodePayloadObject(channel, envelope);
 
-                var objectType = envelope.PayloadObject.GetType();
-
-                // Get the  ObjectsReceivedEvent<> object and .Object property
-                var eventType = typeof(ObjectsReceivedEvent<>).MakeGenericType(objectType);
-                var eventObject = Activator.CreateInstance(eventType);
-                var objectsProperty = eventType.GetProperty(nameof(ObjectsReceivedEvent<object>.Object));
-
-                objectsProperty.SetValue(eventObject, envelope.PayloadObject);
-
-                envelope.Header.PopulateReceivedEvent(eventObject as ReceivedEvent);
-
-                _log.LogDebug("Received object message of type " + objectType.Name);
-
-                _messageBus.Publish(channel, eventType, eventObject);
+                _log.LogDebug("Received object message of type {0} from {1}", envelope.PayloadObject.GetType().Name, envelope.Header.FromNetworkId);
+                _messageBus.PublishMessage(message);
             }
             catch (Exception e)
             {
-
+                _log.LogError(e, "Error decoding PayloadObject of type {0}", envelope.PayloadObject.GetType().Name);
             }
         }
 

@@ -5,7 +5,7 @@ namespace CrossStitch.Backplane.Zyre.Networking
     public class MessageEnvelope
     {
         public const string SendEventName = "Send";
-        public const string ReceiveEventName = "Receive";
+        public const string ReceiveEventName = "Received";
 
         public MessageEnvelope()
         {

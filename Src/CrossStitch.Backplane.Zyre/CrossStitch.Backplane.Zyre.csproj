@@ -71,6 +71,7 @@
     <Compile Include="Networking\MessageReceivedEventArgs.cs" />
     <Compile Include="Networking\NetMq\NetMqMessageMapper.cs" />
     <Compile Include="Networking\TargetType.cs" />
+    <Compile Include="PayloadObjectDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZyreBackplane.cs" />
     <Compile Include="ZyreBackplaneFactory.cs" />

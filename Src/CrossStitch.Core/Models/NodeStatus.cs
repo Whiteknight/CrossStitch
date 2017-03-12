@@ -11,6 +11,7 @@ namespace CrossStitch.Core.Messages
         public string Id { get; set; }
         public string Name { get; set; }
         public long StoreVersion { get; set; }
+
         public string NetworkNodeId { get; set; }
 
         public List<string> RunningModules { get; set; }

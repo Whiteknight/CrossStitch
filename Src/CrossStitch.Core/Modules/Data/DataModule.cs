@@ -4,6 +4,9 @@ using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Data
 {
+    // TODO: We need indexes/caches for the following scenarios:
+    // 1) Given a stitch ID, get the NodeId where it lives
+    // 2) Given a group name, get all stitchId+nodeId pairs in that group.
     public sealed class DataModule : IModule
     {
         public const int VersionMismatch = -1;

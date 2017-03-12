@@ -50,7 +50,7 @@ namespace CrossStitch.Backplane.Zyre
             _backplane.ClusterMember += ClusterMemberHandler;
             _backplane.ZoneMember += ZoneMemberHandler;
 
-            // Setup subscriptsions
+            // Setup subscriptions
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(_messageBus);
             _subscriptions.Subscribe<MessageEnvelope>(s => s

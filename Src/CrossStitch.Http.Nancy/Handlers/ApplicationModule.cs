@@ -86,10 +86,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
             Post["/{Application}/components/{Component}/versions/{Version}/createinstance"] = x =>
             {
                 StitchInstance stitchInstance = this.Bind<StitchInstance>();
-                stitchInstance.Application = x.Application.ToString();
-                stitchInstance.Component = x.Component.ToString();
-                stitchInstance.Version = x.Version.ToString();
-
+                stitchInstance.GroupName = new StitchGroupName(x.Application.ToString(), x.Component.ToString(), x.Version.ToString());
                 return messageBus.Request<StitchInstance, StitchInstance>(StitchInstance.ChannelCreate, stitchInstance);
             };
         }

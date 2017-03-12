@@ -2,8 +2,6 @@
 using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
-using CrossStitch.Core.Models;
-using System.Linq;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -88,6 +86,10 @@ namespace CrossStitch.Core.Modules.Master
                 .Invoke(t => PublishNodeStatus())
                 .OnWorkerThread());
 
+            _subscriptions.Subscribe<StitchDataMessage>(b => b
+                .WithChannelName(StitchDataMessage.ChannelSend)
+                .Invoke(EnrichStitchDataMessageWithAddress));
+
             //messageBus.Subscribe<MessageEnvelope>(s => s
             //    .WithChannelName(MessageEnvelope.SendEventName)
             //    .Invoke(ResolveAppInstanceNodeIdAndSend)
@@ -109,65 +111,20 @@ namespace CrossStitch.Core.Modules.Master
             Stop();
         }
 
-        private void SendMessageToStitchInstance(string stitchInstanceId, string data)
-        {
-            // 1) Look through all node statuses for the stitch instance ID
-            // 2) create a message for that Node
-            // 3) Send the message to the backplane
-        }
-
-        private void SendMessageToApplication(string applicationId, string data)
-        {
-            var application = _data.Get<Application>(applicationId);
-            if (application == null)
-                return;
-
-            string zone = application.Zone ?? Zones.ZoneAll;
-            // TODO: Create a message, addressed to that zone, with the given data.
-            // Send to the backplane
-        }
-
-        private void SendMessageToStitchesByVersion(string applicationId, string component, string version, string data)
-        {
-            string fullName = Application.VersionFullName(applicationId, component, version);
-            var application = _data.Get<Application>(applicationId);
-            if (application == null)
-                return;
-
-            string zone = application.Zone ?? Zones.ZoneAll;
-            // TODO: Create a message, addressed to that zone, with the given data.
-            // Send to the backplane
-        }
-
         private void PublishNodeStatus()
         {
-            var modules = _core.AllModules.ToList();
-            var stitches = _data.GetAll<StitchInstance>()
-                .Where(si => si.State == InstanceStateType.Running || si.State == InstanceStateType.Started)
-                .ToList();
-
-            var message = new NodeStatus
-            {
-                Id = _core.NodeId.ToString(),
-                Name = _core.NodeId.ToString(),
-                NetworkNodeId = _core.NetworkNodeId,
-                RunningModules = modules,
-                Instances = stitches
-                    .Select(si => new Messages.Stitches.InstanceInformation
-                    {
-                        Id = si.Id,
-                        FullVersionName = si.VersionFullName,
-                        State = si.State
-                    })
-                    .ToList(),
-
-                // This gets enriched in the backplane, for now
-                Zones = null
-            };
+            var message = new NodeStatusBuilder(_core, _data).Build();
 
             _data.Save(message, true);
             _messageBus.Publish(NodeStatus.BroadcastEvent, message);
             _log.LogDebug("Published node status");
+        }
+
+        private void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
+        {
+            var messages = new DataMessageAddresser(_data).AddressMessage(message);
+            foreach (var outMessage in messages)
+                _messageBus.Publish(outMessage);
         }
     }
 

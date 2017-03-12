@@ -6,7 +6,7 @@ namespace CrossStitch.Core.Messages.Stitches
     {
         public string Id { get; set; }
 
-        public string FullVersionName { get; set; }
+        public string GroupName { get; set; }
 
         public InstanceStateType State { get; set; }
 

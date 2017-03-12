@@ -1,4 +1,5 @@
-﻿using CrossStitch.Core.Modules.Stitches.Versions;
+﻿using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.Stitches.Versions;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -45,12 +46,12 @@ namespace CrossStitch.Core.Modules.Stitches
             }
         }
 
-        public Result UnzipLibraryPackageToRunningBase(string appName, string componentName, string version, string instanceId)
+        public Result UnzipLibraryPackageToRunningBase(StitchGroupName groupName, string instanceId)
         {
-            string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
+            string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, groupName.ApplicationId, groupName.Component);
             if (!Directory.Exists(libraryDirectoryPath))
                 return Result.Failure();
-            string libraryFilePath = Path.Combine(libraryDirectoryPath, version + ".zip");
+            string libraryFilePath = Path.Combine(libraryDirectoryPath, groupName.Version + ".zip");
             var runningDirectory = GetInstanceRunningDirectory(instanceId);
             if (Directory.Exists(runningDirectory))
                 return Result.Failure();

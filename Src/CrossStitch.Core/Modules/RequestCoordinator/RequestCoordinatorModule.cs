@@ -234,13 +234,13 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
 
         private InstanceResponse CreateNewInstance(InstanceRequest request)
         {
-            if (request == null || request.Instance == null || string.IsNullOrEmpty(request.Instance.Application))
+            if (request == null || request.Instance == null || !request.Instance.GroupName.IsVersionGroup())
                 return InstanceResponse.Failure(request);
             // Check to make sure we have a record for this version.
-            Application application = _data.Get<Application>(request.Instance.Application);
+            Application application = _data.Get<Application>(request.Instance.GroupName.ApplicationId);
             if (application == null)
                 return InstanceResponse.Failure(request);
-            if (!application.HasVersion(request.Instance.Component, request.Instance.Version))
+            if (!application.HasVersion(request.Instance.GroupName.Component, request.Instance.GroupName.Version))
                 return InstanceResponse.Failure(request);
 
             // Insert the new instance to the data module
@@ -252,7 +252,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreateVerified, request);
             if (!response.IsSuccess)
             {
-                _log.LogDebug("Stitch instance {0}:{1} could ot be created", request.Instance.Application, request.Instance.Component);
+                _log.LogDebug("Stitch instance {0} could not be created", request.Instance.GroupName);
                 _data.Delete<StitchInstance>(request.Instance.Id);
                 return InstanceResponse.Failure(request);
             }
@@ -260,7 +260,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             // Update the stitch record in the Data module, log, and return
             var directoryPath = response.Data;
             var instance = _data.Update<StitchInstance>(request.Instance.Id, i => i.DirectoryPath = directoryPath);
-            _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} created", request.Instance.Application, request.Instance.Component, request.Instance.Version, request.Instance.Id);
+            _log.LogDebug("Stitch instance {0} Id={1} created", request.Instance.GroupName, request.Instance.Id);
             return InstanceResponse.Success(request);
         }
 
@@ -278,11 +278,11 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 {
                     InstanceId = request.Id
                 });
-                _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} started", instance.Application, instance.Component, instance.Version, instance.Id);
+                _log.LogDebug("Stitch instance {0} Id={1} started", instance.GroupName, instance.Id);
             }
             else
             {
-                _log.LogError(response.Exception, "Stitch instance {0}:{1}:{2} Id={3} failed to start", instance.Application, instance.Component, instance.Version, instance.Id);
+                _log.LogError(response.Exception, "Stitch instance {0} Id={1} failed to start", instance.GroupName, instance.Id);
             }
 
             // The Stitches module will update status in all cases, so always save
@@ -300,7 +300,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStopVerified, request);
             if (!response.IsSuccess)
             {
-                _log.LogError("Stitch instance {0}:{1}:{2} Id={3} could not be stopped", instance.Application, instance.Component, instance.Version, instance.Id);
+                _log.LogError("Stitch instance {0} Id={3} could not be stopped", instance.GroupName, instance.Id);
                 return response;
             }
 
@@ -309,7 +309,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 InstanceId = request.Id
             });
             var updateResult = _data.Update<StitchInstance>(request.Id, i => i.State = InstanceStateType.Stopped);
-            _log.LogDebug("Stitch instance {0}:{1}:{2} Id={3} stopped", instance.Application, instance.Component, instance.Version, instance.Id);
+            _log.LogDebug("Stitch instance {0} Id={3} stopped", instance.GroupName, instance.Id);
             return InstanceResponse.Create(request, updateResult != null);
         }
     }

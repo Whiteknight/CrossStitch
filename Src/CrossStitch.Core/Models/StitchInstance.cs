@@ -10,10 +10,7 @@ namespace CrossStitch.Core.Models
         public string Name { get; set; }
         public long StoreVersion { get; set; }
 
-        public string Application { get; set; }
-        public string Component { get; set; }
-        public string Version { get; set; }
-        public string VersionFullName { get; set; }
+        public StitchGroupName GroupName { get; set; }
 
         public InstanceAdaptorDetails Adaptor { get; set; }
 

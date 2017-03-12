@@ -110,7 +110,7 @@ namespace CrossStitch.Core.Modules.Stitches
         private InstanceResponse CreateNewInstance(InstanceRequest request)
         {
             // Unzip a copy of the version from the library into the running base
-            var result = _fileSystem.UnzipLibraryPackageToRunningBase(request.Instance.Application, request.Instance.Component, request.Instance.Version, request.Instance.Id);
+            var result = _fileSystem.UnzipLibraryPackageToRunningBase(request.Instance.GroupName, request.Instance.Id);
             return InstanceResponse.Create(request, result.Success, result.Path);
         }
 

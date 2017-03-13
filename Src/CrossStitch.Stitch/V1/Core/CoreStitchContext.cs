@@ -9,6 +9,7 @@ namespace CrossStitch.Stitch.V1.Core
         public event EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
         public event EventHandler<RequestResponseReceivedEventArgs> RequestResponseReceived;
         public event EventHandler<LogsReceivedEventArgs> LogsReceived;
+        public event EventHandler<DataMessageReceivedEventArgs> DataMessageReceived;
 
         public long LastHeartbeatReceived { get; private set; }
 
@@ -44,11 +45,17 @@ namespace CrossStitch.Stitch.V1.Core
             LogsReceived.Raise(this, new LogsReceivedEventArgs(StitchInstanceId, logs));
         }
 
-        public void ReceiveData()
+        public void ReceiveData(long messageId, string toGroupName, string toStitchInstanceId, string channelName, string data)
         {
-            // TODO: The Stitch should be able to send data (addressed to any other stitch in the same application)
-            // or log messages (addressed to the core) without the Core sending a request first. This communication
-            // should be fully bi-directional, not request/response.
+            DataMessageReceived.Raise(this, new DataMessageReceivedEventArgs
+            {
+                MessageId = messageId,
+                ToGroupName = toGroupName,
+                ToStitchInstanceId = toStitchInstanceId,
+                FromStitchInstanceId = StitchInstanceId,
+                ChannelName = channelName,
+                Data = data
+            });
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.MessageBus;
+using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using CrossStitch.Stitch.V1.Core;
@@ -25,6 +26,7 @@ namespace CrossStitch.Core.Modules.Stitches
             _stitchInstanceManager.HeartbeatReceived += StitchInstanceManagerOnHeartbeatReceived;
             _stitchInstanceManager.LogsReceived += StitchInstanceManagerOnLogsReceived;
             _stitchInstanceManager.RequestResponseReceived += StitchInstanceManagerOnRequestResponseReceived;
+            _stitchInstanceManager.DataMessageReceived += StitchInstanceManagerOnDataMessageReceived;
         }
 
         public string Name => ModuleNames.Stitches;
@@ -42,6 +44,12 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStartVerified).Invoke(StartInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStopVerified).Invoke(StopInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelSendHeartbeatVerified).Invoke(SendHeartbeat));
+
+            _subscriptions.Subscribe<StitchDataMessage>(b => b
+                .OnDefaultChannel()
+                .Invoke(SendDataMessageToStitch)
+                .OnWorkerThread()
+                .WithFilter(m => !string.IsNullOrEmpty(m.ToStitchInstanceId)));
 
             _log.LogDebug("Started");
         }
@@ -86,7 +94,7 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             // TODO: Should get the StitchInstance from the data store and enrich this message?
             foreach (var s in e.Logs)
-                _log.LogInformation("Stitch Id={0} Mesage; {1}", e.StitchInstanceId, s);
+                _log.LogInformation("Stitch Id={0} Log Message: {1}", e.StitchInstanceId, s);
         }
 
         private void StitchInstanceManagerOnHeartbeatReceived(object sender, HeartbeatSyncReceivedEventArgs e)
@@ -95,6 +103,20 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 InstanceId = e.StitchInstanceId,
                 DataId = e.Id
+            });
+        }
+
+        private void StitchInstanceManagerOnDataMessageReceived(object sender, DataMessageReceivedEventArgs e)
+        {
+            _log.LogDebug("Received data message Id={0} from StitchInstanceId={1}", e.MessageId, e.FromStitchInstanceId);
+            _messageBus.Publish(new StitchDataMessage
+            {
+                DataChannelName = e.ChannelName,
+                Data = e.Data,
+                FromStitchInstanceId = e.FromStitchInstanceId,
+                Id = e.MessageId,
+                ToStitchGroup = e.ToGroupName,
+                ToStitchInstanceId = e.ToStitchInstanceId
             });
         }
 
@@ -118,6 +140,11 @@ namespace CrossStitch.Core.Modules.Stitches
         private InstanceResponse StartInstance(InstanceRequest request)
         {
             var result = _stitchInstanceManager.Start(request.Instance);
+            if (result.Success)
+                _log.LogInformation("Starting stitch {0} Id={1}", result.StitchInstance.GroupName, result.StitchInstance.Id);
+            else
+                _log.LogError("Could not start stitch {0}", request.Id);
+
             return InstanceResponse.Create(request, result.Success);
         }
 
@@ -134,6 +161,12 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             var result = _stitchInstanceManager.SendHeartbeat(arg.DataId, arg.Instance);
             return InstanceResponse.Create(arg, result.Found && result.Success);
+        }
+
+        private void SendDataMessageToStitch(StitchDataMessage message)
+        {
+            _stitchInstanceManager.SendDataMessage(message);
+            _log.LogDebug("Sending message Id={0} to StitchInstanceId={1}", message.Id, message.ToStitchInstanceId);
         }
     }
 }

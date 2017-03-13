@@ -17,13 +17,10 @@ namespace StitchStart.Server
             {
                 var dataStorage = new InMemoryDataStorage();
 
-                dataStorage.Save(new StitchInstance
+                var result = dataStorage.Save(new StitchInstance
                 {
                     Name = "StitchStart.Client",
-                    Application = "StitchStart",
-                    Component = "Client",
-                    Version = "1",
-                    VersionFullName = Application.VersionFullName("StitchStart", "Client", "1"),
+                    GroupName = new StitchGroupName("StitchStart", "Client", "1"),
                     Adaptor = new InstanceAdaptorDetails
                     {
                         RunMode = InstanceRunModeType.V1Process

@@ -13,4 +13,14 @@ namespace CrossStitch.Stitch.V1.Core
             Logs = logs;
         }
     }
+
+    public class DataMessageReceivedEventArgs : EventArgs
+    {
+        public long MessageId { get; set; }
+        public string ToGroupName { get; set; }
+        public string ToStitchInstanceId { get; set; }
+        public string FromStitchInstanceId { get; set; }
+        public string ChannelName { get; set; }
+        public string Data { get; set; }
+    }
 }

@@ -74,6 +74,11 @@ namespace CrossStitch.Stitch.V1.Stitch
             return message;
         }
 
+        public void Send(FromStitchMessage message)
+        {
+            _sender.SendMessage(message);
+        }
+
         public void SendLogs(string[] logs)
         {
             _sender.SendMessage(FromStitchMessage.LogMessage(logs));

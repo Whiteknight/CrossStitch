@@ -64,7 +64,7 @@ namespace CrossStitch.Stitch.V1.Core
                     break;
                 case FromStitchMessage.CommandData:
                     // TODO: This
-                    _stitchContext.ReceiveData();
+                    _stitchContext.ReceiveData(message.Id, message.ToGroupName, message.ToStitchInstanceId, message.DataChannel, message.Data);
                     break;
                 case FromStitchMessage.CommandLogs:
                     _stitchContext.ReceiveLogs(message.Logs);

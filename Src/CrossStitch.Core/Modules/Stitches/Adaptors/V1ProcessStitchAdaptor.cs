@@ -60,7 +60,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             _channel.SendMessage(new ToStitchMessage
             {
                 Id = id,
-                StitchId = 0,
+                FromStitchInstanceId = "",
                 //NodeId = _nodeContext.NodeId,
                 ChannelName = ToStitchMessage.HeartbeatChannelName,
                 Data = ""
@@ -68,12 +68,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
         }
 
         // TODO: Convert this to take some kind of object instead of all these primitive values
-        public void SendMessage(long messageId, string channel, string data, Guid nodeId, long senderId)
+        public void SendMessage(long messageId, string channel, string data, Guid nodeId, string senderStitchInstanceId)
         {
             _channel.SendMessage(new ToStitchMessage
             {
                 Id = messageId,
-                StitchId = senderId,
+                FromStitchInstanceId = senderStitchInstanceId,
                 NodeId = nodeId,
                 ChannelName = channel,
                 Data = data

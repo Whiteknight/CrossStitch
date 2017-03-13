@@ -9,7 +9,7 @@ namespace CrossStitch.Stitch.V1
         // Cluster-unique message Id
         public long Id { get; set; }
         // ID of the Stitch which created this message. 0 if it's coming from CrossStitch core.
-        public long StitchId { get; set; }
+        public string FromStitchInstanceId { get; set; }
         // Name of the CrossStich node where this message originated
         public Guid NodeId { get; set; }
         public string ChannelName { get; set; }

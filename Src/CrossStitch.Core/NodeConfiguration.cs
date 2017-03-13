@@ -15,6 +15,8 @@ namespace CrossStitch.Core
                 HeartbeatIntervalMinutes = 1;
             if (StitchMonitorIntervalMinutes <= 0)
                 StitchMonitorIntervalMinutes = 5;
+            if (StatusBroadcastIntervalMinutes <= 0)
+                StatusBroadcastIntervalMinutes = 5;
         }
 
         public int HeartbeatIntervalMinutes { get; set; }

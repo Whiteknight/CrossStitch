@@ -1,6 +1,7 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
+using System;
 
 namespace CrossStitch.Core.Modules.Data
 {
@@ -53,21 +54,28 @@ namespace CrossStitch.Core.Modules.Data
         private DataResponse<TEntity> HandleRequest<TEntity>(DataRequest<TEntity> request)
             where TEntity : class, IDataEntity
         {
-            switch (request.Type)
+            try
             {
-                case DataRequestType.GetAll:
-                    var all = _storage.GetAll<TEntity>();
-                    return DataResponse<TEntity>.FoundAll(all);
-                case DataRequestType.Get:
-                    var entity = _storage.Get<TEntity>(request.Id);
-                    return entity == null ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Found(entity);
-                case DataRequestType.Delete:
-                    bool ok = _storage.Delete<TEntity>(request.Id);
-                    return !ok ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Ok();
-                case DataRequestType.Save:
-                    return HandleSaveRequest(request);
-                default:
-                    return DataResponse<TEntity>.BadRequest();
+                switch (request.Type)
+                {
+                    case DataRequestType.GetAll:
+                        var all = _storage.GetAll<TEntity>();
+                        return DataResponse<TEntity>.FoundAll(all);
+                    case DataRequestType.Get:
+                        var entity = _storage.Get<TEntity>(request.Id);
+                        return entity == null ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Found(entity);
+                    case DataRequestType.Delete:
+                        bool ok = _storage.Delete<TEntity>(request.Id);
+                        return !ok ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Ok();
+                    case DataRequestType.Save:
+                        return HandleSaveRequest(request);
+                    default:
+                        return DataResponse<TEntity>.BadRequest();
+                }
+            }
+            catch (Exception e)
+            {
+                return DataResponse<TEntity>.BadRequest();
             }
         }
 

@@ -1,6 +1,6 @@
+using CrossStitch.Core.Modules.Data;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Modules.Data;
 
 namespace CrossStitch.Core.Messages.Data
 {
@@ -63,10 +63,11 @@ namespace CrossStitch.Core.Messages.Data
 
         public static DataResponse<TEntity> FoundAll(IEnumerable<TEntity> entities)
         {
+            var entityList = entities.ToList();
             return new DataResponse<TEntity>
             {
                 Type = DataResponseType.Success,
-                Entities = entities.ToList()
+                Entities = entityList
             };
         }
     }

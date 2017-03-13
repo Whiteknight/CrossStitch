@@ -3,9 +3,11 @@ using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
+using System;
 
 namespace CrossStitch.Core.Modules.Master
 {
+    // TODO: Rename to RouterModule?
     // The Master module coordinates multipart-commands across the cluster.
     public class MasterModule : IModule
     {
@@ -92,8 +94,10 @@ namespace CrossStitch.Core.Modules.Master
                 .Invoke(SaveNodeStatus));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
-                .WithChannelName(StitchDataMessage.ChannelSend)
-                .Invoke(EnrichStitchDataMessageWithAddress));
+                .OnDefaultChannel()
+                .Invoke(EnrichStitchDataMessageWithAddress)
+                .OnWorkerThread()
+                .WithFilter(m => m.ToNodeId == Guid.Empty && string.IsNullOrEmpty(m.ToNetworkId)));
 
             //messageBus.Subscribe<MessageEnvelope>(s => s
             //    .WithChannelName(MessageEnvelope.SendEventName)
@@ -139,7 +143,18 @@ namespace CrossStitch.Core.Modules.Master
         {
             var messages = new DataMessageAddresser(_data).AddressMessage(message);
             foreach (var outMessage in messages)
-                _messageBus.Publish(outMessage);
+            {
+                // If it has a Node id, publish it. The filter will stop it from coming back
+                // and the Backplane will pick it up.
+                if (outMessage.ToNodeId != Guid.Empty)
+                {
+                    _messageBus.Publish(outMessage);
+                    continue;
+                }
+
+                // Otherwise, publish it locally for a local stitch instance to grab it.
+                _messageBus.Publish(StitchDataMessage.ChannelSendLocal, outMessage);
+            }
         }
     }
 

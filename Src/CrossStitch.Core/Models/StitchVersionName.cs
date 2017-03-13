@@ -1,7 +1,14 @@
 ﻿namespace CrossStitch.Core.Models
 {
+    // TODO: We really want this class to be immutable, but we need to make the properties mutable
+    // for now because of json serialization/deserialization concerns. We should fix this eventually.
     public class StitchGroupName
     {
+        public StitchGroupName()
+        {
+
+        }
+
         public StitchGroupName(string versionString)
         {
             VersionString = versionString;
@@ -30,14 +37,19 @@
                 VersionString = $"{applicationId}.{component}.{version}";
         }
 
-        public string ApplicationId { get; }
-        public string Component { get; }
-        public string Version { get; }
-        public string VersionString { get; }
+        public string ApplicationId { get; set; }
+        public string Component { get; set; }
+        public string Version { get; set; }
+        public string VersionString { get; set; }
 
         public override string ToString()
         {
             return VersionString;
+        }
+
+        public bool IsValid()
+        {
+            return VersionString != null;
         }
 
         public bool IsApplicationGroup()

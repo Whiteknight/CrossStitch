@@ -62,12 +62,22 @@ namespace CrossStitch.Backplane.Zyre
                 .WithChannelName(NodeStatus.BroadcastEvent)
                 .Invoke(BroadcastNodeStatus)
                 .OnThread(_workerThreadId));
+            _subscriptions.Subscribe<StitchDataMessage>(b => b
+                .OnDefaultChannel()
+                .Invoke(SendDataMessage)
+                .OnWorkerThread()
+                .WithFilter(m => !string.IsNullOrEmpty(m.ToNetworkId)));
 
             var context = _backplane.Start();
             _nodeNetworkId = context.NodeNetworkId;
             _envelopeFactory = context.EnvelopeFactory;
             _log.LogInformation("Joined cluster with NetworkNodeId={0}", _nodeNetworkId);
             _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeNetworkId.ToString() });
+        }
+
+        private void SendDataMessage(StitchDataMessage obj)
+        {
+            throw new NotImplementedException();
         }
 
         public void Stop()

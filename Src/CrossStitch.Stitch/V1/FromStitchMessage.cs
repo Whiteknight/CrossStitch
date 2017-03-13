@@ -10,8 +10,11 @@ namespace CrossStitch.Stitch.V1
 
         public string Command { get; set; }
         public long Id { get; set; }
+        public string DataChannel { get; set; }
         public string Data { get; set; }
         public string[] Logs { get; set; }
+        public string ToGroupName { get; set; }
+        public string ToStitchInstanceId { get; set; }
 
         public static FromStitchMessage Ack(long id)
         {
@@ -46,6 +49,37 @@ namespace CrossStitch.Stitch.V1
             {
                 Command = CommandLogs,
                 Logs = logs
+            };
+        }
+
+        public static FromStitchMessage ToStitchData(string stitchId, string data)
+        {
+            return new FromStitchMessage
+            {
+                Command = CommandData,
+                Data = data,
+                ToStitchInstanceId = stitchId
+            };
+        }
+
+        public static FromStitchMessage ToGroupData(string groupName, string data)
+        {
+            return new FromStitchMessage
+            {
+                Command = CommandData,
+                Data = data,
+                ToGroupName = groupName
+            };
+        }
+
+        public static FromStitchMessage Respond(ToStitchMessage message, string data)
+        {
+            return new FromStitchMessage
+            {
+                Id = message.Id + 1,
+                Command = CommandData,
+                Data = data,
+                ToStitchInstanceId = message.FromStitchInstanceId
             };
         }
 

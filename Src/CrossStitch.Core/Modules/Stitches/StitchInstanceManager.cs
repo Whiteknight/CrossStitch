@@ -1,4 +1,5 @@
-﻿using CrossStitch.Core.Messages.Stitches;
+﻿using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Stitch.Events;
@@ -27,6 +28,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public event EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
         public event EventHandler<RequestResponseReceivedEventArgs> RequestResponseReceived;
         public event EventHandler<LogsReceivedEventArgs> LogsReceived;
+        public event EventHandler<DataMessageReceivedEventArgs> DataMessageReceived;
 
         public InstanceActionResult Start(StitchInstance stitchInstance)
         {
@@ -72,7 +74,6 @@ namespace CrossStitch.Core.Modules.Stitches
             return null;
         }
 
-
         private IStitchAdaptor CreateStitchAdaptor(StitchInstance stitchInstance)
         {
             var adaptor = _adaptorFactory.Create(stitchInstance);
@@ -84,6 +85,7 @@ namespace CrossStitch.Core.Modules.Stitches
             adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
             adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;
             adaptor.StitchContext.RequestResponseReceived += OnStitchResponseReceived;
+            adaptor.StitchContext.DataMessageReceived += OnDataMessageReceived;
             return adaptor;
         }
 
@@ -184,6 +186,17 @@ namespace CrossStitch.Core.Modules.Stitches
             return InstanceActionResult.Result(instance.Id, true, instance);
         }
 
+        public InstanceActionResult SendDataMessage(StitchDataMessage message)
+        {
+            IStitchAdaptor adaptor;
+            bool found = _adaptors.TryGetValue(message.ToStitchInstanceId, out adaptor);
+            if (!found)
+                return InstanceActionResult.NotFound(message.ToStitchInstanceId);
+
+            adaptor.SendMessage(message.Id, message.DataChannelName, message.Data, message.FromNodeId, message.FromStitchInstanceId);
+            return InstanceActionResult.Result(message.ToStitchInstanceId, true);
+        }
+
         private void OnStitchStateChange(object sender, StitchProcessEventArgs stitchProcessEventArgs)
         {
             StitchStateChange.Raise(this, stitchProcessEventArgs);
@@ -202,6 +215,11 @@ namespace CrossStitch.Core.Modules.Stitches
         private void OnStitchResponseReceived(object sender, RequestResponseReceivedEventArgs e)
         {
             RequestResponseReceived.Raise(this, e);
+        }
+
+        private void OnDataMessageReceived(object sender, DataMessageReceivedEventArgs e)
+        {
+            DataMessageReceived.Raise(this, e);
         }
     }
 }

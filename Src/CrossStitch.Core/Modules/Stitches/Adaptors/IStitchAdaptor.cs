@@ -8,7 +8,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
         bool Start();
         void Stop();
         void SendHeartbeat(long id);
-        void SendMessage(long messageId, string channel, string data, Guid nodeId, long senderId);
+        void SendMessage(long messageId, string channel, string data, Guid nodeId, string senderStitchInstanceId);
         StitchResourceUsage GetResources();
         CoreStitchContext StitchContext { get; }
     }

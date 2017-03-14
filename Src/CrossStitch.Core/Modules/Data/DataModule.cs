@@ -19,9 +19,9 @@ namespace CrossStitch.Core.Modules.Data
         private IMessageBus _messageBus;
         private int _workerThreadId;
 
-        public DataModule(IDataStorage storage)
+        public DataModule(IDataStorage storage = null)
         {
-            _storage = storage;
+            _storage = storage ?? new InMemory.InMemoryDataStorage();
         }
 
         public string Name => ModuleNames.Data;
@@ -30,10 +30,20 @@ namespace CrossStitch.Core.Modules.Data
         {
             _messageBus = core.MessageBus;
             _workerThreadId = core.MessageBus.ThreadPool.StartDedicatedWorker();
+
             _subscriptions = new SubscriptionCollection(core.MessageBus);
-            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
-            _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
-            _subscriptions.Listen<DataRequest<NodeStatus>, DataResponse<NodeStatus>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l
+                .OnDefaultChannel()
+                .Invoke(HandleRequest)
+                .OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l
+                .OnDefaultChannel()
+                .Invoke(HandleRequest)
+                .OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<NodeStatus>, DataResponse<NodeStatus>>(l => l
+                .OnDefaultChannel()
+                .Invoke(HandleRequest)
+                .OnThread(_workerThreadId));
         }
 
         public void Stop()
@@ -86,7 +96,8 @@ namespace CrossStitch.Core.Modules.Data
             }
         }
 
-        private DataResponse<TEntity> HandleSaveRequest<TEntity>(DataRequest<TEntity> request) where TEntity : class, IDataEntity
+        private DataResponse<TEntity> HandleSaveRequest<TEntity>(DataRequest<TEntity> request)
+            where TEntity : class, IDataEntity
         {
             if (!request.IsValid())
                 return DataResponse<TEntity>.BadRequest();

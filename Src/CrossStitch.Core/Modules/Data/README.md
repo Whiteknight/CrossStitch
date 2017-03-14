@@ -10,12 +10,19 @@ The `DataModule` receives all request on a single thread, to simplify storage sc
 
 The Data module receives requests from the message bus and dispatches them to the `IDataStorage` instance. `IDataStorage` is fully pluggable and customizable, and can target any desired storage backend. The two built-in options are `InMemoryDataStorage` and `FolderDataStorage`
 
-### InMemoryDataStorage
+#### InMemoryDataStorage
 
 The `InMemoryDataStorage` engine stores data in memory and does not persist to disk. Every time the node restarts, this storage will be empty. This is useful for testing scenarios and for scenarios where the node is self-assembling.
 
-### FolderDataStorage
+#### FolderDataStorage
 
 The `FolderDataStorage` engine stores each record as a json-formatted file in a directory structure. As part of configuration, you must provide a directory path to store the files.
 
 All data is stored in files named [DataPath]\[TypeName]\[Id].json
+
+### Overriding and Extending
+
+There are two ways to change the behavior of the DataModule. 
+
+1. Create a new `IModule` with Name="Data" and register it with the core. This module should respond to `DataRequest<T>` messages and respond with appropriate `DataResponse<T>` messages, at least.
+2. Create a new `IDataStorage` (recommended). Load this into the existing `DataModule` and implement the necessary methods to respond to requests.

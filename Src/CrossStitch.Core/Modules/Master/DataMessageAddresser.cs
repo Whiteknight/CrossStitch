@@ -40,7 +40,10 @@ namespace CrossStitch.Core.Modules.Master
                 {
                     // Leave the ToNodeID and NetworkID empty, so it gets routed locally
                     Data = message.Data,
-                    ToStitchInstanceId = stitch.Id
+                    ToStitchInstanceId = stitch.Id,
+                    FromNetworkId = message.FromNetworkId,
+                    FromNodeId = message.FromNodeId,
+                    FromStitchInstanceId = message.FromStitchInstanceId
                 });
             }
 
@@ -55,6 +58,9 @@ namespace CrossStitch.Core.Modules.Master
                     {
                         Data = message.Data,
                         ToStitchInstanceId = stitch.Id,
+                        FromNetworkId = message.FromNetworkId,
+                        FromNodeId = message.FromNodeId,
+                        FromStitchInstanceId = message.FromStitchInstanceId,
 
                         // Fill in destination node details, so it gets sent over the backplane
                         ToNodeId = Guid.Parse(node.Id),
@@ -72,6 +78,7 @@ namespace CrossStitch.Core.Modules.Master
             if (localStitch != null)
             {
                 // Clear out recipient node info, to make clear that this is a local delivery
+                // Otherwise reuse the same object instance
                 message.ToNodeId = Guid.Empty;
                 message.ToNetworkId = null;
                 return message;
@@ -88,6 +95,9 @@ namespace CrossStitch.Core.Modules.Master
                     {
                         Data = message.Data,
                         ToStitchInstanceId = message.ToStitchInstanceId,
+                        FromNetworkId = message.FromNetworkId,
+                        FromNodeId = message.FromNodeId,
+                        FromStitchInstanceId = message.FromStitchInstanceId,
 
                         // Fill in node details to send over the Backplane
                         ToNodeId = Guid.Parse(node.Id),

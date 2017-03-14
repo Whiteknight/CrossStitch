@@ -1,14 +1,21 @@
 ﻿## Master Module
 
-The Master Module serves as a brain for a cluster, by allowing commands to affect multiple cluster nodes instead of only the current node. The Master Node will take a few large, complex commands and turn them into a list of smaller atomic commands which can be distributed over the cluster. In this way, we can coordinate large operations.
+The Master Module serves as a brain for a cluster, keeping track of nodes on the network, and allowing routing and dispatch of events and commands between nodes. The Master module serves several purposes, which seem distinct but have several shared requirements which prevent them from being cleanly separated (at this time).
 
-CrossStitch by default is "leaderless". This means that there isn't a single "Leader" in the cluster which can receive and coordinate complex requests. Each individual node in the cluster can have an active Master module, and each Master module makes decisions based on its understanding of the state of the cluster. If a node in the cluster is not acurately or reliably reporting its status, the Master node might not have up-to-date information about that node and might make some decisions which are incorrect. 
+1. Keeping track of the state of nodes in the cluster
+2. Publishing the state of the current running node
+3. Responding to requests for node state
+4. Routing messages to individual stitches, by looking up what node the stitch lives on and sending the message to that node
+5. Breaking up complex commands to commands for individual nodes, and dispatching those individual commands to nodes in the cluster.
 
-The Master node operates on a best-effort basis. It issues commands to nodes in the cluster and attempts to wait for confirmation of each command. If some of the commands fail, it will report status back to the user so that the user can make a decision about how to proceed (by re-issuing the command, issuing a new catch-up command, or by rolling back the whole thing)
+### Leaders and Leaderlessness
 
-### Examples
+CrossStitch by default is "leaderless". This means that there isn't a single "Leader" in the cluster which is guaranteed to receive and coordinate complex requests. There is no single, default, source of truth which all other nodes replicate. Each individual node in the cluster can have an active Master module, and each Master module makes decisions based on its understanding of the state of the cluster at that time. If a node in the cluster is not accurately or reliably reporting its status, the Master node might not have up-to-date information about that node and might make some decisions which are incorrect.
 
-I want to deploy an application A. A has two components C1 and C2, with versions VC1 and VC2 respectively. I issue a command to the Master node to deploy N1 versions of Stitch VC1 and N2 versions of Stitch VC2. The master node reviews it's known cluster state information to determine which nodes have space. It then issues the N1+N2 commands to the individual nodes in the cluster. 
+Because the cluster is leaderless by default (alternate implementations of the Master node or other nodes can change that behavior, of course), Conflicting commands sent at the same time to different nodes can have conflicted outcomes. As a matter of implementation and cultural best practice, consider designating one node in the cluster as the "preferred" Master, and asking all CrossStitch users very nicely to direct commands to that one node only. Or, you can use all the nodes in the cluster for load balancing, but ask people to coordinate among themselves before issuing commands.
+
+It is possible to override the default `MasterModule` instance with a version which does implement a strong leader election algorithm such as RAFT or PAXOS, and to route all requests to the master and replicate state from the master only. This is possible because all of these features are encapsulated within a single module. The current default implementation of Master is too simple for this, and can be used for cases where a strong leader and the guarantees which come along with it are not necessary.
+
 
 
 

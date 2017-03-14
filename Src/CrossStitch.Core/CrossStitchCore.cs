@@ -16,9 +16,9 @@ namespace CrossStitch.Core
         private bool _started;
         public ModuleLog Log { get; }
 
-        public CrossStitchCore(NodeConfiguration configuration)
+        public CrossStitchCore(NodeConfiguration configuration = null)
         {
-            Configuration = configuration;
+            Configuration = configuration ?? NodeConfiguration.GetDefault();
             // TODO: Should store the current NodeId in a Node file somewhere, so we can get the 
             // same ID on service restart.
             NodeId = Guid.NewGuid();

@@ -152,6 +152,7 @@
     <None Include="Modules\StitchMonitor\README.md" />
     <None Include="Modules\Timer\README.md" />
     <None Include="packages.config" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CrossStitch.Stitch\CrossStitch.Stitch.csproj">

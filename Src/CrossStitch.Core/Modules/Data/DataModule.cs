@@ -33,7 +33,6 @@ namespace CrossStitch.Core.Modules.Data
             _subscriptions = new SubscriptionCollection(core.MessageBus);
             _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
-            _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<NodeStatus>, DataResponse<NodeStatus>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
         }
 

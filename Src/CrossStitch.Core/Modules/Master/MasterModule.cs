@@ -63,17 +63,6 @@ namespace CrossStitch.Core.Modules.Master
 
         // TODO: Method to lookup NodeId by NetworkNodeId and vice-versa
 
-        //private static bool IsMessageAddressedToAppInstance(MessageEnvelope arg)
-        //{
-        //    return arg.Header.ToType == TargetType.AppInstance;
-        //}
-
-        //private void ResolveAppInstanceNodeIdAndSend(MessageEnvelope obj)
-        //{
-        //    throw new NotImplementedException();
-        //    // TODO: Resolve the NodeId for the message and publish again.
-        //}
-
         public string Name => ModuleNames.Master;
 
         public void Start(CrossStitchCore core)

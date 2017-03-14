@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\IModuleConfiguration.cs" />
+    <Compile Include="Messages\Alerts\AlertEvent.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />
     <Compile Include="Messages\Backplane\ReceivedEvent.cs" />
     <Compile Include="Messages\Core\ModuleStatusRequest.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Models\NodeCommunicationInformation.cs" />
     <Compile Include="Models\StitchVersionName.cs" />
     <Compile Include="ModuleCollection.cs" />
+    <Compile Include="Modules\Alerts\AlertsModule.cs" />
     <Compile Include="Modules\Core\CoreModule.cs" />
     <Compile Include="Modules\Data\DataCache.cs" />
     <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
@@ -140,6 +142,7 @@
     <Compile Include="Utility\Serialization\JsonSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Messages\Alerts\README.md" />
     <None Include="Modules\Data\README.md" />
     <None Include="Modules\Logging\README.md" />
     <None Include="Modules\Master\README.md" />

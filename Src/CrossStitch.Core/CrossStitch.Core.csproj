@@ -142,7 +142,8 @@
     <Compile Include="Utility\Serialization\JsonSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Messages\Alerts\README.md" />
+    <None Include="Modules\Alerts\README.md" />
+    <None Include="Modules\Core\README.md" />
     <None Include="Modules\Data\README.md" />
     <None Include="Modules\Logging\README.md" />
     <None Include="Modules\Master\README.md" />

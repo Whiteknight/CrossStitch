@@ -11,16 +11,16 @@ namespace CrossStitch.Backplane.Zyre.Networking
 
         public TargetType FromType { get; set; }
         public string FromEntityId { get; set; }
-        public Guid FromNodeId { get; set; }
+        public string FromNodeId { get; set; }
         public string FromNetworkId { get; set; }
 
         public TargetType ToType { get; set; }
         public string ToEntityId { get; set; }
         public string ToNetworkId { get; set; }
-        public Guid ToNodeId { get; set; }
+        public string ToNodeId { get; set; }
 
         public string ZoneName { get; set; }
-        public Guid? ProxyNodeNetworkId { get; set; }
+        public string ProxyNodeNetworkId { get; set; }
 
         public void PopulateReceivedEvent(ReceivedEvent receivedEvent)
         {

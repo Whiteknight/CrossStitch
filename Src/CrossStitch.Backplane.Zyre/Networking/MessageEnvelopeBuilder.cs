@@ -10,9 +10,9 @@ namespace CrossStitch.Backplane.Zyre.Networking
     {
         private readonly MessageEnvelope _envelope;
         private readonly Guid _networkNodeId;
-        private readonly Guid _nodeId;
+        private readonly string _nodeId;
 
-        public MessageEnvelopeBuilder(Guid networkNodeId, Guid nodeId)
+        public MessageEnvelopeBuilder(Guid networkNodeId, string nodeId)
         {
             _networkNodeId = networkNodeId;
             _nodeId = nodeId;
@@ -84,7 +84,7 @@ namespace CrossStitch.Backplane.Zyre.Networking
             return this;
         }
 
-        public MessageEnvelopeBuilder ToNode(string networkId, Guid nodeId)
+        public MessageEnvelopeBuilder ToNode(string networkId, string nodeId)
         {
             _envelope.Header.ToType = TargetType.Node;
             _envelope.Header.ToNetworkId = networkId;

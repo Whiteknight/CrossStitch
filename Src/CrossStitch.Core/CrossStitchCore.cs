@@ -20,8 +20,6 @@ namespace CrossStitch.Core
         public CrossStitchCore(NodeConfiguration configuration = null)
         {
             Configuration = configuration ?? NodeConfiguration.GetDefault();
-            // TODO: Should store the current NodeId in a Node file somewhere, so we can get the 
-            // same ID on service restart.
             NodeId = GetNodeId(Configuration);
             MessageBus = new Acquaintance.MessageBus();
 
@@ -31,7 +29,7 @@ namespace CrossStitch.Core
             Log = new ModuleLog(MessageBus, "Core");
         }
 
-        public Guid NodeId { get; }
+        public string NodeId { get; }
 
         public IMessageBus MessageBus { get; }
 
@@ -93,25 +91,21 @@ namespace CrossStitch.Core
             MessageBus.Dispose();
         }
 
-        private static Guid GetNodeId(NodeConfiguration config)
+        private static string GetNodeId(NodeConfiguration config)
         {
             const string nodeIdFile = "NODEID";
             string nodeIdFilePath = System.IO.Path.Combine(config.StateFileFolder, nodeIdFile);
-            Guid nodeId;
             if (System.IO.File.Exists(nodeIdFilePath))
             {
                 var text = System.IO.File.ReadAllLines(nodeIdFilePath).FirstOrDefault();
                 if (text != null)
-                {
-                    if (Guid.TryParse(text, out nodeId))
-                        return nodeId;
-                }
+                    return text;
             }
 
-            nodeId = Guid.NewGuid();
+            var nodeId = Guid.NewGuid().ToString();
             try
             {
-                System.IO.File.WriteAllText(nodeIdFilePath, nodeId.ToString());
+                System.IO.File.WriteAllText(nodeIdFilePath, nodeId);
             }
             catch { }
             return nodeId;

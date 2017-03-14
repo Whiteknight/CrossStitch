@@ -85,8 +85,13 @@ namespace CrossStitch.Backplane.Zyre
             // If we have a proxy node ID, send the message there and let the proxy sort out
             // further actions.
             // Otherwise a zone type becomes a Shout and a Node type becomes a Whisper
-            if (envelope.Header.ProxyNodeNetworkId.HasValue)
-                _zyre.Whisper(envelope.Header.ProxyNodeNetworkId.Value, message);
+            if (!string.IsNullOrEmpty(envelope.Header.ProxyNodeNetworkId))
+            {
+                Guid uuid;
+                bool ok = Guid.TryParse(envelope.Header.ProxyNodeNetworkId, out uuid);
+                if (ok)
+                    _zyre.Whisper(uuid, message);
+            }
             else if (envelope.Header.ToType == TargetType.Cluster)
                 _zyre.Shout(Zones.ZoneAll, message);
             else if (envelope.Header.ToType == TargetType.Zone)

@@ -8,9 +8,9 @@ namespace CrossStitch.Backplane.Zyre.Networking
     public class MessageEnvelopeBuilderFactory
     {
         private readonly Guid _networkNodeId;
-        private readonly Guid _nodeId;
+        private readonly string _nodeId;
 
-        public MessageEnvelopeBuilderFactory(Guid networkNodeId, Guid nodeId)
+        public MessageEnvelopeBuilderFactory(Guid networkNodeId, string nodeId)
         {
             _networkNodeId = networkNodeId;
             _nodeId = nodeId;

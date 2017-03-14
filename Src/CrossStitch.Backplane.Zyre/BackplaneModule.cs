@@ -181,9 +181,7 @@ namespace CrossStitch.Backplane.Zyre
         {
             return envelope.Header.ToType == TargetType.Node ||
                    envelope.Header.ToType == TargetType.Zone ||
-                   // TODO: Need to store the Proxy ID as a string, for consistency
-                   // TODO: Need an extension method to get a Guid from the string.
-                   (envelope.Header.ProxyNodeNetworkId.HasValue && envelope.Header.ProxyNodeNetworkId.Value != Guid.Empty);
+                   !string.IsNullOrEmpty(envelope.Header.ProxyNodeNetworkId);
         }
     }
 }

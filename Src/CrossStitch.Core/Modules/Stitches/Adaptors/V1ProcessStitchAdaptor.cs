@@ -4,6 +4,7 @@ using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
@@ -37,7 +38,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
             // TODO: What other values should we pass to the new process?
-            _process.StartInfo.Arguments = $"CorePID={parentPid}";
+            _process.StartInfo.Arguments = BuildArgumentsString(parentPid);
             _process.Exited += ProcessOnExited;
 
             // TODO: We should pass some command-line args to the new program:
@@ -53,6 +54,32 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             StitchContext.RaiseProcessEvent(true, true);
 
             return true;
+        }
+
+        private string BuildArgumentsString(int parentPid)
+        {
+            var sb = new StringBuilder();
+            AddArgument(sb, Arguments.CorePid, parentPid.ToString());
+            AddArgument(sb, Arguments.Application, _stitchInstance.GroupName.ApplicationId);
+            AddArgument(sb, Arguments.Component, _stitchInstance.GroupName.Component);
+            AddArgument(sb, Arguments.Version, _stitchInstance.GroupName.Version);
+            AddArgument(sb, Arguments.GroupName, _stitchInstance.GroupName.ToString());
+            if (!string.IsNullOrEmpty(_stitchInstance.ExecutableArguments))
+            {
+                sb.Append("-- ");
+                sb.Append(_stitchInstance.ExecutableArguments);
+            }
+            return sb.ToString();
+        }
+
+        private void AddArgument(StringBuilder sb, string name, string value)
+        {
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
+                return;
+            sb.Append(name);
+            sb.Append("=");
+            sb.Append(value);
+            sb.Append(" ");
         }
 
         public void SendHeartbeat(long id)

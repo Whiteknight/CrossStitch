@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -14,32 +15,48 @@ namespace CrossStitch.Stitch.V1.Stitch
 
         private readonly ToStitchMessageReader _reader;
         private readonly FromStitchMessageSender _sender;
-        private readonly int? _corePid;
-        private Thread _readerThread;
-        private Thread _coreMonitorThread;
         private readonly BlockingCollection<ToStitchMessage> _incomingMessages;
 
-        public bool ReceiveHeartbeats { get; set; }
+        private Thread _readerThread;
+        private Thread _coreMonitorThread;
 
         public StitchMessageManager(string[] processArgs, ToStitchMessageReader reader = null, FromStitchMessageSender sender = null)
         {
-            if (processArgs != null)
+            int i = 0;
+            var csArgs = new Dictionary<string, string>();
+            for (; i < processArgs.Length; i++)
             {
-                var args = processArgs.Select(s => s.Split('=')).Where(s => s.Length == 2).ToDictionary(s => s[0], s => s[1]);
-                if (args.ContainsKey("CorePID"))
-                    _corePid = int.Parse(args["CorePID"]);
+                string s = processArgs[i];
+                if (s == "--")
+                {
+                    i++;
+                    break;
+                }
+
+                var parts = s.Split(new[] { '=' }, 2);
+                if (parts.Length == 1)
+                    csArgs.Add(parts[0], "1");
+                else if (parts.Length == 2)
+                    csArgs.Add(parts[0], parts[1]);
             }
+            CrossStitchArguments = csArgs;
+            CustomArguments = processArgs.Skip(i).ToArray();
 
             _reader = reader ?? new ToStitchMessageReader(Console.OpenStandardInput());
             _sender = sender ?? new FromStitchMessageSender(Console.OpenStandardOutput());
             _incomingMessages = new BlockingCollection<ToStitchMessage>();
         }
 
+        public bool ReceiveHeartbeats { get; set; }
+        public IReadOnlyDictionary<string, string> CrossStitchArguments { get; }
+        public string[] CustomArguments { get; }
+
         public void Start()
         {
-            if (_corePid.HasValue)
+            int corePid = GetIntegerArgument(Arguments.CorePid);
+            if (corePid > 0)
             {
-                var coreProcess = Process.GetProcessById(_corePid.Value);
+                var coreProcess = Process.GetProcessById(corePid);
                 _coreMonitorThread = new Thread(CoreCheckerThreadFunction);
                 _coreMonitorThread.Start(coreProcess);
             }
@@ -104,6 +121,13 @@ namespace CrossStitch.Stitch.V1.Stitch
             Stop();
             _reader.Dispose();
             _sender.Dispose();
+        }
+
+        private int GetIntegerArgument(string name, int defaultValue = 0)
+        {
+            if (CrossStitchArguments.ContainsKey(name))
+                return int.Parse(CrossStitchArguments[name]);
+            return defaultValue;
         }
 
         private void ReaderThreadFunction()

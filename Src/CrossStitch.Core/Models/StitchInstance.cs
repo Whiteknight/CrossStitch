@@ -16,6 +16,7 @@ namespace CrossStitch.Core.Models
 
         public string DirectoryPath { get; set; }
         public string ExecutableName { get; set; }
+        public string ExecutableArguments { get; set; }
         public InstanceStateType State { get; set; }
         public long LastHeartbeatReceived { get; set; }
     }

@@ -17,6 +17,12 @@ namespace PingPong.Ping
             try
             {
                 _manager.Start();
+                Thread.Sleep(5000);
+
+                // Start the chain by sending a ping to the entire group
+                string groupName = _manager.CrossStitchArguments[Arguments.Application];
+                _manager.Send(FromStitchMessage.ToGroupData(groupName, "ping?"));
+
                 while (true)
                 {
                     var msg = _manager.GetNextMessage();

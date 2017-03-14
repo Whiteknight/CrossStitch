@@ -1,13 +1,10 @@
-﻿using Acquaintance;
-using CrossStitch.Core;
-using CrossStitch.Core.Messages;
+﻿using CrossStitch.Core;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using System;
-using System.Threading;
 
 namespace PingPong.Server
 {
@@ -66,14 +63,6 @@ namespace PingPong.Server
                 // being initialized
                 node.Start();
 
-                Thread.Sleep(5000);
-                // Start the show by sending the first message:
-                node.MessageBus.Publish(new StitchDataMessage
-                {
-                    Data = "ping?",
-                    FromStitchInstanceId = ping.Id,
-                    ToStitchInstanceId = pong.Id
-                });
                 Console.ReadKey();
                 node.Stop();
             }

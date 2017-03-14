@@ -1,6 +1,7 @@
 ﻿using CrossStitch.Stitch.V1;
 using CrossStitch.Stitch.V1.Stitch;
 using System;
+using System.Linq;
 
 namespace StitchStart.Client
 {
@@ -23,7 +24,7 @@ namespace StitchStart.Client
                     if (msg.IsHeartbeatMessage())
                     {
                         _manager.SyncHeartbeat(msg.Id);
-                        ManagerHeartbeatReceived(msg);
+                        _manager.SendLogs(_manager.CrossStitchArguments.Select(kvp => kvp.Key + "=" + kvp.Value).ToArray());
                     }
                     else
                     {
@@ -38,11 +39,6 @@ namespace StitchStart.Client
                 Log(e.ToString());
             }
             Log("Stopped");
-        }
-
-        private static void ManagerHeartbeatReceived(ToStitchMessage heartbeat)
-        {
-            Log("Heartbeat " + heartbeat.Id);
         }
 
         public static void Log(string s)

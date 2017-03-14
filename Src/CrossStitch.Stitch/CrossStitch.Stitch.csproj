@@ -47,6 +47,7 @@
     <Compile Include="Events\EventHandlerExtensions.cs" />
     <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="Utility\JsonUtility.cs" />
+    <Compile Include="V1\Arguments.cs" />
     <Compile Include="V1\Core\CoreMessageManager.cs" />
     <Compile Include="V1\Core\CoreStitchContext.cs" />
     <Compile Include="V1\Core\FromStitchMessageReader.cs" />

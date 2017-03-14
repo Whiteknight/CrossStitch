@@ -3,6 +3,7 @@ using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
+using CrossStitch.Core.Messages.CoordinatedRequests;
 using System;
 
 namespace CrossStitch.Core.Modules.Master
@@ -88,6 +89,12 @@ namespace CrossStitch.Core.Modules.Master
             _subscriptions.TimerSubscribe(timerTickMultiple, b => b
                 .Invoke(t => PublishNodeStatus())
                 .OnWorkerThread());
+            _subscriptions.Listen<NodeStatusRequest, NodeStatus>(b => b
+                .OnDefaultChannel()
+                .Invoke(GetNodeStatus));
+            _subscriptions.Subscribe<CoreEvent>(b => b
+                .WithChannelName(CoreEvent.ChannelInitialized)
+                .Invoke(m => PublishNodeStatus()));
 
             _subscriptions.Subscribe<ObjectsReceivedEvent<NodeStatus>>(b => b
                 .WithChannelName(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
@@ -115,6 +122,13 @@ namespace CrossStitch.Core.Modules.Master
             _nodeManager.Stop();
         }
 
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+            };
+        }
+
         public void Dispose()
         {
             Stop();
@@ -124,9 +138,17 @@ namespace CrossStitch.Core.Modules.Master
         {
             var message = new NodeStatusBuilder(_core, _data).Build();
 
-            _data.Save(message, true);
+            bool ok = _data.Save(message, true);
             _messageBus.Publish(NodeStatus.BroadcastEvent, message);
             _log.LogDebug("Published node status");
+        }
+
+        private NodeStatus GetNodeStatus(NodeStatusRequest arg)
+        {
+            string id = arg.NodeId;
+            if (string.IsNullOrEmpty(id))
+                id = _core.NodeId.ToString();
+            return _data.Get<NodeStatus>(id);
         }
 
         private void SaveNodeStatus(ObjectsReceivedEvent<NodeStatus> eventMessage)

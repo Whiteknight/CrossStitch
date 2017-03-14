@@ -18,7 +18,7 @@ namespace CrossStitch.Core.Modules.Master
 
         public NodeStatus Build()
         {
-            var modules = _core.AllModules.ToList();
+            var modules = _core.Modules.AddedModules.ToList();
             var stitches = _data.GetAll<StitchInstance>()
                 .Where(si => si.State == InstanceStateType.Running || si.State == InstanceStateType.Started)
                 .ToList();
@@ -27,7 +27,6 @@ namespace CrossStitch.Core.Modules.Master
             {
                 Id = _core.NodeId.ToString(),
                 Name = _core.NodeId.ToString(),
-                NetworkNodeId = _core.NetworkNodeId,
                 RunningModules = modules,
                 Instances = stitches
                     .Select(si => new Messages.Stitches.InstanceInformation

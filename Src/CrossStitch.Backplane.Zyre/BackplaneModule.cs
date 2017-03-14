@@ -75,11 +75,6 @@ namespace CrossStitch.Backplane.Zyre
             _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeNetworkId.ToString() });
         }
 
-        private void SendDataMessage(StitchDataMessage obj)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Stop()
         {
             _backplane.Stop();
@@ -93,9 +88,23 @@ namespace CrossStitch.Backplane.Zyre
             _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
         }
 
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+                { "NetworkId", _nodeNetworkId.ToString() },
+                { "Connected", "true" } // TODO: Actually determine this
+            };
+        }
+
         public void Dispose()
         {
             Stop();
+        }
+
+        private void SendDataMessage(StitchDataMessage obj)
+        {
+            throw new NotImplementedException();
         }
 
         private void BroadcastNodeStatus(NodeStatus nodeStatus)

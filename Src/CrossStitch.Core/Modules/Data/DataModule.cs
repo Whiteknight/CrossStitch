@@ -1,7 +1,9 @@
 ﻿using Acquaintance;
+using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
 using System;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Data
 {
@@ -32,6 +34,7 @@ namespace CrossStitch.Core.Modules.Data
             _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<PeerNode>, DataResponse<PeerNode>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<NodeStatus>, DataResponse<NodeStatus>>(l => l.OnDefaultChannel().Invoke(HandleRequest).OnThread(_workerThreadId));
         }
 
         public void Stop()
@@ -42,6 +45,11 @@ namespace CrossStitch.Core.Modules.Data
             _subscriptions = null;
             _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
             _workerThreadId = 0;
+        }
+
+        public IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new Dictionary<string, string> { };
         }
 
         public void Dispose()

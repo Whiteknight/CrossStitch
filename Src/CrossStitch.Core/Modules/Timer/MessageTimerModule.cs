@@ -8,13 +8,14 @@ namespace CrossStitch.Core.Modules.Timer
     public class MessageTimerModule : IModule
     {
         public const int TimerIntervalSeconds = 10;
-        private IDisposable _token;
+
         private readonly IMessageBus _messageBus;
+        private readonly int _intervalSeconds;
+        private readonly ModuleLog _log;
+
         private RegisteredWaitHandle _waitHandle;
         private ManualResetEvent _stop;
-        private readonly int _intervalSeconds;
         private long _sequence;
-        private ModuleLog _log;
 
         public MessageTimerModule(IMessageBus messageBus)
             : this(messageBus, TimerIntervalSeconds)
@@ -33,6 +34,33 @@ namespace CrossStitch.Core.Modules.Timer
             _log = new ModuleLog(messageBus, Name);
         }
 
+        public string Name => ModuleNames.Timer;
+
+        public void Start(CrossStitchCore core)
+        {
+            _stop = new ManualResetEvent(false);
+            _waitHandle = ThreadPool.RegisterWaitForSingleObject(_stop, TimerTick, null, 1000 * _intervalSeconds, false);
+        }
+
+        public void Stop()
+        {
+            _stop.Set();
+        }
+
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            long sequenceId = Interlocked.Read(ref _sequence);
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+                { "SequenceNumber", sequenceId.ToString() }
+            };
+        }
+
+        public void Dispose()
+        {
+            Stop();
+        }
+
         private void TimerTick(object state, bool timedOut)
         {
             if (!timedOut)
@@ -49,24 +77,6 @@ namespace CrossStitch.Core.Modules.Timer
             {
                 _log.LogError(e, "Error publishing tick");
             }
-        }
-
-        public string Name => ModuleNames.Timer;
-
-        public void Start(CrossStitchCore core)
-        {
-            _stop = new ManualResetEvent(false);
-            _waitHandle = ThreadPool.RegisterWaitForSingleObject(_stop, TimerTick, null, 1000 * _intervalSeconds, false);
-        }
-
-        public void Stop()
-        {
-            _stop.Set();
-        }
-
-        public void Dispose()
-        {
-            Stop();
         }
     }
 }

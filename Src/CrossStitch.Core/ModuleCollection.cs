@@ -31,6 +31,13 @@ namespace CrossStitch.Core
             _modules.Add(module.Name, module);
         }
 
+        public IModule Get(string name)
+        {
+            if (!_modules.ContainsKey(name))
+                return null;
+            return _modules[name];
+        }
+
         private void AddWithWarning(IModule module)
         {
             Add(module);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules
 {
@@ -8,5 +9,6 @@ namespace CrossStitch.Core.Modules
         string Name { get; }
         void Start(CrossStitchCore core);
         void Stop();
+        IReadOnlyDictionary<string, string> GetStatusDetails();
     }
 }

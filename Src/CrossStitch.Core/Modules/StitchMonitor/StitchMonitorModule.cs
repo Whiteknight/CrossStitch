@@ -49,6 +49,14 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             _subscriptions = null;
         }
 
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+                { "CurrentHeartbeatId", _heartbeatId.ToString() }
+            };
+        }
+
         public void Dispose()
         {
             Stop();

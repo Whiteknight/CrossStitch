@@ -64,6 +64,14 @@ namespace CrossStitch.Core.Modules.Stitches
             _log.LogDebug("Stopped");
         }
 
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+                { "NumberOfStitches", _stitchInstanceManager.GetNumberOfRunningStitches().ToString() }
+            };
+        }
+
         public void Dispose()
         {
             Stop();

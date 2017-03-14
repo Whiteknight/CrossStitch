@@ -59,36 +59,6 @@ namespace CrossStitch.Core.Modules.Stitches
             }
         }
 
-        private IStitchAdaptor GetStitchAdaptor(StitchInstance stitchInstance)
-        {
-            IStitchAdaptor adaptor;
-            bool found = _adaptors.TryGetValue(stitchInstance.Id, out adaptor);
-            if (found)
-                return adaptor;
-
-            adaptor = CreateStitchAdaptor(stitchInstance);
-            if (adaptor != null)
-                return adaptor;
-
-            stitchInstance.State = InstanceStateType.Missing;
-            return null;
-        }
-
-        private IStitchAdaptor CreateStitchAdaptor(StitchInstance stitchInstance)
-        {
-            var adaptor = _adaptorFactory.Create(stitchInstance);
-            bool added = _adaptors.TryAdd(stitchInstance.Id, adaptor);
-            if (!added)
-                return null;
-
-            adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
-            adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
-            adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;
-            adaptor.StitchContext.RequestResponseReceived += OnStitchResponseReceived;
-            adaptor.StitchContext.DataMessageReceived += OnDataMessageReceived;
-            return adaptor;
-        }
-
         public InstanceActionResult Stop(string instanceId)
         {
             IStitchAdaptor adaptor = null;
@@ -195,6 +165,41 @@ namespace CrossStitch.Core.Modules.Stitches
 
             adaptor.SendMessage(message.Id, message.DataChannelName, message.Data, message.FromNodeId, message.FromStitchInstanceId);
             return InstanceActionResult.Result(message.ToStitchInstanceId, true);
+        }
+
+        public int GetNumberOfRunningStitches()
+        {
+            return _adaptors.Count;
+        }
+
+        private IStitchAdaptor GetStitchAdaptor(StitchInstance stitchInstance)
+        {
+            IStitchAdaptor adaptor;
+            bool found = _adaptors.TryGetValue(stitchInstance.Id, out adaptor);
+            if (found)
+                return adaptor;
+
+            adaptor = CreateStitchAdaptor(stitchInstance);
+            if (adaptor != null)
+                return adaptor;
+
+            stitchInstance.State = InstanceStateType.Missing;
+            return null;
+        }
+
+        private IStitchAdaptor CreateStitchAdaptor(StitchInstance stitchInstance)
+        {
+            var adaptor = _adaptorFactory.Create(stitchInstance);
+            bool added = _adaptors.TryAdd(stitchInstance.Id, adaptor);
+            if (!added)
+                return null;
+
+            adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
+            adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
+            adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;
+            adaptor.StitchContext.RequestResponseReceived += OnStitchResponseReceived;
+            adaptor.StitchContext.DataMessageReceived += OnDataMessageReceived;
+            return adaptor;
         }
 
         private void OnStitchStateChange(object sender, StitchProcessEventArgs stitchProcessEventArgs)

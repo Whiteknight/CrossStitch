@@ -1,5 +1,6 @@
 ﻿using Acquaintance;
 using CrossStitch.Core;
+using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules;
 using Nancy.Hosting.Self;
 using System;
@@ -12,6 +13,7 @@ namespace CrossStitch.Http.NancyFx
     {
         private readonly NancyHost _host;
         private readonly HttpConfiguration _httpConfiguration;
+        private readonly ModuleLog _log;
 
         public NancyHttpModule(HttpConfiguration httpConfiguration, IMessageBus messageBus)
         {
@@ -25,6 +27,7 @@ namespace CrossStitch.Http.NancyFx
             };
             _host = new NancyHost(new Uri("http://localhost:" + httpConfiguration.Port), bootstrapper, hostConfig);
             _httpConfiguration = httpConfiguration;
+            _log = new ModuleLog(messageBus, Name);
         }
 
         public string Name => $"Http:{_httpConfiguration.Port}";
@@ -32,11 +35,21 @@ namespace CrossStitch.Http.NancyFx
         public void Start(CrossStitchCore core)
         {
             _host.Start();
+            _log.LogInformation("REST API Listening on port {0}", _httpConfiguration.Port);
         }
 
         public void Stop()
         {
             _host.Stop();
+            _log.LogInformation("REST API stopped Listening on port {0}", _httpConfiguration.Port);
+        }
+
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+                { "ListeningPort", _httpConfiguration.Port.ToString() }
+            };
         }
 
         public void Dispose()

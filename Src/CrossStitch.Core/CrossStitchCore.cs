@@ -1,18 +1,18 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
-using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
+using CrossStitch.Core.Modules.Core;
 using System;
-using System.Collections.Generic;
 
 namespace CrossStitch.Core
 {
-    public class CrossStitchCore : IDisposable, CrossStitch.Stitch.IRunningNodeContext
+    public class CrossStitchCore : IDisposable
     {
         public NodeConfiguration Configuration { get; set; }
-        private readonly ModuleCollection _modules;
-        private SubscriptionCollection _subscriptions;
+        public ModuleCollection Modules { get; }
+        public CoreModule CoreModule { get; }
+
         private bool _started;
         public ModuleLog Log { get; }
 
@@ -24,12 +24,11 @@ namespace CrossStitch.Core
             NodeId = Guid.NewGuid();
             MessageBus = new Acquaintance.MessageBus();
 
-            _modules = new ModuleCollection();
+            CoreModule = new CoreModule(this, MessageBus);
+            Modules = new ModuleCollection();
 
             Log = new ModuleLog(MessageBus, "Core");
         }
-
-        public string NetworkNodeId { get; private set; }
 
         public Guid NodeId { get; }
 
@@ -37,24 +36,22 @@ namespace CrossStitch.Core
 
         public void AddModule(IModule module)
         {
-            _modules.Add(module);
+            if (module.Name == ModuleNames.Core)
+                throw new Exception("Cannot create a module with reserved name 'Core'");
+            Modules.Add(module);
             if (_started)
             {
-                _modules.Add(module);
+                Modules.Add(module);
                 module.Start(this);
                 MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(module.Name));
                 Log.LogInformation("New module added: {0}", module.Name);
             }
         }
 
-        public IEnumerable<string> AllModules => _modules.AddedModules;
-
         public void Start()
         {
             if (_started)
                 throw new Exception("Core is already started");
-
-            _subscriptions = new SubscriptionCollection(MessageBus);
 
             // TODO: Move this to the master node, where we can either query the live status of the
             // current node or query the last-known status of the requested node.
@@ -62,11 +59,10 @@ namespace CrossStitch.Core
             // more likely)
             //_subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
 
-            _subscriptions.Subscribe<BackplaneEvent>(b => b.WithChannelName(BackplaneEvent.ChannelNetworkIdChanged).Invoke(OnNetworkNodeIdChanged));
-
-            _modules.AddMissingModules(this);
-            _modules.StartAll(this);
-            _modules.WarnOnMissingModules(Log);
+            Modules.AddMissingModules(this);
+            CoreModule.Start(this);
+            Modules.StartAll(this);
+            Modules.WarnOnMissingModules(Log);
 
             _started = true;
             MessageBus.Publish(CoreEvent.ChannelInitialized, new CoreEvent());
@@ -75,22 +71,14 @@ namespace CrossStitch.Core
             Log.LogInformation("Core initialized Id={0}", NodeId);
         }
 
-        private void OnNetworkNodeIdChanged(BackplaneEvent backplaneEvent)
-        {
-            NetworkNodeId = backplaneEvent.Data;
-            Log.LogInformation("Network Node ID set. NetworkId=" + NetworkNodeId);
-        }
-
         // TODO: Break stop down into two-phases. Pre-stop alerts all modules about shutdown and does logging.
         // Stop will wait for all modules to indicate readiness or, after a timeout, force shutdown.
         public void Stop()
         {
             Log.LogInformation("Core is shutting down");
 
-            _modules.StopAll(this);
-
-            _subscriptions.Dispose();
-            _subscriptions = null;
+            Modules.StopAll(this);
+            CoreModule.Stop();
 
             _started = false;
 

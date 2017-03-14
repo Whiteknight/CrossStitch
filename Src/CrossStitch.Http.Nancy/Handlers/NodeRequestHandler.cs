@@ -11,6 +11,14 @@ namespace CrossStitch.Http.NancyFx.Handlers
             : base("/node")
         {
             Get["/"] = _ => messageBus.Request<NodeStatusRequest, NodeStatus>(new NodeStatusRequest());
+
+            Get["/{NodeId}"] = _ =>
+            {
+                return messageBus.Request<NodeStatusRequest, NodeStatus>(new NodeStatusRequest
+                {
+                    NodeId = _.NodeId.ToString()
+                });
+            };
         }
     }
 }

@@ -61,6 +61,13 @@ namespace CrossStitch.Core.Modules.Logging
             _threadId = 0;
         }
 
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+            };
+        }
+
         public void Dispose()
         {
             Stop();

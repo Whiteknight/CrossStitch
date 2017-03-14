@@ -21,11 +21,11 @@ namespace ClusterTest.Master
                 core.AddModule(new LoggingModule(Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 core.Start();
-                core.Log.LogInformation("Started MASTER node {0}", core.NetworkNodeId);
+                core.Log.LogInformation("Started MASTER node {0}", core.NodeId);
 
                 Console.ReadKey();
 
-                core.Log.LogInformation("Stopping node {0}", core.NetworkNodeId);
+                core.Log.LogInformation("Stopping node {0}", core.NodeId);
                 core.Stop();
             }
         }

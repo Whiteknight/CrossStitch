@@ -2,6 +2,7 @@
 {
     public static class ModuleNames
     {
+        public const string Core = "Core";
         public const string RequestCoordinator = "RequestCoordinator";
         public const string StitchMonitor = "StitchMonitor";
         public const string Stitches = "Stitches";

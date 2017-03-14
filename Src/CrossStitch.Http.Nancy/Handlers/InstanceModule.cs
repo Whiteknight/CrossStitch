@@ -1,4 +1,5 @@
 using Acquaintance;
+using CrossStitch.Core.Messages.Core;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Messages.StitchMonitor;

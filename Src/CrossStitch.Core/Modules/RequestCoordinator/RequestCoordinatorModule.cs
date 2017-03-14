@@ -60,6 +60,13 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             _log.LogDebug("Started");
         }
 
+        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        {
+            return new System.Collections.Generic.Dictionary<string, string>
+            {
+            };
+        }
+
         public void Stop()
         {
             _subscriptions?.Dispose();

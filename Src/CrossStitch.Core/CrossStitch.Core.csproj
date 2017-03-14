@@ -59,6 +59,7 @@
     <Compile Include="Configuration\IModuleConfiguration.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />
     <Compile Include="Messages\Backplane\ReceivedEvent.cs" />
+    <Compile Include="Messages\Core\ModuleStatusRequest.cs" />
     <Compile Include="Messages\Data\DataRequestType.cs" />
     <Compile Include="Messages\Data\DataResponse.cs" />
     <Compile Include="Messages\Data\DataResponseType.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Models\NodeCommunicationInformation.cs" />
     <Compile Include="Models\StitchVersionName.cs" />
     <Compile Include="ModuleCollection.cs" />
+    <Compile Include="Modules\Core\CoreModule.cs" />
     <Compile Include="Modules\Data\DataCache.cs" />
     <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
@@ -125,7 +127,7 @@
     <Compile Include="Monitoring\Events\ObservationEvent.cs" />
     <Compile Include="Messages\CoreEvent.cs" />
     <Compile Include="Models\NodeStatus.cs" />
-    <Compile Include="Messages\CoordinatedRequests\NodeStatusRequest.cs" />
+    <Compile Include="Messages\Master\NodeStatusRequest.cs" />
     <Compile Include="NodeConfiguration.cs" />
     <Compile Include="CrossStitchCore.cs" />
     <Compile Include="Modules\Master\MasterConfiguration.cs" />

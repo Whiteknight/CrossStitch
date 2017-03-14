@@ -1,9 +1,10 @@
-﻿using CrossStitch.Core.Modules.Data;
+﻿using CrossStitch.Core;
+using CrossStitch.Core.Modules.Data;
+using CrossStitch.Core.Modules.Data.Folders;
+using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Http.NancyFx;
 using System;
-using CrossStitch.Core;
-using CrossStitch.Core.Modules.Data.Folders;
 
 namespace HttpTest
 {
@@ -27,6 +28,8 @@ namespace HttpTest
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();
                 var stitches = new StitchesModule(stitchesConfiguration);
                 core.AddModule(stitches);
+
+                core.AddModule(new LoggingModule(Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 core.Start();
                 Console.ReadKey();

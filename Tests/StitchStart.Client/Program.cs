@@ -1,5 +1,4 @@
-﻿using CrossStitch.Stitch.V1;
-using CrossStitch.Stitch.V1.Stitch;
+﻿using CrossStitch.Stitch.V1.Stitch;
 using System;
 using System.Linq;
 
@@ -12,6 +11,7 @@ namespace StitchStart.Client
         {
             _manager = new StitchMessageManager(args);
             _manager.ReceiveHeartbeats = true;
+            _manager.ReceiveExitMessage = true;
             try
             {
                 _manager.Start();
@@ -21,7 +21,11 @@ namespace StitchStart.Client
                     if (msg == null)
                         continue;
 
-                    if (msg.IsHeartbeatMessage())
+                    if (msg.IsExitMessage())
+                    {
+                        return;
+                    }
+                    else if (msg.IsHeartbeatMessage())
                     {
                         _manager.SyncHeartbeat(msg.Id);
                         _manager.SendLogs(_manager.CrossStitchArguments.Select(kvp => kvp.Key + "=" + kvp.Value).ToArray());

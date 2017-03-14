@@ -89,7 +89,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
                 Id = id,
                 FromStitchInstanceId = "",
                 //NodeId = _nodeContext.NodeId,
-                ChannelName = ToStitchMessage.HeartbeatChannelName,
+                ChannelName = ToStitchMessage.ChannelNameHeartbeat,
                 Data = ""
             });
         }

@@ -48,6 +48,7 @@ namespace CrossStitch.Stitch.V1.Stitch
         }
 
         public bool ReceiveHeartbeats { get; set; }
+        public bool ReceiveExitMessage { get; set; }
         public IReadOnlyDictionary<string, string> CrossStitchArguments { get; }
         public string[] CustomArguments { get; }
 
@@ -171,9 +172,10 @@ namespace CrossStitch.Stitch.V1.Stitch
 
         private void OnCoreDisappeared()
         {
-            // TODO: Communicate with the rest of the stitch, it may want to gracefully finish
-            // some processing work first.
-            Environment.Exit(ExitBecauseOfCoreDisappearance);
+            if (ReceiveExitMessage)
+                _incomingMessages.Add(ToStitchMessage.Exit());
+            else
+                Environment.Exit(ExitBecauseOfCoreDisappearance);
         }
     }
 }

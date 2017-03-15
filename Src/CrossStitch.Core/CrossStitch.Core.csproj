@@ -78,6 +78,7 @@
     <Compile Include="Modules\Core\CoreModule.cs" />
     <Compile Include="Modules\Core\CoreService.cs" />
     <Compile Include="Modules\Data\DataCache.cs" />
+    <Compile Include="Modules\Data\DataService.cs" />
     <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
     <Compile Include="MessageBus\ModuleLog.cs" />

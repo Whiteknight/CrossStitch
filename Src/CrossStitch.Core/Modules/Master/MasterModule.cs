@@ -3,7 +3,6 @@ using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
-using CrossStitch.Core.Messages.CoordinatedRequests;
 using System;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
@@ -15,16 +14,21 @@ namespace CrossStitch.Core.Modules.Master
     // The Master module coordinates multipart-commands across the cluster.
     public class MasterModule : IModule
     {
-        private CrossStitchCore _core;
+        private readonly MasterService _service;
+        private readonly NodeConfiguration _configuration;
+
         private DataHelperClient _data;
         private SubscriptionCollection _subscriptions;
         private IMessageBus _messageBus;
         private ModuleLog _log;
-        private readonly NodeConfiguration _configuration;
+        
 
-        public MasterModule(NodeConfiguration configuration)
+        public MasterModule(CrossStitchCore core, NodeConfiguration configuration)
         {
             _configuration = configuration;
+            _log = new ModuleLog(core.MessageBus, Name);
+            _data = new DataHelperClient(core.MessageBus);
+            _service = new MasterService(core, _log, _data);
         }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
@@ -68,7 +72,6 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Start(CrossStitchCore core)
         {
-            _core = core;
             _messageBus = core.MessageBus;
             _log = new ModuleLog(core.MessageBus, Name);
             _subscriptions = new SubscriptionCollection(_messageBus);
@@ -77,18 +80,18 @@ namespace CrossStitch.Core.Modules.Master
             // Publish the status of the node every 60 seconds
             int timerTickMultiple = (_configuration.StatusBroadcastIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
             _subscriptions.TimerSubscribe(timerTickMultiple, b => b
-                .Invoke(t => PublishNodeStatus())
+                .Invoke(t => GenerateAndPublishNodeStatus())
                 .OnWorkerThread());
             _subscriptions.Listen<NodeStatusRequest, NodeStatus>(b => b
                 .OnDefaultChannel()
-                .Invoke(GetNodeStatus));
+                .Invoke(m => _service.GetExistingNodeStatus(m.NodeId)));
             _subscriptions.Subscribe<CoreEvent>(b => b
                 .WithChannelName(CoreEvent.ChannelInitialized)
-                .Invoke(m => PublishNodeStatus()));
+                .Invoke(m => GenerateAndPublishNodeStatus()));
 
             _subscriptions.Subscribe<ObjectsReceivedEvent<NodeStatus>>(b => b
                 .WithChannelName(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
-                .Invoke(SaveNodeStatus));
+                .Invoke(m => _service.SaveNodeStatus(m.Object)));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()
@@ -106,14 +109,11 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Stop()
         {
-            
         }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
         {
-            return new System.Collections.Generic.Dictionary<string, string>
-            {
-            };
+            return new System.Collections.Generic.Dictionary<string, string>();
         }
 
         public void Dispose()
@@ -121,59 +121,17 @@ namespace CrossStitch.Core.Modules.Master
             Stop();
         }
 
-        private void PublishNodeStatus()
+        private void GenerateAndPublishNodeStatus()
         {
-            var message = new NodeStatusBuilder(_core, _data).Build();
-
-            bool ok = _data.Save(message, true);
-            _messageBus.Publish(NodeStatus.BroadcastEvent, message);
-            _log.LogDebug("Published node status");
-        }
-
-        private NodeStatus GetNodeStatus(NodeStatusRequest arg)
-        {
-            string id = arg.NodeId;
-            if (string.IsNullOrEmpty(id))
-                id = _core.NodeId.ToString();
-            return _data.Get<NodeStatus>(id);
-        }
-
-        private void SaveNodeStatus(ObjectsReceivedEvent<NodeStatus> eventMessage)
-        {
-            var status = eventMessage.Object;
-            if (status == null)
-                return;
-            // TODO: Make sure the values are filled in.
-            _data.Save(status, true);
-            _log.LogDebug("Received node status from NodeId={0} and saved it", status.Id);
+            var message = _service.GenerateCurrentNodeStatus();
+            if (message != null)
+                _messageBus.Publish(NodeStatus.BroadcastEvent, message);
         }
 
         private void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
         {
-            var messages = new DataMessageAddresser(_data).AddressMessage(message);
-            foreach (var outMessage in messages)
-            {
-                // If it has a Node id, publish it. The filter will stop it from coming back
-                // and the Backplane will pick it up.
-                if (outMessage.ToNodeId != Guid.Empty)
-                {
-                    _messageBus.Publish(outMessage);
-                    continue;
-                }
-
-                // Otherwise, publish it locally for a local stitch instance to grab it.
-                _messageBus.Publish(StitchDataMessage.ChannelSendLocal, outMessage);
-            }
+            foreach (var outMessage in _service.EnrichStitchDataMessageWithAddress(message))
+                _messageBus.PublishMessage(outMessage);
         }
     }
-
-    //public static class HardwareScoreCalculator
-    //{
-    //    public static int Calculate()
-    //    {
-    //        // TODO: Need to get the amount of RAM available, in whole-numbers of GB (rounded) and
-    //        // include that in the score somehow.
-    //        return Environment.ProcessorCount;
-    //    }
-    //}
 }

@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\IModuleConfiguration.cs" />
+    <Compile Include="Utility\IDataRepository.cs" />
     <Compile Include="Messages\Alerts\AlertEvent.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />
     <Compile Include="Messages\Backplane\ReceivedEvent.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Modules\Logging\LoggingModule.cs" />
     <Compile Include="MessageBus\ModuleLog.cs" />
     <Compile Include="Modules\Master\DataMessageAddresser.cs" />
+    <Compile Include="Modules\Master\MasterService.cs" />
     <Compile Include="Modules\Master\NodeStatusBuilder.cs" />
     <Compile Include="Modules\Master\Zones.cs" />
     <Compile Include="Modules\ModuleNames.cs" />
@@ -136,6 +138,7 @@
     <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Utility\IFactory.cs" />
     <Compile Include="Utility\IMapper.cs" />
+    <Compile Include="Utility\IModuleLog.cs" />
     <Compile Include="Utility\Serialization\ISerializer.cs" />
     <Compile Include="Utility\Serialization\JsonSerializer.cs" />
   </ItemGroup>

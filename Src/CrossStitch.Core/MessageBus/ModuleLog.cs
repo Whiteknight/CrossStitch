@@ -1,10 +1,11 @@
 ﻿using Acquaintance;
 using System;
 using CrossStitch.Core.Messages.Logging;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.MessageBus
 {
-    public class ModuleLog
+    public class ModuleLog : IModuleLog
     {
         private readonly string _moduleName;
         protected IMessageBus MessageBus { get; }

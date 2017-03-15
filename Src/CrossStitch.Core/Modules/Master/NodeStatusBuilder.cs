@@ -1,16 +1,15 @@
-﻿using CrossStitch.Core.MessageBus;
-using CrossStitch.Core.Messages;
-using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Models;
 using System.Linq;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Master
 {
     public class NodeStatusBuilder
     {
         private readonly CrossStitchCore _core;
-        private readonly DataHelperClient _data;
+        private readonly IDataRepository _data;
 
-        public NodeStatusBuilder(CrossStitchCore core, DataHelperClient data)
+        public NodeStatusBuilder(CrossStitchCore core, IDataRepository data)
         {
             _core = core;
             _data = data;

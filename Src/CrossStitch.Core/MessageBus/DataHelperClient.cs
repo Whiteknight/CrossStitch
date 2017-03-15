@@ -1,14 +1,14 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Messages.Data;
-using CrossStitch.Core.Modules.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.MessageBus
 {
-    public class DataHelperClient
+    public class DataHelperClient : IDataRepository
     {
         protected IMessageBus Bus { get; }
 

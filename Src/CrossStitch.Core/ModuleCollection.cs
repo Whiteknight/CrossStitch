@@ -54,7 +54,7 @@ namespace CrossStitch.Core
             if (!_modules.ContainsKey(ModuleNames.StitchMonitor))
                 Add(new StitchMonitorModule(core.Configuration));
             if (!_modules.ContainsKey(ModuleNames.Master))
-                Add(new MasterModule(core.Configuration));
+                Add(new MasterModule(core, core.Configuration));
 
             // These modules are necessary for basic operation, but defaulting is not
             // straight-forward, so we need to raise a warning.

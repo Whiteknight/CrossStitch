@@ -61,16 +61,16 @@ namespace CrossStitch.Core.Modules.Data.Folders
             where TEntity : class, IDataEntity
         {
             if (string.IsNullOrEmpty(entity.Id))
-                return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
+                return SaveNew(entity) ? entity.StoreVersion : DataService.InvalidId;
 
             var stored = Get<TEntity>(entity.Id);
             if (stored == null)
-                return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
+                return SaveNew(entity) ? entity.StoreVersion : DataService.InvalidId;
 
             if (force)
                 entity.StoreVersion = stored.StoreVersion;
             if (entity.StoreVersion != stored.StoreVersion)
-                return DataModule.VersionMismatch;
+                return DataService.VersionMismatch;
 
             SaveExisting(entity);
             return entity.StoreVersion;

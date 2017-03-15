@@ -53,7 +53,7 @@ namespace CrossStitch.Core.Modules.Data.InMemory
                 if (kvp.Key.StartsWith(prefix))
                     entities.Add(kvp.Value);
             }
-            var deserialized = entities.Select(s => JsonUtility.Deserialize<TEntity>(s));
+            var deserialized = entities.Select(JsonUtility.Deserialize<TEntity>);
             return deserialized;
         }
 
@@ -61,16 +61,16 @@ namespace CrossStitch.Core.Modules.Data.InMemory
             where TEntity : class, IDataEntity
         {
             if (string.IsNullOrEmpty(entity.Id))
-                return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
+                return SaveNew(entity) ? entity.StoreVersion : DataService.InvalidId;
 
             var stored = Get<TEntity>(entity.Id);
             if (stored == null)
-                return SaveNew(entity) ? entity.StoreVersion : DataModule.InvalidId;
+                return SaveNew(entity) ? entity.StoreVersion : DataService.InvalidId;
 
             if (force)
                 entity.StoreVersion = stored.StoreVersion;
             if (entity.StoreVersion != stored.StoreVersion)
-                return DataModule.VersionMismatch;
+                return DataService.VersionMismatch;
 
             SaveExisting(entity);
             return entity.StoreVersion;

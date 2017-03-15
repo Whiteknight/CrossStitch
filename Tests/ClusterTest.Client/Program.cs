@@ -14,11 +14,15 @@ namespace ClusterTest.Client
             var nodeConfig = NodeConfiguration.GetDefault();
             using (var core = new CrossStitchCore(nodeConfig))
             {
-                core.MessageBus.Subscribe<NodeAddedToClusterEvent>(l => l.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
-                core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
+                core.MessageBus.Subscribe<NodeAddedToClusterEvent>(l => l
+                    .WithChannelName(NodeAddedToClusterEvent.EventName)
+                    .Invoke(NodeAdded));
+                core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l
+                    .WithChannelName(NodeRemovedFromClusterEvent.EventName)
+                    .Invoke(NodeRemoved));
 
-                core.AddModule(new BackplaneModule());
-                core.AddModule(new LoggingModule(Common.Logging.LogManager.GetLogger("CrossStitch")));
+                core.AddModule(new BackplaneModule(core));
+                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 core.Start();
                 core.Log.LogInformation("Starting CLIENT node {0}", core.NodeId);

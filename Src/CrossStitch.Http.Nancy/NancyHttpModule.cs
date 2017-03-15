@@ -1,5 +1,4 @@
 ﻿using Acquaintance;
-using CrossStitch.Core;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules;
 using Nancy.Hosting.Self;
@@ -32,7 +31,7 @@ namespace CrossStitch.Http.NancyFx
 
         public string Name => $"Http:{_httpConfiguration.Port}";
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
             _host.Start();
             _log.LogInformation("REST API Listening on port {0}", _httpConfiguration.Port);

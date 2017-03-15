@@ -6,24 +6,25 @@ namespace CrossStitch.Core.Modules.Logging
 {
     public class LoggingModule : IModule
     {
-        private SubscriptionCollection _subscriptions;
+        private readonly IMessageBus _messageBus;
         private readonly ILog _log;
-        private int _threadId;
-        private IMessageBus _messageBus;
 
-        public LoggingModule(ILog log)
+        private SubscriptionCollection _subscriptions;
+        private int _threadId;
+
+        public LoggingModule(CrossStitchCore core, ILog log)
         {
             _log = log;
+            _messageBus = core.MessageBus;
         }
 
         public string Name => ModuleNames.Log;
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _messageBus = core.MessageBus;
-            _subscriptions = new SubscriptionCollection(core.MessageBus);
+            _subscriptions = new SubscriptionCollection(_messageBus);
 
-            _threadId = core.MessageBus.ThreadPool.StartDedicatedWorker();
+            _threadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
             _subscriptions.Subscribe<LogEvent>(b => b
                 .WithChannelName(LogEvent.LevelDebug)
@@ -63,9 +64,7 @@ namespace CrossStitch.Core.Modules.Logging
 
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
         {
-            return new System.Collections.Generic.Dictionary<string, string>
-            {
-            };
+            return new System.Collections.Generic.Dictionary<string, string>();
         }
 
         public void Dispose()

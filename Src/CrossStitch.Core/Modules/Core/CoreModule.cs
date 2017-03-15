@@ -29,7 +29,7 @@ namespace CrossStitch.Core.Modules.Core
             };
         }
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
             _subscriptions.Listen<ModuleStatusRequest, ModuleStatusResponse>(l => l
                 .OnDefaultChannel()

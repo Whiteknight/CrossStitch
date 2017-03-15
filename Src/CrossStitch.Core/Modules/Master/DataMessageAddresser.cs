@@ -4,14 +4,15 @@ using CrossStitch.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Master
 {
     public class DataMessageAddresser
     {
-        private readonly DataHelperClient _data;
+        private readonly IDataRepository _data;
 
-        public DataMessageAddresser(DataHelperClient data)
+        public DataMessageAddresser(IDataRepository data)
         {
             _data = data;
         }

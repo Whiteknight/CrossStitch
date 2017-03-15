@@ -36,7 +36,7 @@ namespace CrossStitch.Core.Modules.Timer
 
         public string Name => ModuleNames.Timer;
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
             _stop = new ManualResetEvent(false);
             _waitHandle = ThreadPool.RegisterWaitForSingleObject(_stop, TimerTick, null, 1000 * _intervalSeconds, false);

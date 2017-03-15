@@ -12,25 +12,26 @@ namespace CrossStitch.Core.Modules.StitchMonitor
     public class StitchMonitorModule : IModule
     {
         private readonly NodeConfiguration _configuration;
-        private IMessageBus _messageBus;
+        private readonly IMessageBus _messageBus;
+        private readonly DataHelperClient _data;
+        private readonly ModuleLog _log;
+
         private SubscriptionCollection _subscriptions;
-        private DataHelperClient _data;
-        private ModuleLog _log;
         private long _heartbeatId;
 
-        public StitchMonitorModule(NodeConfiguration configuration)
+        public StitchMonitorModule(CrossStitchCore core, NodeConfiguration configuration)
         {
+            _messageBus = core.MessageBus;
             _configuration = configuration;
+            _data = new DataHelperClient(core.MessageBus);
+            _log = new ModuleLog(_messageBus, Name);
         }
 
         public string Name => ModuleNames.StitchMonitor;
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _messageBus = core.MessageBus;
-            _subscriptions = new SubscriptionCollection(core.MessageBus);
-            _data = new DataHelperClient(core.MessageBus);
-            _log = new ModuleLog(_messageBus, Name);
+            _subscriptions = new SubscriptionCollection(_messageBus);
 
             int heartbeatTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
             _subscriptions.TimerSubscribe(heartbeatTickMultiple, b => b.Invoke(e => SendScheduledHeartbeat()));
@@ -38,9 +39,13 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             int monitorTickMultiple = (_configuration.StitchMonitorIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
             _subscriptions.TimerSubscribe(monitorTickMultiple, b => b.Invoke(e => MonitorStitchStatus()));
 
-            _subscriptions.Subscribe<StitchInstanceEvent>(b => b.WithChannelName(StitchInstanceEvent.ChannelSynced).Invoke(StitchSyncReceived));
+            _subscriptions.Subscribe<StitchInstanceEvent>(b => b
+                .WithChannelName(StitchInstanceEvent.ChannelSynced)
+                .Invoke(StitchSyncReceived));
 
-            _subscriptions.Listen<StitchHealthRequest, StitchHealthResponse>(l => l.OnDefaultChannel().Invoke(GetStitchHealthReport));
+            _subscriptions.Listen<StitchHealthRequest, StitchHealthResponse>(l => l
+                .OnDefaultChannel()
+                .Invoke(GetStitchHealthReport));
         }
 
         public void Stop()
@@ -79,7 +84,7 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             _log.LogDebug("Sending heartbeat {0}", id);
             var instances = _data.GetAll<StitchInstance>()
                 .Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started)
-                .ToList(); ;
+                .ToList();
 
             foreach (var instance in instances)
             {

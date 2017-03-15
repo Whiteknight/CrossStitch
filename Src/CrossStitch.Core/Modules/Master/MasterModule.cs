@@ -6,6 +6,7 @@ using CrossStitch.Core.Messages.Backplane;
 using System;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Utility;
 using StitchDataMessage = CrossStitch.Core.Messages.StitchDataMessage;
 
 namespace CrossStitch.Core.Modules.Master
@@ -16,19 +17,18 @@ namespace CrossStitch.Core.Modules.Master
     {
         private readonly MasterService _service;
         private readonly NodeConfiguration _configuration;
+        private readonly IModuleLog _log;
+        private readonly IMessageBus _messageBus;
 
-        private DataHelperClient _data;
         private SubscriptionCollection _subscriptions;
-        private IMessageBus _messageBus;
-        private ModuleLog _log;
-        
 
         public MasterModule(CrossStitchCore core, NodeConfiguration configuration)
         {
             _configuration = configuration;
+            _messageBus = core.MessageBus;
             _log = new ModuleLog(core.MessageBus, Name);
-            _data = new DataHelperClient(core.MessageBus);
-            _service = new MasterService(core, _log, _data);
+            var data = new DataHelperClient(core.MessageBus);
+            _service = new MasterService(core, _log, data);
         }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
@@ -70,12 +70,9 @@ namespace CrossStitch.Core.Modules.Master
 
         public string Name => ModuleNames.Master;
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _messageBus = core.MessageBus;
-            _log = new ModuleLog(core.MessageBus, Name);
             _subscriptions = new SubscriptionCollection(_messageBus);
-            _data = new DataHelperClient(_messageBus);
 
             // Publish the status of the node every 60 seconds
             int timerTickMultiple = (_configuration.StatusBroadcastIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;

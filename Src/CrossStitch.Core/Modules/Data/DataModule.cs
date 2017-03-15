@@ -23,11 +23,11 @@ namespace CrossStitch.Core.Modules.Data
 
         public string Name => ModuleNames.Data;
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _workerThreadId = core.MessageBus.ThreadPool.StartDedicatedWorker();
+            _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
-            _subscriptions = new SubscriptionCollection(core.MessageBus);
+            _subscriptions = new SubscriptionCollection(_messageBus);
             _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l
                 .OnDefaultChannel()
                 .Invoke(_service.HandleRequest)
@@ -54,9 +54,7 @@ namespace CrossStitch.Core.Modules.Data
 
         public IReadOnlyDictionary<string, string> GetStatusDetails()
         {
-            return new Dictionary<string, string>
-            {
-            };
+            return new Dictionary<string, string>();
         }
 
         public void Dispose()

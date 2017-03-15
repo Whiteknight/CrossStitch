@@ -1,7 +1,7 @@
 ﻿using System;
-using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Data
 {
@@ -14,9 +14,9 @@ namespace CrossStitch.Core.Modules.Data
         public const int InvalidId = -2;
 
         private readonly IDataStorage _storage;
-        private readonly ModuleLog _log;
+        private readonly IModuleLog _log;
 
-        public DataService(IDataStorage storage, ModuleLog log)
+        public DataService(IDataStorage storage, IModuleLog log)
         {
             _storage = storage;
             _log = log;

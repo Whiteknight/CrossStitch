@@ -13,7 +13,7 @@ namespace PingPong.Server
         static void Main(string[] args)
         {
             var config = NodeConfiguration.GetDefault();
-            using (var node = new CrossStitchCore(config))
+            using (var core = new CrossStitchCore(config))
             {
                 var dataStorage = new InMemoryDataStorage();
 
@@ -47,24 +47,24 @@ namespace PingPong.Server
                 dataStorage.Save(ping, true);
                 dataStorage.Save(pong, true);
 
-                var data = new DataModule(node.MessageBus, dataStorage);
-                node.AddModule(data);
+                var data = new DataModule(core.MessageBus, dataStorage);
+                core.AddModule(data);
 
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();
-                var stitches = new StitchesModule(stitchesConfiguration);
-                node.AddModule(stitches);
+                var stitches = new StitchesModule(core, stitchesConfiguration);
+                core.AddModule(stitches);
 
                 var log = Common.Logging.LogManager.GetLogger("CrossStitch");
-                var logging = new LoggingModule(log);
-                node.AddModule(logging);
+                var logging = new LoggingModule(core, log);
+                core.AddModule(logging);
 
                 // TODO: We need a way to start for initialization to complete, either having Start
                 // block or providing an Initialized event which waits for all modules to report
                 // being initialized
-                node.Start();
+                core.Start();
 
                 Console.ReadKey();
-                node.Stop();
+                core.Stop();
             }
         }
     }

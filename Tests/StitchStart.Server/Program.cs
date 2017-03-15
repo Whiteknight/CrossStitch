@@ -13,7 +13,7 @@ namespace StitchStart.Server
         static void Main(string[] args)
         {
             var config = NodeConfiguration.GetDefault();
-            using (var node = new CrossStitchCore(config))
+            using (var core = new CrossStitchCore(config))
             {
                 var dataStorage = new InMemoryDataStorage();
 
@@ -31,20 +31,20 @@ namespace StitchStart.Server
                     LastHeartbeatReceived = 0
                 }, true);
 
-                var data = new DataModule(node.MessageBus, dataStorage);
-                node.AddModule(data);
+                var data = new DataModule(core.MessageBus, dataStorage);
+                core.AddModule(data);
 
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();
-                var stitches = new StitchesModule(stitchesConfiguration);
-                node.AddModule(stitches);
+                var stitches = new StitchesModule(core, stitchesConfiguration);
+                core.AddModule(stitches);
 
                 var log = Common.Logging.LogManager.GetLogger("CrossStitch");
-                var logging = new LoggingModule(log);
-                node.AddModule(logging);
+                var logging = new LoggingModule(core, log);
+                core.AddModule(logging);
 
-                node.Start();
+                core.Start();
                 Console.ReadKey();
-                node.Stop();
+                core.Stop();
             }
         }
     }

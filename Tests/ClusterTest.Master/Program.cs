@@ -17,8 +17,8 @@ namespace ClusterTest.Master
                 core.MessageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
                 core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
 
-                core.AddModule(new BackplaneModule());
-                core.AddModule(new LoggingModule(Common.Logging.LogManager.GetLogger("CrossStitch")));
+                core.AddModule(new BackplaneModule(core));
+                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 core.Start();
                 core.Log.LogInformation("Started MASTER node {0}", core.NodeId);

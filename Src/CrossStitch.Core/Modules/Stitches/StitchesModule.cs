@@ -12,13 +12,16 @@ namespace CrossStitch.Core.Modules.Stitches
     {
         private readonly StitchFileSystem _fileSystem;
         private readonly StitchInstanceManager _stitchInstanceManager;
+        private readonly ModuleLog _log;
+        private readonly IMessageBus _messageBus;
 
-        private IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
-        private ModuleLog _log;
 
-        public StitchesModule(StitchesConfiguration configuration)
+        public StitchesModule(CrossStitchCore core, StitchesConfiguration configuration)
         {
+            _messageBus = core.MessageBus;
+            _log = new ModuleLog(_messageBus, Name);
+
             _fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
 
             _stitchInstanceManager = new StitchInstanceManager(_fileSystem);
@@ -31,19 +34,28 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public string Name => ModuleNames.Stitches;
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _messageBus = core.MessageBus;
-            _log = new ModuleLog(_messageBus, Name);
+            _subscriptions = new SubscriptionCollection(_messageBus);
+            _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(l => l
+                .OnDefaultChannel()
+                .Invoke(GetInstanceInformation));
+            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
+                .WithChannelName(PackageFileUploadRequest.ChannelUpload)
+                .Invoke(UploadPackageFile));
 
-            _subscriptions = new SubscriptionCollection(core.MessageBus);
-            _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(l => l.OnDefaultChannel().Invoke(GetInstanceInformation));
-            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l.WithChannelName(PackageFileUploadRequest.ChannelUpload).Invoke(UploadPackageFile));
-
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelCreateVerified).Invoke(CreateNewInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStartVerified).Invoke(StartInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStopVerified).Invoke(StopInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelSendHeartbeatVerified).Invoke(SendHeartbeat));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelCreateVerified)
+                .Invoke(CreateNewInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStartVerified)
+                .Invoke(StartInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStopVerified)
+                .Invoke(StopInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelSendHeartbeatVerified)
+                .Invoke(SendHeartbeat));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()
@@ -64,9 +76,9 @@ namespace CrossStitch.Core.Modules.Stitches
             _log.LogDebug("Stopped");
         }
 
-        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        public IReadOnlyDictionary<string, string> GetStatusDetails()
         {
-            return new System.Collections.Generic.Dictionary<string, string>
+            return new Dictionary<string, string>
             {
                 { "NumberOfStitches", _stitchInstanceManager.GetNumberOfRunningStitches().ToString() }
             };

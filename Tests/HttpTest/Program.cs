@@ -26,10 +26,10 @@ namespace HttpTest
                 core.AddModule(data);
 
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();
-                var stitches = new StitchesModule(stitchesConfiguration);
+                var stitches = new StitchesModule(core, stitchesConfiguration);
                 core.AddModule(stitches);
 
-                core.AddModule(new LoggingModule(Common.Logging.LogManager.GetLogger("CrossStitch")));
+                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 core.Start();
                 Console.ReadKey();

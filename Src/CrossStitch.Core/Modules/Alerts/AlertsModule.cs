@@ -7,11 +7,13 @@ namespace CrossStitch.Core.Modules.Alerts
     public class AlertsModule : IModule
     {
         private readonly IAlertSender[] _senders;
+        private readonly IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
 
-        public AlertsModule(params IAlertSender[] senders)
+        public AlertsModule(CrossStitchCore core, params IAlertSender[] senders)
         {
             _senders = senders;
+            _messageBus = core.MessageBus;
         }
 
         public string Name => ModuleNames.Alerts;
@@ -24,9 +26,9 @@ namespace CrossStitch.Core.Modules.Alerts
             };
         }
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _subscriptions = new SubscriptionCollection(core.MessageBus);
+            _subscriptions = new SubscriptionCollection(_messageBus);
             _subscriptions.Subscribe<AlertEvent>(b => b
                 .OnDefaultChannel()
                 .Invoke(ReceiveAlert));

@@ -5,7 +5,6 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
-using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.Events;
 using System;
@@ -18,20 +17,28 @@ namespace CrossStitch.Backplane.Zyre
     // CrossStitch.Core. 
     public sealed class BackplaneModule : IModule
     {
-        private readonly IFactory<IClusterBackplane, CrossStitchCore> _backplaneFactory;
-        private IClusterBackplane _backplane;
-        private IMessageBus _messageBus;
+        private readonly IClusterBackplane _backplane;
+        private readonly IMessageBus _messageBus;
+        private readonly ModuleLog _log;
+        private readonly BackplaneConfiguration _configuration;
+
         private int _workerThreadId;
         private SubscriptionCollection _subscriptions;
         private Guid _nodeNetworkId;
-        private ModuleLog _log;
         private MessageEnvelopeBuilderFactory _envelopeFactory;
-        private readonly BackplaneConfiguration _configuration;
 
-        public BackplaneModule(BackplaneConfiguration configuration = null, IFactory<IClusterBackplane, CrossStitchCore> backplaneFactory = null)
+        public BackplaneModule(CrossStitchCore core, IClusterBackplane backplane = null, BackplaneConfiguration configuration = null)
         {
+            _messageBus = core.MessageBus;
+            _log = new ModuleLog(_messageBus, Name);
+
             _configuration = configuration ?? BackplaneConfiguration.GetDefault();
-            _backplaneFactory = backplaneFactory ?? new ZyreBackplaneFactory();
+            _backplane = backplane ?? new ZyreBackplane(core, _configuration);
+
+            // Forward messages from the backplane to the IMessageBus
+            _backplane.MessageReceived += MessageReceivedHandler;
+            _backplane.ClusterMember += ClusterMemberHandler;
+            _backplane.ZoneMember += ZoneMemberHandler;
         }
 
         public string Name => ModuleNames.Backplane;
@@ -40,17 +47,8 @@ namespace CrossStitch.Backplane.Zyre
         // zone membership at runtime (and preferrably, store those in the data module so we can 
         // check that on startup and override the values in the config file)
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _messageBus = core.MessageBus;
-            _log = new ModuleLog(_messageBus, Name);
-
-            _backplane = _backplaneFactory.Create(core);
-            // Forward messages from the backplane to the IMessageBus
-            _backplane.MessageReceived += MessageReceivedHandler;
-            _backplane.ClusterMember += ClusterMemberHandler;
-            _backplane.ZoneMember += ZoneMemberHandler;
-
             // Setup subscriptions
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(_messageBus);

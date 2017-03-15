@@ -50,9 +50,9 @@ namespace CrossStitch.Core
             if (!_modules.ContainsKey(ModuleNames.Timer))
                 Add(new MessageTimerModule(core.MessageBus));
             if (!_modules.ContainsKey(ModuleNames.RequestCoordinator))
-                Add(new RequestCoordinatorModule());
+                Add(new RequestCoordinatorModule(core));
             if (!_modules.ContainsKey(ModuleNames.StitchMonitor))
-                Add(new StitchMonitorModule(core.Configuration));
+                Add(new StitchMonitorModule(core, core.Configuration));
             if (!_modules.ContainsKey(ModuleNames.Master))
                 Add(new MasterModule(core, core.Configuration));
 
@@ -73,7 +73,7 @@ namespace CrossStitch.Core
                 log.LogWarning("Backplane module was not added. This CrossStitch instance will not be able to join a cluster with other nodes.");
         }
 
-        public void StartAll(CrossStitchCore core)
+        public void StartAll()
         {
             // Start the "Log" module first, to make sure that messages generated during startup
             // for other modules are logged.
@@ -82,9 +82,9 @@ namespace CrossStitch.Core
             // TODO: We definitely want the DataModule to initialize early, in case other modules
             // need to get stored config/state data
             foreach (var module in _modules.Values.Where(m => m.Name == ModuleNames.Log))
-                module.Start(core);
+                module.Start();
             foreach (var module in _modules.Values.Where(m => m.Name != ModuleNames.Log))
-                module.Start(core);
+                module.Start();
         }
 
         public void StopAll(CrossStitchCore core)

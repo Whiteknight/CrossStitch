@@ -10,21 +10,26 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
 {
     public class RequestCoordinatorModule : IModule
     {
+        private readonly CrossStitchCore _node;
+        private readonly IMessageBus _messageBus;
+        private readonly DataHelperClient _data;
+        private readonly ModuleLog _log;
+
         private SubscriptionCollection _subscriptions;
-        private CrossStitchCore _node;
-        private IMessageBus _messageBus;
-        private DataHelperClient _data;
-        private ModuleLog _log;
+
+        public RequestCoordinatorModule(CrossStitchCore core)
+        {
+            _messageBus = core.MessageBus;
+            _node = core;
+            _log = new ModuleLog(_messageBus, Name);
+            _data = new DataHelperClient(_messageBus);
+        }
 
         public string Name => ModuleNames.RequestCoordinator;
 
-        public void Start(CrossStitchCore core)
+        public void Start()
         {
-            _node = core;
-            _subscriptions = new SubscriptionCollection(core.MessageBus);
-            _messageBus = core.MessageBus;
-            _log = new ModuleLog(_messageBus, Name);
-            _data = new DataHelperClient(_messageBus);
+            _subscriptions = new SubscriptionCollection(_messageBus);
 
             // On Core initialization, startup all necessary Stitches
             _subscriptions.Subscribe<CoreEvent>(b => b
@@ -44,27 +49,43 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 .Invoke(DeleteApplication));
 
             // CRUD requests for Components, which are all updates on Application records
-            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Insert).Invoke(InsertComponent));
-            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Update).Invoke(UpdateComponent));
-            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l.WithChannelName(ComponentChangeRequest.Delete).Invoke(DeleteComponent));
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l
+                .WithChannelName(ComponentChangeRequest.Insert)
+                .Invoke(InsertComponent));
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l
+                .WithChannelName(ComponentChangeRequest.Update)
+                .Invoke(UpdateComponent));
+            _subscriptions.Listen<ComponentChangeRequest, GenericResponse>(l => l
+                .WithChannelName(ComponentChangeRequest.Delete)
+                .Invoke(DeleteComponent));
 
             // CRUD requests for Stitch Instances
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelCreate).Invoke(CreateNewInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelDelete).Invoke(DeleteInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelClone).Invoke(CloneInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStart).Invoke(StartInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l.WithChannelName(InstanceRequest.ChannelStop).Invoke(StopInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelCreate)
+                .Invoke(CreateNewInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelDelete)
+                .Invoke(DeleteInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelClone)
+                .Invoke(CloneInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStart)
+                .Invoke(StartInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStop)
+                .Invoke(StopInstance));
 
-            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l.OnDefaultChannel().Invoke(UploadPackageFile));
+            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
+                .OnDefaultChannel()
+                .Invoke(UploadPackageFile));
 
             _log.LogDebug("Started");
         }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
         {
-            return new System.Collections.Generic.Dictionary<string, string>
-            {
-            };
+            return new System.Collections.Generic.Dictionary<string, string>();
         }
 
         public void Stop()

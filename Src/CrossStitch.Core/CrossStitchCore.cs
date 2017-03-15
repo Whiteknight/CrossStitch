@@ -41,7 +41,7 @@ namespace CrossStitch.Core
             if (_started)
             {
                 Modules.Add(module);
-                module.Start(this);
+                module.Start();
                 MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(module.Name));
                 Log.LogInformation("New module added: {0}", module.Name);
             }
@@ -59,8 +59,8 @@ namespace CrossStitch.Core
             //_subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
 
             Modules.AddMissingModules(this);
-            CoreModule.Start(this);
-            Modules.StartAll(this);
+            CoreModule.Start();
+            Modules.StartAll();
             Modules.WarnOnMissingModules(Log);
 
             _started = true;

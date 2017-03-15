@@ -27,6 +27,9 @@ namespace CrossStitch.Core.Modules.Data
         public DataResponse<TEntity> HandleRequest<TEntity>(DataRequest<TEntity> request)
             where TEntity : class, IDataEntity
         {
+            if (!request.IsValid())
+                return DataResponse<TEntity>.BadRequest();
+
             try
             {
                 switch (request.Type)
@@ -35,11 +38,9 @@ namespace CrossStitch.Core.Modules.Data
                         var all = _storage.GetAll<TEntity>();
                         return DataResponse<TEntity>.FoundAll(all);
                     case DataRequestType.Get:
-                        var entity = _storage.Get<TEntity>(request.Id);
-                        return entity == null ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Found(entity);
+                        return HandleGetRequest(request);
                     case DataRequestType.Delete:
-                        bool ok = _storage.Delete<TEntity>(request.Id);
-                        return !ok ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Ok();
+                        return HandleDeleteRequest(request);
                     case DataRequestType.Save:
                         return HandleSaveRequest(request);
                     default:
@@ -53,12 +54,22 @@ namespace CrossStitch.Core.Modules.Data
             }
         }
 
+        private DataResponse<TEntity> HandleGetRequest<TEntity>(DataRequest<TEntity> request) where TEntity : class, IDataEntity
+        {
+            var entity = _storage.Get<TEntity>(request.Id);
+            return entity == null ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Found(entity);
+        }
+
+        private DataResponse<TEntity> HandleDeleteRequest<TEntity>(DataRequest<TEntity> request)
+            where TEntity : class, IDataEntity
+        {
+            bool ok = _storage.Delete<TEntity>(request.Id);
+            return !ok ? DataResponse<TEntity>.NotFound() : DataResponse<TEntity>.Ok();
+        }
+
         private DataResponse<TEntity> HandleSaveRequest<TEntity>(DataRequest<TEntity> request)
             where TEntity : class, IDataEntity
         {
-            if (!request.IsValid())
-                return DataResponse<TEntity>.BadRequest();
-
             // If we are doing an in-place update, we need the entity to not exist, the ID to
             // be provided, and the InPlaceUpdate delegate to be set
             if (request.Entity == null && !string.IsNullOrEmpty(request.Id) && request.InPlaceUpdate != null)

@@ -86,5 +86,91 @@ namespace CrossStitch.Core.Tests.Modules.Data
             result.Type.Should().Be(DataResponseType.Success);
             result.Entity.Name.Should().Be("A");
         }
+
+        [Test]
+        public void HandleRequest_Save_null_Test()
+        {
+            var target = new DataService(new InMemoryDataStorage(), null);
+
+
+            var result = target.HandleRequest(DataRequest<Application>.Save(null));
+            result.Type.Should().Be(DataResponseType.GeneralFailure);
+        }
+
+
+        [Test]
+        public void HandleRequest_Save_Update_Test()
+        {
+            var target = new DataService(new InMemoryDataStorage(), null);
+
+            var entity = new Application()
+            {
+                Name = "A"
+            };
+            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
+            entity.Name = "B";
+            var result = target.HandleRequest(DataRequest<Application>.Save(entity));
+            result.Type.Should().Be(DataResponseType.Success);
+            result.Entity.Name.Should().Be("B");
+        }
+
+        [Test]
+        public void HandleRequest_Save_Update_VersionMismatch_Test()
+        {
+            var target = new DataService(new InMemoryDataStorage(), null);
+
+            var entity = new Application()
+            {
+                Name = "A"
+            };
+            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
+            entity.Name = "B";
+            entity.StoreVersion = 0;
+            var result = target.HandleRequest(DataRequest<Application>.Save(entity));
+            result.Type.Should().Be(DataResponseType.VersionMismatch);
+        }
+
+        [Test]
+        public void HandleRequest_Save_InPlaceUpdate_Test()
+        {
+            var target = new DataService(new InMemoryDataStorage(), null);
+
+            var entity = new Application()
+            {
+                Name = "A"
+            };
+            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
+            var result = target.HandleRequest(DataRequest<Application>.Save(entity.Id, a => a.Name = "B"));
+            result.Type.Should().Be(DataResponseType.Success);
+            result.Entity.Name.Should().Be("B");
+        }
+
+        [Test]
+        public void HandleRequest_Save_InPlaceUpdate_NotFound_Test()
+        {
+            var target = new DataService(new InMemoryDataStorage(), null);
+
+            var entity = new Application()
+            {
+                Name = "A"
+            };
+            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
+            var result = target.HandleRequest(DataRequest<Application>.Save("GARBAGE", a => a.Name = "B"));
+            result.Type.Should().Be(DataResponseType.NotFound);
+        }
+
+        [Test]
+        public void HandleRequest_Save_InPlaceUpdate_null_Test()
+        {
+            var target = new DataService(new InMemoryDataStorage(), null);
+
+            var entity = new Application()
+            {
+                Name = "A"
+            };
+            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
+            var result = target.HandleRequest(DataRequest<Application>.Save(entity.Id, null));
+            result.Type.Should().Be(DataResponseType.GeneralFailure);
+        }
     }
 }

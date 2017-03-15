@@ -72,11 +72,11 @@
     <Compile Include="Messages\StitchMonitor\StitchHealthRequest.cs" />
     <Compile Include="Models\ApplicationComponent.cs" />
     <Compile Include="Models\ApplicationComponentVersion.cs" />
-    <Compile Include="Models\NodeCommunicationInformation.cs" />
     <Compile Include="Models\StitchVersionName.cs" />
     <Compile Include="ModuleCollection.cs" />
     <Compile Include="Modules\Alerts\AlertsModule.cs" />
     <Compile Include="Modules\Core\CoreModule.cs" />
+    <Compile Include="Modules\Core\CoreService.cs" />
     <Compile Include="Modules\Data\DataCache.cs" />
     <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
     <Compile Include="Modules\Logging\LoggingModule.cs" />
@@ -111,12 +111,10 @@
     <Compile Include="Messages\Data\DataRequest.cs" />
     <Compile Include="MessageBus\MessageBusExtensions.cs" />
     <Compile Include="Messages\Logging\LogEvent.cs" />
-    <Compile Include="Modules\Master\ClusterPeerNode.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
     <Compile Include="Configuration\ConfigurationLoader.cs" />
     <Compile Include="Modules\Master\Events\NodeAddedToClusterEvent.cs" />
     <Compile Include="Modules\Master\Events\NodeRemovedFromCluster.cs" />
-    <Compile Include="Modules\Master\IClusterNodeManager.cs" />
     <Compile Include="Messages\GenericResponse.cs" />
     <Compile Include="Modules\RequestCoordinator\RequestCoordinatorModule.cs" />
     <Compile Include="MessageBus\DataHelperClient.cs" />
@@ -134,7 +132,6 @@
     <Compile Include="Modules\Master\MasterConfiguration.cs" />
     <Compile Include="Modules\Master\MasterModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Modules\Master\ClusterNodeManager.cs" />
     <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Utility\IFactory.cs" />
     <Compile Include="Utility\IMapper.cs" />

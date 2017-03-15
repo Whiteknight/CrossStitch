@@ -4,6 +4,7 @@ using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
 using System;
 using System.Collections.Generic;
+using CrossStitch.Core.MessageBus;
 
 namespace CrossStitch.Core.Modules.Data
 {
@@ -14,13 +15,18 @@ namespace CrossStitch.Core.Modules.Data
     {
         public const int VersionMismatch = -1;
         public const int InvalidId = -2;
+
         private readonly IDataStorage _storage;
+        private readonly IMessageBus _messageBus;
+        private readonly ModuleLog _log;
+
         private SubscriptionCollection _subscriptions;
-        private IMessageBus _messageBus;
         private int _workerThreadId;
 
-        public DataModule(IDataStorage storage = null)
+        public DataModule(IMessageBus messageBus, IDataStorage storage = null)
         {
+            _messageBus = messageBus;
+            _log = new ModuleLog(messageBus, Name);
             _storage = storage ?? new InMemory.InMemoryDataStorage();
         }
 
@@ -28,7 +34,6 @@ namespace CrossStitch.Core.Modules.Data
 
         public void Start(CrossStitchCore core)
         {
-            _messageBus = core.MessageBus;
             _workerThreadId = core.MessageBus.ThreadPool.StartDedicatedWorker();
 
             _subscriptions = new SubscriptionCollection(core.MessageBus);
@@ -92,6 +97,7 @@ namespace CrossStitch.Core.Modules.Data
             }
             catch (Exception e)
             {
+                _log.LogError(e, "Error handling data request");
                 return DataResponse<TEntity>.BadRequest();
             }
         }

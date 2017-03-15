@@ -15,11 +15,24 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 var request = new ModuleStatusRequest { ModuleName = ModuleNames.Core };
                 return messageBus.Request<ModuleStatusRequest, ModuleStatusResponse>(request);
             };
-            Get["/{ModuleName}"] = _ =>
+
+            Get["/{ModuleName}/status"] = _ =>
             {
                 var request = new ModuleStatusRequest { ModuleName = _.ModuleName.ToString() };
                 return messageBus.Request<ModuleStatusRequest, ModuleStatusResponse>(request);
             };
+        }
+    }
+
+    public class StitchGroupsNancyModule : NancyModule
+    {
+        public StitchGroupsNancyModule()
+            : base("/stitchgroups")
+        {
+            // TODO: Get all groups?
+            Get["/"] = _ => { return null; };
+
+            Get["/"] = _ => { return null; };
         }
     }
 }

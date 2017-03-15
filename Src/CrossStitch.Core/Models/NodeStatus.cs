@@ -1,8 +1,8 @@
-﻿using CrossStitch.Core.Messages.Stitches;
+﻿using System.Collections.Generic;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Modules.Data;
-using System.Collections.Generic;
 
-namespace CrossStitch.Core.Messages
+namespace CrossStitch.Core.Models
 {
     public class NodeStatus : IDataEntity
     {

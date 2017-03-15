@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace CrossStitch.Core.Models
 {
-
     public class ApplicationComponent
     {
         public ApplicationComponent()

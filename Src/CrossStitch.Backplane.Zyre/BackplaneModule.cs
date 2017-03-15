@@ -10,6 +10,7 @@ using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.Events;
 using System;
 using System.Linq;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Backplane.Zyre
 {

@@ -7,14 +7,14 @@ namespace CrossStitch.Core.Modules.Core
     public class CoreModule : IModule
     {
         private readonly CrossStitchCore _core;
-        private readonly IMessageBus _messageBus;
         private readonly SubscriptionCollection _subscriptions;
+        private readonly CoreService _service;
 
         public CoreModule(CrossStitchCore core, IMessageBus messageBus)
         {
             _core = core;
-            _messageBus = messageBus;
-            _subscriptions = new SubscriptionCollection(_messageBus);
+            _subscriptions = new SubscriptionCollection(messageBus);
+            _service = new CoreService(core);
         }
 
         public string Name => ModuleNames.Core;
@@ -49,10 +49,9 @@ namespace CrossStitch.Core.Modules.Core
         {
             if (arg.ModuleName == Name)
                 return ModuleStatusResponse.Ok(Name, GetStatusDetails());
-            var module = _core.Modules.Get(arg.ModuleName);
-            if (module == null)
+            var status = _service.GetModuleStatusDetails(arg.ModuleName);
+            if (status == null)
                 return ModuleStatusResponse.NotFound(arg.ModuleName);
-            var status = module.GetStatusDetails() ?? new Dictionary<string, string>();
             return ModuleStatusResponse.Ok(arg.ModuleName, status);
         }
     }

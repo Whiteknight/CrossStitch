@@ -5,6 +5,7 @@ using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.CoordinatedRequests;
 using System;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -12,8 +13,6 @@ namespace CrossStitch.Core.Modules.Master
     // The Master module coordinates multipart-commands across the cluster.
     public class MasterModule : IModule
     {
-        private readonly IClusterNodeManager _nodeManager;
-
         private CrossStitchCore _core;
         private DataHelperClient _data;
         private SubscriptionCollection _subscriptions;
@@ -105,10 +104,7 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Stop()
         {
-            if (_core == null)
-                return;
-            _core = null;
-            _nodeManager.Stop();
+            
         }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()

@@ -107,7 +107,7 @@
     <Compile Include="Models\Application.cs" />
     <Compile Include="Models\StitchInstance.cs" />
     <Compile Include="Modules\Data\Folders\FolderDataStorage.cs" />
-    <Compile Include="Modules\Data\IDataEntity.cs" />
+    <Compile Include="Models\IDataEntity.cs" />
     <Compile Include="Modules\Data\IDataStorage.cs" />
     <Compile Include="Messages\Data\DataRequest.cs" />
     <Compile Include="MessageBus\MessageBusExtensions.cs" />

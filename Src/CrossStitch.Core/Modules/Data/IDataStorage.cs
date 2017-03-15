@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Data
 {

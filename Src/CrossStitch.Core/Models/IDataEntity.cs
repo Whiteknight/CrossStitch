@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Modules.Data
+﻿namespace CrossStitch.Core.Models
 {
     public interface IDataEntity
     {

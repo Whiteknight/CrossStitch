@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Data.Folders
 {

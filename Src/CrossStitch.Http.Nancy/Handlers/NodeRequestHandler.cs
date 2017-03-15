@@ -1,6 +1,7 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.CoordinatedRequests;
+using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
 using Nancy;
 

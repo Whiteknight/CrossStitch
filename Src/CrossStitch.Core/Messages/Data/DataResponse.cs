@@ -1,6 +1,7 @@
 using CrossStitch.Core.Modules.Data;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Messages.Data
 {

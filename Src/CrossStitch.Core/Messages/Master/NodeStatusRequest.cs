@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Messages.CoordinatedRequests
+﻿namespace CrossStitch.Core.Messages.Master
 {
     public class NodeStatusRequest
     {

@@ -5,7 +5,9 @@ using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.CoordinatedRequests;
 using System;
+using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
+using StitchDataMessage = CrossStitch.Core.Messages.StitchDataMessage;
 
 namespace CrossStitch.Core.Modules.Master
 {

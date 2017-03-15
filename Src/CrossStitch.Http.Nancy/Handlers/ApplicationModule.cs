@@ -1,10 +1,9 @@
 ﻿using Acquaintance;
+using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.CoordinatedRequests;
-using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Utility.Extensions;
 using Nancy;
 using Nancy.ModelBinding;
 using System.Linq;
@@ -16,26 +15,17 @@ namespace CrossStitch.Http.NancyFx.Handlers
         public ApplicationNancyModule(IMessageBus messageBus)
             : base("/applications")
         {
-            Get["/"] = x =>
-            {
-                var request = DataRequest<Application>.GetAll();
-                var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Entities.OrEmptyIfNull().ToList();
-            };
+            var data = new DataHelperClient(messageBus);
+
+            Get["/"] = x => data.GetAll<Application>().ToList();
 
             Post["/"] = x =>
             {
-                ApplicationChangeRequest request = this.Bind<ApplicationChangeRequest>();
+                var request = this.Bind<ApplicationChangeRequest>();
                 return messageBus.Request<ApplicationChangeRequest, Application>(ApplicationChangeRequest.Insert, request);
             };
 
-            Get["/{Application}"] = x =>
-            {
-                string application = x.Application.ToString();
-                var request = DataRequest<Application>.Get(application);
-                var response = messageBus.Request<DataRequest<Application>, DataResponse<Application>>(request);
-                return response.Entity;
-            };
+            Get["/{Application}"] = x => data.Get<Application>(x.Application.ToString());
 
             Put["/{Application}"] = x =>
             {
@@ -59,6 +49,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 request.Application = x.Application.ToString();
                 return messageBus.Request<ComponentChangeRequest, GenericResponse>(ComponentChangeRequest.Insert, request);
             };
+
             Delete["/{Application}/components/{Component}"] = x =>
             {
                 var request = new ComponentChangeRequest();

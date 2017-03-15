@@ -1,30 +1,24 @@
 using Acquaintance;
-using CrossStitch.Core.Messages.Core;
-using CrossStitch.Core.Messages.Data;
+using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Messages.StitchMonitor;
 using CrossStitch.Core.Models;
 using Nancy;
+using System.Linq;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
     public class StitchNancyModule : NancyModule
     {
+        // TODO: /stitchgroups/* endpoints where we can perform actions on entire groups
         public StitchNancyModule(IMessageBus messageBus)
             : base("/stitches")
         {
-            Get["/"] = _ =>
-            {
-                return messageBus.Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(DataRequest<StitchInstance>.GetAll());
-            };
+            var data = new DataHelperClient(messageBus);
 
-            Get["/{StitchId}"] = _ =>
-            {
-                string instance = _.StitchId.ToString();
-                var request = DataRequest<StitchInstance>.Get(instance);
-                var response = messageBus.Request<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(request);
-                return response.Entity;
-            };
+            Get["/"] = _ => data.GetAll<StitchInstance>().ToList();
+
+            Get["/{StitchId}"] = _ => data.Get<StitchInstance>(_.StitchId.ToString());
 
             Post["/{StitchId}/start"] = _ =>
             {

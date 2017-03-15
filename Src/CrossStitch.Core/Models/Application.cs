@@ -1,5 +1,4 @@
-﻿using CrossStitch.Core.Modules.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CrossStitch.Core.Models
@@ -15,7 +14,6 @@ namespace CrossStitch.Core.Models
         public long StoreVersion { get; set; }
         public string Name { get; set; }
         public string Zone { get; set; }
-        public string NodeId { get; set; }
         public List<ApplicationComponent> Components { get; set; }
 
         public bool AddComponent(string name)

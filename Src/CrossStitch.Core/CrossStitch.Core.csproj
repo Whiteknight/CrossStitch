@@ -72,7 +72,7 @@
     <Compile Include="Messages\StitchMonitor\StitchHealthRequest.cs" />
     <Compile Include="Models\ApplicationComponent.cs" />
     <Compile Include="Models\ApplicationComponentVersion.cs" />
-    <Compile Include="Models\StitchVersionName.cs" />
+    <Compile Include="Models\StitchGroupName.cs" />
     <Compile Include="ModuleCollection.cs" />
     <Compile Include="Modules\Alerts\AlertsModule.cs" />
     <Compile Include="Modules\Core\CoreModule.cs" />

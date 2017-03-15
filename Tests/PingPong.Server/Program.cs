@@ -47,7 +47,7 @@ namespace PingPong.Server
                 dataStorage.Save(ping, true);
                 dataStorage.Save(pong, true);
 
-                var data = new DataModule(dataStorage);
+                var data = new DataModule(node.MessageBus, dataStorage);
                 node.AddModule(data);
 
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();

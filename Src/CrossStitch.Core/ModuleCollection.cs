@@ -59,7 +59,7 @@ namespace CrossStitch.Core
             // These modules are necessary for basic operation, but defaulting is not
             // straight-forward, so we need to raise a warning.
             if (!_modules.ContainsKey(ModuleNames.Data))
-                AddWithWarning(new DataModule(new InMemoryDataStorage()));
+                AddWithWarning(new DataModule(core.MessageBus, new InMemoryDataStorage()));
         }
 
         public void WarnOnMissingModules(ModuleLog log)

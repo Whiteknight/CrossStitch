@@ -22,7 +22,7 @@ namespace HttpTest
 
                 var dataConfiguration = Configuration.GetDefault();
                 var dataStorage = new FolderDataStorage(dataConfiguration);
-                var data = new DataModule(dataStorage);
+                var data = new DataModule(core.MessageBus, dataStorage);
                 core.AddModule(data);
 
                 var stitchesConfiguration = StitchesConfiguration.GetDefault();

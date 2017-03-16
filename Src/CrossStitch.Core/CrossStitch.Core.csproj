@@ -58,6 +58,8 @@
   <ItemGroup>
     <Compile Include="Configuration\IModuleConfiguration.cs" />
     <Compile Include="Modules\RequestCoordinator\CoordinatorService.cs" />
+    <Compile Include="Modules\Stitches\StitchesService.cs" />
+    <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
     <Compile Include="Utility\IDataRepository.cs" />
     <Compile Include="Messages\Alerts\AlertEvent.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />

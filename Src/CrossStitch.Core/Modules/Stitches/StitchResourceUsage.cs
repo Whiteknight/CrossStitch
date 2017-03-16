@@ -2,6 +2,7 @@
 
 namespace CrossStitch.Core.Modules.Stitches
 {
+    // TODO: Move this to the Messages or Models namespace?
     public class StitchResourceUsage
     {
         public int ProcessId { get; set; }

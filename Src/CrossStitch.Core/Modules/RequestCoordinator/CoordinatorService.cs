@@ -1,4 +1,5 @@
-﻿using CrossStitch.Core.Messages.Stitches;
+﻿using System;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
 using System.Linq;

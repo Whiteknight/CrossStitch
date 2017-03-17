@@ -3,8 +3,6 @@ using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Utility;
 using CrossStitch.Stitch.V1.Core;
-using System;
-using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

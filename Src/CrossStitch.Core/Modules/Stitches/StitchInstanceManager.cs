@@ -53,7 +53,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 if (started)
                     stitchInstance.State = InstanceStateType.Started;
 
-                return InstanceActionResult.Result(instanceId, started);
+                return InstanceActionResult.Result(instanceId, started, stitchInstance);
             }
             catch (Exception e)
             {

@@ -59,6 +59,7 @@ namespace CrossStitch.Core.Modules.Timer
         public void Dispose()
         {
             Stop();
+            _waitHandle = null;
         }
 
         private void TimerTick(object state, bool timedOut)

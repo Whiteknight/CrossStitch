@@ -14,6 +14,7 @@ namespace CrossStitch.Stitch.V1.Core
         {
             _reader = reader;
             _readerThread = new Thread(ReaderThreadFunction);
+            _readerThread.IsBackground = true;
         }
 
         public event EventHandler<FromStitchMessageReceivedEventArgs> MessageReceived;

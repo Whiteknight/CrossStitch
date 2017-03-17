@@ -65,10 +65,8 @@ namespace CrossStitch.Core.Modules.Timer
         private void TimerTick(object state, bool timedOut)
         {
             if (!timedOut)
-            {
-                _log.LogDebug("Waiter has ended");
                 return;
-            }
+
             try
             {
                 long sequence = Interlocked.Increment(ref _sequence);

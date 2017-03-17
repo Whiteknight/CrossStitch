@@ -59,10 +59,12 @@ namespace CrossStitch.Stitch.V1.Stitch
             {
                 var coreProcess = Process.GetProcessById(corePid);
                 _coreMonitorThread = new Thread(CoreCheckerThreadFunction);
+                _coreMonitorThread.IsBackground = true;
                 _coreMonitorThread.Start(coreProcess);
             }
 
             _readerThread = new Thread(ReaderThreadFunction);
+            _readerThread.IsBackground = true;
             _readerThread.Start();
         }
 

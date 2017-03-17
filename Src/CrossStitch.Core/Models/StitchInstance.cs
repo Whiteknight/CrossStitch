@@ -15,6 +15,11 @@
         public string ExecutableArguments { get; set; }
         public InstanceStateType State { get; set; }
         public long LastHeartbeatReceived { get; set; }
+
+        public bool IsStartedOrRunning()
+        {
+            return State == InstanceStateType.Started || State == InstanceStateType.Running;
+        }
     }
 
     public enum InstanceStateType

@@ -62,7 +62,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public InstanceResponse StopInstance(EnrichedInstanceRequest request)
         {
-            var stopResult = _stitchInstanceManager.Stop(request.Id);
+            var stopResult = _stitchInstanceManager.Stop(request.StitchInstance);
             return InstanceResponse.Create(request, stopResult.Success);
         }
 

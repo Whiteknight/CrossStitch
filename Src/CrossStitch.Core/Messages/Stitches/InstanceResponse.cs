@@ -31,18 +31,30 @@ namespace CrossStitch.Core.Messages.Stitches
             };
         }
 
-        public static InstanceResponse Success(InstanceRequest request, string data = null)
+        public static InstanceResponse Success(InstanceRequest request, StitchInstance instance = null, string data = null)
         {
-            return Create(request, true, data);
+            return Create(request, true, instance, data);
         }
 
-        public static InstanceResponse Create(InstanceRequest request, bool success, string data = null)
+        public static InstanceResponse Success(CreateInstanceRequest request, StitchInstance createdInstance, string data = null)
+        {
+            return new InstanceResponse
+            {
+                Id = createdInstance.Id,
+                Instance = createdInstance,
+                Data = data,
+                IsSuccess = true
+            };
+        }
+
+        public static InstanceResponse Create(InstanceRequest request, bool success, StitchInstance instance = null, string data = null)
         {
             return new InstanceResponse
             {
                 IsSuccess = success,
                 Id = request.Id,
-                Data = data
+                Data = data,
+                Instance = instance
             };
         }
 

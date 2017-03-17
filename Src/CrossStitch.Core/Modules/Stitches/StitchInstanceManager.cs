@@ -59,21 +59,22 @@ namespace CrossStitch.Core.Modules.Stitches
             }
         }
 
-        public InstanceActionResult Stop(string instanceId)
+        public InstanceActionResult Stop(StitchInstance stitchInstance)
         {
             IStitchAdaptor adaptor = null;
             try
             {
-                bool found = _adaptors.TryGetValue(instanceId, out adaptor);
+                bool found = _adaptors.TryGetValue(stitchInstance.Id, out adaptor);
                 if (!found)
-                    return InstanceActionResult.NotFound(instanceId);
+                    return InstanceActionResult.NotFound(stitchInstance.Id);
                 adaptor.Stop();
+                stitchInstance.State = InstanceStateType.Stopped;
 
-                return InstanceActionResult.Result(instanceId, true);
+                return InstanceActionResult.Result(stitchInstance.Id, true, stitchInstance);
             }
             catch (Exception e)
             {
-                return InstanceActionResult.Failure(instanceId, adaptor != null, e);
+                return InstanceActionResult.Failure(stitchInstance.Id, adaptor != null, stitchInstance, e);
             }
         }
 
@@ -83,8 +84,27 @@ namespace CrossStitch.Core.Modules.Stitches
 
             foreach (var kvp in _adaptors)
             {
-                var result = Stop(kvp.Key);
-                results.Add(result);
+                try
+                {
+                    var adaptor = kvp.Value;
+                    adaptor.Stop();
+                    results.Add(new InstanceActionResult
+                    {
+                        Found = true,
+                        Success = true,
+                        InstanceId = kvp.Key
+                    });
+                } 
+                catch (Exception e)
+                {
+                    results.Add(new InstanceActionResult
+                    {
+                        Found = true,
+                        Success = false,
+                        InstanceId = kvp.Key,
+                        Exception = e
+                    });
+                }
             }
 
             return results;

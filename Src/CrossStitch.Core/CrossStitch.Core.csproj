@@ -62,6 +62,7 @@
     <Compile Include="Modules\RequestCoordinator\CoordinatorService.cs" />
     <Compile Include="Modules\Stitches\StitchesService.cs" />
     <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
+    <Compile Include="Modules\StitchMonitor\IHeartbeatSender.cs" />
     <Compile Include="Modules\StitchMonitor\StitchHeartbeatService.cs" />
     <Compile Include="Utility\IDataRepository.cs" />
     <Compile Include="Messages\Alerts\AlertEvent.cs" />

@@ -3,6 +3,7 @@ using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Messages.StitchMonitor;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.StitchMonitor
 {
@@ -20,7 +21,7 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             _configuration = configuration;
             var data = new DataHelperClient(core.MessageBus);
             var log = new ModuleLog(_messageBus, Name);
-            _heartbeatService = new StitchHeartbeatService(_messageBus, data, log);
+            _heartbeatService = new StitchHeartbeatService(data, log, new HeartbeatSender(_messageBus));
         }
 
         public string Name => ModuleNames.StitchMonitor;
@@ -68,6 +69,26 @@ namespace CrossStitch.Core.Modules.StitchMonitor
         {
             // TODO: Some kind of process to check the status of stitches, see how their LastHeartbeatId
             // compares to the current value, and send out alerts if things are looking unhealthy.
+        }
+
+        private class HeartbeatSender : IHeartbeatSender
+        {
+            private readonly IMessageBus _messageBus;
+
+            public HeartbeatSender(IMessageBus messageBus)
+            {
+                _messageBus = messageBus;
+            }
+
+            public bool SendHeartbeat(StitchInstance instance, long heartbeatId)
+            {
+                var request = new EnrichedInstanceRequest(instance.Id, instance)
+                {
+                    DataId = heartbeatId
+                };
+                var result = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelSendHeartbeat, request);
+                return result.IsSuccess;
+            }
         }
     }
 }

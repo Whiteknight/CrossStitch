@@ -1,5 +1,4 @@
-﻿using Acquaintance;
-using CrossStitch.Core.Messages.Stitches;
+﻿using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Messages.StitchMonitor;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
@@ -10,17 +9,17 @@ namespace CrossStitch.Core.Modules.StitchMonitor
 {
     public class StitchHeartbeatService
     {
-        private readonly IMessageBus _messageBus;
         private readonly IDataRepository _data;
         private readonly IModuleLog _log;
+        private readonly IHeartbeatSender _sender;
 
         private long _heartbeatId;
 
-        public StitchHeartbeatService(IMessageBus messageBus, IDataRepository data, IModuleLog log)
+        public StitchHeartbeatService(IDataRepository data, IModuleLog log, IHeartbeatSender sender)
         {
-            _messageBus = messageBus;
             _data = data;
             _log = log;
+            _sender = sender;
             _heartbeatId = 0;
         }
 
@@ -51,12 +50,8 @@ namespace CrossStitch.Core.Modules.StitchMonitor
 
             foreach (var instance in instances)
             {
-                var request = new EnrichedInstanceRequest(instance.Id, instance)
-                {
-                    DataId = id,
-                };
-                var result = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelSendHeartbeat, request);
-                if (!result.IsSuccess)
+                var ok = _sender.SendHeartbeat(instance, id);
+                if (!ok)
                     _data.Update<StitchInstance>(instance.Id, si => si.State = InstanceStateType.Missing);
             }
         }

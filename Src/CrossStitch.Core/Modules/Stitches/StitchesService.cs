@@ -45,6 +45,13 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             // Unzip a copy of the version from the library into the running base
             var result = _fileSystem.UnzipLibraryPackageToRunningBase(request.StitchInstance.GroupName, request.StitchInstance.Id);
+            if (!result.Success)
+            {
+                _log.LogError("Could not unzip library package for new stitch {0}", request.StitchInstance.GroupName);
+                return InstanceResponse.Failure(request);
+            }
+
+            // StitchInstanceManager auto-creates the necessary adaptor on Start. We don't need to do anything for it here.
             return InstanceResponse.Create(request, result.Success, result.Path);
         }
 

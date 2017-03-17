@@ -21,6 +21,16 @@ namespace CrossStitch.Core.Modules.Stitches
             };
         }
 
+        public static InstanceActionResult BadRequest()
+        {
+            return new InstanceActionResult
+            {
+                InstanceId = null,
+                Success = false,
+                Found = false
+            };
+        }
+
         public static InstanceActionResult Result(string instanceId, bool ok, StitchInstance instance = null)
         {
             return new InstanceActionResult

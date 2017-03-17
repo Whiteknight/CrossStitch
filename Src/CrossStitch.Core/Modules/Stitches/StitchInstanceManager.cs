@@ -32,13 +32,16 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public InstanceActionResult Start(StitchInstance stitchInstance)
         {
+            if (string.IsNullOrEmpty(stitchInstance?.Id))
+                return InstanceActionResult.BadRequest();
+
             string instanceId = stitchInstance.Id;
             IStitchAdaptor adaptor = null;
 
             try
             {
                 stitchInstance.State = InstanceStateType.Stopped;
-                adaptor = GetStitchAdaptor(stitchInstance);
+                adaptor = GetOrCreateStitchAdaptor(stitchInstance);
                 if (adaptor == null)
                     return InstanceActionResult.NotFound(instanceId);
 
@@ -110,25 +113,6 @@ namespace CrossStitch.Core.Modules.Stitches
             return results;
         }
 
-        //public InstanceActionResult CreateInstance(Instance instance)
-        //{
-
-        //    bool added = _instances.TryAdd(instance.Id, instance);
-        //    if (!added)
-        //        return InstanceActionResult.Failure();
-
-        //    bool ok = _fileSystem.UnzipLibraryPackageToRunningBase(application.Name, component.Name, version.Version, instance.Id);
-        //    if (!ok)
-        //        return InstanceActionResult.Failure();
-
-        //    return new InstanceActionResult
-        //    {
-        //        IsSuccess = true,
-        //        InstanceId = instance.Id
-        //    };
-        //    return null;
-        //}
-
         public InstanceActionResult RemoveInstance(string instanceId)
         {
             IStitchAdaptor adaptor;
@@ -151,13 +135,6 @@ namespace CrossStitch.Core.Modules.Stitches
             var usage = adaptor.GetResources();
             _fileSystem.GetInstanceDiskUsage(instanceId, usage);
             return usage;
-        }
-
-        public void Dispose()
-        {
-            StopAll();
-            _adaptors.Clear();
-            _adaptors = null;
         }
 
         public List<InstanceInformation> GetInstanceInformation()
@@ -192,7 +169,14 @@ namespace CrossStitch.Core.Modules.Stitches
             return _adaptors.Count;
         }
 
-        private IStitchAdaptor GetStitchAdaptor(StitchInstance stitchInstance)
+        public void Dispose()
+        {
+            StopAll();
+            _adaptors.Clear();
+            _adaptors = null;
+        }
+
+        private IStitchAdaptor GetOrCreateStitchAdaptor(StitchInstance stitchInstance)
         {
             IStitchAdaptor adaptor;
             bool found = _adaptors.TryGetValue(stitchInstance.Id, out adaptor);

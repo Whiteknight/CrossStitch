@@ -5,20 +5,6 @@ using System.Linq;
 
 namespace CrossStitch.Core.Modules.RequestCoordinator
 {
-    public interface IStitchRequestHandler
-    {
-        StitchInstance StartInstance(StitchInstance instance);
-        StitchInstance StopInstance(StitchInstance instance);
-        StitchInstance CreateInstance(StitchInstance instance);
-        PackageFileUploadResponse UploadStitchPackageFile(PackageFileUploadRequest request);
-    }
-
-    public interface IStitchEventNotifier
-    {
-        void StitchStarted(StitchInstance instance);
-        void StitchStopped(StitchInstance instance);
-    }
-    
     public class CoordinatorService
     {
         private readonly IDataRepository _data;

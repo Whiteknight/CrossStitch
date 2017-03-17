@@ -60,6 +60,8 @@
     <Compile Include="Messages\Stitches\CreateInstanceRequest.cs" />
     <Compile Include="Messages\Stitches\EnrichedInstanceRequest.cs" />
     <Compile Include="Modules\RequestCoordinator\CoordinatorService.cs" />
+    <Compile Include="Modules\RequestCoordinator\IStitchEventNotifier.cs" />
+    <Compile Include="Modules\RequestCoordinator\IStitchRequestHandler.cs" />
     <Compile Include="Modules\Stitches\StitchesService.cs" />
     <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
     <Compile Include="Modules\StitchMonitor\IHeartbeatSender.cs" />

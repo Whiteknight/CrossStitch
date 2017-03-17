@@ -36,17 +36,17 @@ namespace CrossStitch.Core.Modules.Stitches
                 .WithChannelName(PackageFileUploadRequest.ChannelUpload)
                 .Invoke(_service.UploadPackageFile));
 
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelCreateVerified)
+            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelCreate)
                 .Invoke(_service.CreateNewInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelStartVerified)
+            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStart)
                 .Invoke(_service.StartInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelStopVerified)
+            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStop)
                 .Invoke(_service.StopInstance));
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelSendHeartbeatVerified)
+            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelSendHeartbeat)
                 .Invoke(_service.SendHeartbeat));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b

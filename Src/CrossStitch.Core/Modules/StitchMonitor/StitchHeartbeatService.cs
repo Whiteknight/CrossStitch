@@ -1,6 +1,4 @@
 ﻿using Acquaintance;
-using Acquaintance.Timers;
-using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Messages.StitchMonitor;
 using CrossStitch.Core.Models;
@@ -53,13 +51,11 @@ namespace CrossStitch.Core.Modules.StitchMonitor
 
             foreach (var instance in instances)
             {
-                var request = new InstanceRequest
+                var request = new EnrichedInstanceRequest(instance.Id, instance)
                 {
                     DataId = id,
-                    Id = instance.Id,
-                    Instance = instance
                 };
-                var result = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelSendHeartbeatVerified, request);
+                var result = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelSendHeartbeat, request);
                 if (!result.IsSuccess)
                     _data.Update<StitchInstance>(instance.Id, si => si.State = InstanceStateType.Missing);
             }

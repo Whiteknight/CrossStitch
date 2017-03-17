@@ -1,11 +1,7 @@
-﻿using CrossStitch.Core.Modules.Data;
-
-namespace CrossStitch.Core.Models
+﻿namespace CrossStitch.Core.Models
 {
     public class StitchInstance : IDataEntity
     {
-        public const string ChannelCreate = "Create";
-
         public string Id { get; set; }
         public string Name { get; set; }
         public long StoreVersion { get; set; }

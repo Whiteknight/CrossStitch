@@ -79,9 +79,9 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 // TODO: Don't use StitchInstance as the DTO here. Use a smaller object with just
                 // the fields we need, validate that we have everything, and then map to a
                 // StitchInstance (in the RequestCoordinator?)
-                StitchInstance stitchInstance = this.Bind<StitchInstance>();
-                stitchInstance.GroupName = new StitchGroupName(x.Application.ToString(), x.Component.ToString(), x.Version.ToString());
-                return messageBus.Request<StitchInstance, StitchInstance>(StitchInstance.ChannelCreate, stitchInstance);
+                var request = this.Bind<CreateInstanceRequest>();
+                request.GroupName = new StitchGroupName(x.Application.ToString(), x.Component.ToString(), x.Version.ToString());
+                return messageBus.Request<CreateInstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreate, request);
             };
         }
     }

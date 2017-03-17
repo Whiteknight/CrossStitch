@@ -41,17 +41,17 @@ namespace CrossStitch.Core.Modules.Stitches
 
         // Creates an unzipped copy of the executable for the Stitch, and any other resource
         // allocation. Call StartInstance to start the instance
-        public InstanceResponse CreateNewInstance(InstanceRequest request)
+        public InstanceResponse CreateNewInstance(EnrichedInstanceRequest request)
         {
             // Unzip a copy of the version from the library into the running base
-            var result = _fileSystem.UnzipLibraryPackageToRunningBase(request.Instance.GroupName, request.Instance.Id);
+            var result = _fileSystem.UnzipLibraryPackageToRunningBase(request.StitchInstance.GroupName, request.StitchInstance.Id);
             return InstanceResponse.Create(request, result.Success, result.Path);
         }
 
         // Starts the instance. Must have been created with CreateNewInstance first
-        public InstanceResponse StartInstance(InstanceRequest request)
+        public InstanceResponse StartInstance(EnrichedInstanceRequest request)
         {
-            var result = _stitchInstanceManager.Start(request.Instance);
+            var result = _stitchInstanceManager.Start(request.StitchInstance);
             if (result.Success)
                 _log.LogInformation("Starting stitch {0} Id={1}", result.StitchInstance.GroupName, result.StitchInstance.Id);
             else
@@ -60,19 +60,16 @@ namespace CrossStitch.Core.Modules.Stitches
             return InstanceResponse.Create(request, result.Success);
         }
 
-        public InstanceResponse StopInstance(InstanceRequest request)
+        public InstanceResponse StopInstance(EnrichedInstanceRequest request)
         {
             var stopResult = _stitchInstanceManager.Stop(request.Id);
-            if (!stopResult.Success)
-                return InstanceResponse.Failure(request);
-
-            return InstanceResponse.Success(request);
+            return InstanceResponse.Create(request, stopResult.Success);
         }
 
-        public InstanceResponse SendHeartbeat(InstanceRequest arg)
+        public InstanceResponse SendHeartbeat(EnrichedInstanceRequest request)
         {
-            var result = _stitchInstanceManager.SendHeartbeat(arg.DataId, arg.Instance);
-            return InstanceResponse.Create(arg, result.Found && result.Success);
+            var result = _stitchInstanceManager.SendHeartbeat(request.DataId, request.StitchInstance);
+            return InstanceResponse.Create(request, result.Found && result.Success);
         }
 
         public void SendDataMessageToStitch(StitchDataMessage message)

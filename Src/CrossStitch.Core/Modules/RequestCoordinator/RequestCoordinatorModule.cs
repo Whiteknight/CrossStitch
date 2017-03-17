@@ -59,7 +59,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 .Invoke(DeleteComponent));
 
             // CRUD requests for Stitch Instances
-            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+            _subscriptions.Listen<CreateInstanceRequest, InstanceResponse>(l => l
                 .WithChannelName(InstanceRequest.ChannelCreate)
                 .Invoke(_service.CreateNewInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
@@ -131,9 +131,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
         private InstanceResponse CloneInstance(InstanceRequest request)
         {
             var instance = _service.CloneStitchInstance(request.Id);
-            if (instance == null)
-                return InstanceResponse.Failure(request);
-            return InstanceResponse.Success(request);
+            return InstanceResponse.Create(request, instance != null);
         }
     }
 }

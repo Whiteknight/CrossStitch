@@ -101,9 +101,13 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
 
         public bool DeleteStitchInstance(string stitchInstanceId)
         {
+            var instance = _data.Get<StitchInstance>(stitchInstanceId);
+            if (instance == null)
+                return false;
+
             // Tell the Stitches module to stop the Stitch
-            var request = new InstanceRequest { Id = stitchInstanceId };
-            var stopResponse = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStopVerified, request);
+            var request = new EnrichedInstanceRequest(stitchInstanceId, instance);
+            var stopResponse = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, request);
             if (!stopResponse.IsSuccess)
                 _log.LogError("Instance {0} could not be stopped", stitchInstanceId);
 
@@ -175,36 +179,51 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
         // track of applications. Actually, this might be included with node status broadcasts.
         // Investigate further.
 
-        public InstanceResponse CreateNewInstance(InstanceRequest request)
+        public InstanceResponse CreateNewInstance(CreateInstanceRequest request)
         {
-            if (request == null || request.Instance == null || !request.Instance.GroupName.IsVersionGroup())
+            if (request == null || !request.IsValid())
                 return InstanceResponse.Failure(request);
+
+            string applicationId = request.GroupName.ApplicationId;
+            string component = request.GroupName.Component;
+            string version = request.GroupName.Version;
+
             // Check to make sure we have a record for this version.
-            Application application = _data.Get<Application>(request.Instance.GroupName.ApplicationId);
+            Application application = _data.Get<Application>(applicationId);
             if (application == null)
                 return InstanceResponse.Failure(request);
-            if (!application.HasVersion(request.Instance.GroupName.Component, request.Instance.GroupName.Version))
+            if (!application.HasVersion(component, version))
                 return InstanceResponse.Failure(request);
 
             // Insert the new instance to the data module
-            request.Instance.Id = null;
-            request.Instance.StoreVersion = 0;
-            request.Instance = _data.Insert(request.Instance);
+            var instance = new StitchInstance
+            {
+                Id = null,
+                StoreVersion = 0,
+                Adaptor = request.Adaptor,
+                ExecutableArguments = request.ExecutableArguments ?? "",
+                ExecutableName = request.ExecutableName,
+                GroupName = request.GroupName,
+                LastHeartbeatReceived = 0,
+                Name = request.Name
+            };
+            instance = _data.Insert(instance);
+            var instanceRequest = new EnrichedInstanceRequest(instance);
 
             // Perform the actual create logic in the Stitches module
-            var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreateVerified, request);
+            var response = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreate, instanceRequest);
             if (!response.IsSuccess)
             {
-                _log.LogDebug("Stitch instance {0} could not be created", request.Instance.GroupName);
-                _data.Delete<StitchInstance>(request.Instance.Id);
+                _log.LogDebug("Stitch instance {0} could not be created", instanceRequest.StitchInstance.GroupName);
+                _data.Delete<StitchInstance>(instanceRequest.StitchInstance.Id);
                 return InstanceResponse.Failure(request);
             }
 
             // Update the stitch record in the Data module, log, and return
             var directoryPath = response.Data;
-            var instance = _data.Update<StitchInstance>(request.Instance.Id, i => i.DirectoryPath = directoryPath);
-            _log.LogDebug("Stitch instance {0} Id={1} created", request.Instance.GroupName, request.Instance.Id);
-            return InstanceResponse.Success(request);
+            instance = _data.Update<StitchInstance>(instanceRequest.StitchInstance.Id, i => i.DirectoryPath = directoryPath);
+            _log.LogDebug("Stitch instance {0} Id={1} created", instanceRequest.StitchInstance.GroupName, instanceRequest.StitchInstance.Id);
+            return InstanceResponse.Success(instanceRequest);
         }
 
         public InstanceResponse StartInstance(InstanceRequest request)
@@ -212,9 +231,9 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             var instance = _data.Get<StitchInstance>(request.Id);
             if (instance == null)
                 return InstanceResponse.Failure(request);
-            request.Instance = instance;
 
-            var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStartVerified, request);
+            var enriched = new EnrichedInstanceRequest(request, instance);
+            var response = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, enriched);
             if (response.IsSuccess)
             {
                 _messageBus.Publish(StitchInstanceEvent.ChannelStarted, new StitchInstanceEvent
@@ -238,9 +257,9 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             var instance = _data.Get<StitchInstance>(request.Id);
             if (instance == null)
                 return InstanceResponse.Failure(request);
-            request.Instance = instance;
 
-            var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStopVerified, request);
+            var instanceRequest = new EnrichedInstanceRequest(request, instance);
+            var response = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, instanceRequest);
             if (!response.IsSuccess)
             {
                 _log.LogError("Stitch instance {0} Id={3} could not be stopped", instance.GroupName, instance.Id);

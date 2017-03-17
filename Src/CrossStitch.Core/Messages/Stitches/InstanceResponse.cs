@@ -1,5 +1,5 @@
-﻿using System;
-using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Models;
+using System;
 
 namespace CrossStitch.Core.Messages.Stitches
 {
@@ -23,6 +23,14 @@ namespace CrossStitch.Core.Messages.Stitches
             return response;
         }
 
+        public static InstanceResponse Failure(CreateInstanceRequest request)
+        {
+            return new InstanceResponse
+            {
+                IsSuccess = false
+            };
+        }
+
         public static InstanceResponse Success(InstanceRequest request, string data = null)
         {
             return Create(request, true, data);
@@ -34,7 +42,17 @@ namespace CrossStitch.Core.Messages.Stitches
             {
                 IsSuccess = success,
                 Id = request.Id,
-                Instance = request.Instance,
+                Data = data
+            };
+        }
+
+        public static InstanceResponse Create(EnrichedInstanceRequest request, bool success, string data = null)
+        {
+            return new InstanceResponse
+            {
+                IsSuccess = success,
+                Id = request.Id,
+                Instance = request.StitchInstance,
                 Data = data
             };
         }

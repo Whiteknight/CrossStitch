@@ -27,7 +27,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
 
             var log = new ModuleLog(_messageBus, Name);
             var data = new DataHelperClient(_messageBus);
-            _service = new CoordinatorService(data, log, new StitchRequestHandler(_messageBus, log), new StitchEventNotifier(_messageBus));
+            _service = new CoordinatorService(core, data, log, new StitchRequestHandler(_messageBus, log), new StitchEventNotifier(_messageBus));
         }
 
         public RequestCoordinatorModule(CrossStitchCore core, CoordinatorService service)

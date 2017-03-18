@@ -67,7 +67,6 @@ namespace CrossStitch.Http.NancyFx.Handlers
                     Contents = Request.Files.Single().Value
                 };
 
-                // TODO: Validate the file. It should be a .zip
                 return messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
             };
 

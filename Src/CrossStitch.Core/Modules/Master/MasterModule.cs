@@ -3,10 +3,10 @@ using Acquaintance.Timers;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
-using System;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
+using System;
 using StitchDataMessage = CrossStitch.Core.Messages.StitchDataMessage;
 
 namespace CrossStitch.Core.Modules.Master
@@ -37,13 +37,6 @@ namespace CrossStitch.Core.Modules.Master
         // TODO: We need some kind of scoring metric for a node to report, which will take into 
         // account the number of processor cores and available RAM, and reduce by the number of
         // running stitches, so we can know which nodes to deploy stitches to.
-
-        // TODO: We need to be storing, through the Data Module, state instance of all nodes in the
-        // cluster, including the current running node.
-
-        // TODO: We need a model class that can represent the node with status, along with an array
-        // of application.component.version/StitchId running on that node. We can pass this model 
-        // over the network and store in the data module for usage here.
 
         /* Commands to support:
          * 1) Create N instances of a Stitch version, with automatic balancing across the cluster to nodes with space

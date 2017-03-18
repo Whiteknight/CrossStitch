@@ -8,6 +8,9 @@ namespace CrossStitch.Core.Models
         public string Name { get; set; }
         public long StoreVersion { get; set; }
 
+        public string OwnerNodeId { get; set; }
+        public string OwnerNodeName { get; set; }
+
         public StitchGroupName GroupName { get; set; }
 
         public InstanceAdaptorDetails Adaptor { get; set; }

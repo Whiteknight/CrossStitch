@@ -11,13 +11,15 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
         private readonly IModuleLog _log;
         private readonly IStitchRequestHandler _stitchRequests;
         private readonly IStitchEventNotifier _notifier;
+        private readonly CrossStitchCore _core;
 
-        public CoordinatorService(IDataRepository data, IModuleLog log, IStitchRequestHandler stitchRequests, IStitchEventNotifier notifier)
+        public CoordinatorService(CrossStitchCore core, IDataRepository data, IModuleLog log, IStitchRequestHandler stitchRequests, IStitchEventNotifier notifier)
         {
             _data = data;
             _log = log;
             _stitchRequests = stitchRequests;
             _notifier = notifier;
+            _core = core;
         }
 
         // On Core Initialization, get all stitch instances from the data store and start them.
@@ -126,6 +128,9 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             return true;
         }
 
+        // TODO: Ability to CloneTo a local instance to a remote node
+        // TODO: Ability to CloneFrom a remote instance to the local node
+        // This will require handling Clone requests through the master node
         public StitchInstance CloneStitchInstance(string stitchInstanceId)
         {
             // Get a copy of the instance data from the Data module
@@ -206,7 +211,9 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 Adaptor = request.Adaptor,
                 GroupName = request.GroupName,
                 LastHeartbeatReceived = 0,
-                Name = request.Name
+                Name = request.Name,
+                OwnerNodeName = _core.Name,
+                OwnerNodeId = _core.NodeId
             };
             instance = _data.Insert(instance);
             if (instance == null)

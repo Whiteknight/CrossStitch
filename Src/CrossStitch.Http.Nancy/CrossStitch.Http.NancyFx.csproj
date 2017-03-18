@@ -56,6 +56,7 @@
     <Compile Include="Handlers\InstanceModule.cs" />
     <Compile Include="Handlers\ModulesNancyModule.cs" />
     <Compile Include="Handlers\NodeRequestHandler.cs" />
+    <Compile Include="Handlers\StitchGroupNancyModule.cs" />
     <Compile Include="HttpConfiguration.cs" />
     <Compile Include="HttpModuleBootstrapper.cs" />
     <Compile Include="NancyHttpModule.cs" />

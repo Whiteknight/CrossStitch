@@ -59,6 +59,12 @@ namespace CrossStitch.Http.NancyFx.Handlers
                     StitchId = _.StitchId.ToString()
                 });
             };
+
+            Post["/{StitchId}/moveto/{NodeId}"] = _ =>
+            {
+                // TODO: Move the stitch instance to the specified node
+                return null;
+            };
         }
     }
 }

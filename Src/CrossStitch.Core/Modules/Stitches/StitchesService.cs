@@ -1,6 +1,7 @@
 ﻿using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Utility;
+using CrossStitch.Stitch.ProcessV1;
 using System;
 using System.Collections.Generic;
 
@@ -50,9 +51,11 @@ namespace CrossStitch.Core.Modules.Stitches
                 _log.LogError("Could not unzip library package for new stitch {0}", request.StitchInstance.GroupName);
                 return InstanceResponse.Failure(request);
             }
+            // TODO: We should move this into a class specific to ProcessV1 types.
+            request.StitchInstance.Adaptor.Parameters[Parameters.DirectoryPath] = result.Path;
 
             // StitchInstanceManager auto-creates the necessary adaptor on Start. We don't need to do anything for it here.
-            return InstanceResponse.Create(request, result.Success, result.Path);
+            return InstanceResponse.Create(request, result.Success);
         }
 
         // Starts the instance. Must have been created with CreateNewInstance first

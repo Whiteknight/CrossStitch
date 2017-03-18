@@ -1,4 +1,6 @@
-﻿namespace CrossStitch.Core.Models
+﻿using System.Collections.Generic;
+
+namespace CrossStitch.Core.Models
 {
     public class StitchInstance : IDataEntity
     {
@@ -10,9 +12,6 @@
 
         public InstanceAdaptorDetails Adaptor { get; set; }
 
-        public string DirectoryPath { get; set; }
-        public string ExecutableName { get; set; }
-        public string ExecutableArguments { get; set; }
         public InstanceStateType State { get; set; }
         public long LastHeartbeatReceived { get; set; }
 
@@ -40,14 +39,15 @@
         Missing
     }
 
-    public enum InstanceRunModeType
+    public enum AdaptorType
     {
         //AppDomain,
-        V1Process
+        ProcessV1
     }
 
     public class InstanceAdaptorDetails
     {
-        public InstanceRunModeType RunMode { get; set; }
+        public AdaptorType Type { get; set; }
+        public Dictionary<string, string> Parameters { get; set; }
     }
 }

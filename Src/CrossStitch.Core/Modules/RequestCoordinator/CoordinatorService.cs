@@ -1,5 +1,4 @@
-﻿using System;
-using CrossStitch.Core.Messages.Stitches;
+﻿using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
 using System.Linq;
@@ -204,8 +203,6 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 Id = null,
                 StoreVersion = 0,
                 Adaptor = request.Adaptor,
-                ExecutableArguments = request.ExecutableArguments ?? "",
-                ExecutableName = request.ExecutableName,
                 GroupName = request.GroupName,
                 LastHeartbeatReceived = 0,
                 Name = request.Name
@@ -226,8 +223,8 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 return InstanceResponse.Failure(request);
             }
 
-            // Update the stitch record in the Data module, log, and return
-            createdInstance = _data.Update<StitchInstance>(createdInstance.Id, i => i.DirectoryPath = createdInstance.DirectoryPath);
+            // Update the stitch record with updated data from the adaptor
+            instance = _data.Update<StitchInstance>(createdInstance.Id, i => i.Adaptor = createdInstance.Adaptor);
             _log.LogDebug("Stitch instance {0} Id={1} created", createdInstance.GroupName, createdInstance.Id);
             return InstanceResponse.Success(request, createdInstance);
         }

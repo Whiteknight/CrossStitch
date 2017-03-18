@@ -8,30 +8,40 @@ using System.Text;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
 {
-    public class V1ProcessStitchAdaptor : IStitchAdaptor
+    public class ProcessV1StitchAdaptor : IStitchAdaptor
     {
         private readonly StitchInstance _stitchInstance;
+        private readonly ProcessV1Parameters _parameters;
+
         public CoreStitchContext StitchContext { get; }
         private Process _process;
         private CoreMessageManager _channel;
 
-        public V1ProcessStitchAdaptor(StitchInstance stitchInstance, CoreStitchContext stitchContext)
+        public ProcessV1StitchAdaptor(StitchInstance stitchInstance, CoreStitchContext stitchContext)
         {
+            if (stitchInstance == null)
+                throw new ArgumentNullException(nameof(stitchInstance));
+            if (stitchContext == null)
+                throw new ArgumentNullException(nameof(stitchContext));
+
             _stitchInstance = stitchInstance;
             StitchContext = stitchContext;
+            _parameters = new ProcessV1Parameters(stitchInstance.Adaptor.Parameters);
         }
+
+        public AdaptorType Type => AdaptorType.ProcessV1;
 
         public bool Start()
         {
             int parentPid = Process.GetCurrentProcess().Id;
-            var executableName = Path.Combine(_stitchInstance.DirectoryPath, _stitchInstance.ExecutableName);
+            var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
             _process = new Process();
 
             _process.EnableRaisingEvents = true;
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.ErrorDialog = false;
             _process.StartInfo.FileName = executableName;
-            _process.StartInfo.WorkingDirectory = _stitchInstance.DirectoryPath;
+            _process.StartInfo.WorkingDirectory = _parameters.DirectoryPath;
             _process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             _process.StartInfo.UseShellExecute = false;
             _process.StartInfo.RedirectStandardError = true;
@@ -64,10 +74,10 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
             AddArgument(sb, Arguments.Component, _stitchInstance.GroupName.Component);
             AddArgument(sb, Arguments.Version, _stitchInstance.GroupName.Version);
             AddArgument(sb, Arguments.GroupName, _stitchInstance.GroupName.ToString());
-            if (!string.IsNullOrEmpty(_stitchInstance.ExecutableArguments))
+            if (!string.IsNullOrEmpty(_parameters.ExecutableArguments))
             {
                 sb.Append("-- ");
-                sb.Append(_stitchInstance.ExecutableArguments);
+                sb.Append(_parameters.ExecutableArguments);
             }
             return sb.ToString();
         }

@@ -5,6 +5,7 @@ using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using System;
+using System.Collections.Generic;
 
 namespace PingPong.Server
 {
@@ -23,10 +24,13 @@ namespace PingPong.Server
                     GroupName = new StitchGroupName("PingPong", "Ping", "1"),
                     Adaptor = new InstanceAdaptorDetails
                     {
-                        RunMode = InstanceRunModeType.V1Process
+                        Type = AdaptorType.ProcessV1,
+                        Parameters = new Dictionary<string, string>
+                        {
+                            { CrossStitch.Stitch.ProcessV1.Parameters.DirectoryPath, "." },
+                            { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "PingPong.Ping.exe" }
+                        }
                     },
-                    DirectoryPath = ".",
-                    ExecutableName = "PingPong.Ping.exe",
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
                 };
@@ -36,10 +40,13 @@ namespace PingPong.Server
                     GroupName = new StitchGroupName("PingPong", "Pong", "1"),
                     Adaptor = new InstanceAdaptorDetails
                     {
-                        RunMode = InstanceRunModeType.V1Process
+                        Type = AdaptorType.ProcessV1,
+                        Parameters = new Dictionary<string, string>
+                        {
+                            { CrossStitch.Stitch.ProcessV1.Parameters.DirectoryPath, "." },
+                            { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "PingPong.Pong.exe" }
+                        }
                     },
-                    DirectoryPath = ".",
-                    ExecutableName = "PingPong.Pong.exe",
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
                 };

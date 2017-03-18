@@ -46,26 +46,27 @@
   <ItemGroup>
     <Compile Include="Events\EventHandlerExtensions.cs" />
     <Compile Include="Events\PayloadEventArgs.cs" />
+    <Compile Include="ProcessV1\Parameters.cs" />
     <Compile Include="Utility\JsonUtility.cs" />
-    <Compile Include="V1\Arguments.cs" />
-    <Compile Include="V1\Core\CoreMessageManager.cs" />
-    <Compile Include="V1\Core\CoreStitchContext.cs" />
-    <Compile Include="V1\Core\FromStitchMessageReader.cs" />
-    <Compile Include="V1\Core\FromStitchMessageReceivedEventArgs.cs" />
-    <Compile Include="V1\Core\FromStitchReaderThread.cs" />
-    <Compile Include="V1\Core\HeartbeatSyncReceivedEventArgs.cs" />
-    <Compile Include="V1\Core\LogsReceivedEventArgs.cs" />
-    <Compile Include="V1\Core\RequestResponseReceivedEventArgs.cs" />
-    <Compile Include="V1\Core\StitchProcessEventArgs.cs" />
-    <Compile Include="V1\Stitch\HeartbeatReceivedEventArgs.cs" />
-    <Compile Include="V1\Stitch\StitchMessageManager.cs" />
+    <Compile Include="ProcessV1\Arguments.cs" />
+    <Compile Include="ProcessV1\Core\CoreMessageManager.cs" />
+    <Compile Include="ProcessV1\Core\CoreStitchContext.cs" />
+    <Compile Include="ProcessV1\Core\FromStitchMessageReader.cs" />
+    <Compile Include="ProcessV1\Core\FromStitchMessageReceivedEventArgs.cs" />
+    <Compile Include="ProcessV1\Core\FromStitchReaderThread.cs" />
+    <Compile Include="ProcessV1\Core\HeartbeatSyncReceivedEventArgs.cs" />
+    <Compile Include="ProcessV1\Core\LogsReceivedEventArgs.cs" />
+    <Compile Include="ProcessV1\Core\RequestResponseReceivedEventArgs.cs" />
+    <Compile Include="ProcessV1\Core\StitchProcessEventArgs.cs" />
+    <Compile Include="ProcessV1\Stitch\HeartbeatReceivedEventArgs.cs" />
+    <Compile Include="ProcessV1\Stitch\StitchMessageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="V1\FromStitchMessage.cs" />
-    <Compile Include="V1\Stitch\IToStitchMessageProcessor.cs" />
-    <Compile Include="V1\Stitch\ToStitchMessageReader.cs" />
-    <Compile Include="V1\Stitch\FromStitchMessageSender.cs" />
-    <Compile Include="V1\ToStitchMessage.cs" />
-    <Compile Include="V1\Core\ToStitchMessageSender.cs" />
+    <Compile Include="ProcessV1\FromStitchMessage.cs" />
+    <Compile Include="ProcessV1\Stitch\IToStitchMessageProcessor.cs" />
+    <Compile Include="ProcessV1\Stitch\ToStitchMessageReader.cs" />
+    <Compile Include="ProcessV1\Stitch\FromStitchMessageSender.cs" />
+    <Compile Include="ProcessV1\ToStitchMessage.cs" />
+    <Compile Include="ProcessV1\Core\ToStitchMessageSender.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

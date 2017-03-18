@@ -62,10 +62,12 @@
     <Compile Include="Modules\RequestCoordinator\CoordinatorService.cs" />
     <Compile Include="Modules\RequestCoordinator\IStitchEventNotifier.cs" />
     <Compile Include="Modules\RequestCoordinator\IStitchRequestHandler.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1Parameters.cs" />
     <Compile Include="Modules\Stitches\StitchesService.cs" />
     <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
     <Compile Include="Modules\StitchMonitor\IHeartbeatSender.cs" />
     <Compile Include="Modules\StitchMonitor\StitchHeartbeatService.cs" />
+    <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
     <Compile Include="Utility\IDataRepository.cs" />
     <Compile Include="Messages\Alerts\AlertEvent.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />
@@ -112,7 +114,7 @@
     <Compile Include="Messages\Stitches\InstanceInformation.cs" />
     <Compile Include="Messages\Stitches\InstanceInformationRequest.cs" />
     <Compile Include="Messages\Stitches\PackageFileUploadRequest.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\V1ProcessStitchAdaptor.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1StitchAdaptor.cs" />
     <Compile Include="Modules\Data\Folders\DataConfiguration.cs" />
     <Compile Include="Modules\Data\DataModule.cs" />
     <Compile Include="Models\Application.cs" />

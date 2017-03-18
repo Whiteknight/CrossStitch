@@ -4,7 +4,9 @@ using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
+using CrossStitch.Stitch.ProcessV1;
 using System;
+using System.Collections.Generic;
 
 namespace StitchStart.Server
 {
@@ -23,10 +25,13 @@ namespace StitchStart.Server
                     GroupName = new StitchGroupName("StitchStart", "Client", "1"),
                     Adaptor = new InstanceAdaptorDetails
                     {
-                        RunMode = InstanceRunModeType.V1Process
+                        Type = AdaptorType.ProcessV1,
+                        Parameters = new Dictionary<string, string>
+                        {
+                            { Parameters.DirectoryPath, "." },
+                            { Parameters.ExecutableName, "StitchStart.Client.exe" }
+                        }
                     },
-                    DirectoryPath = ".",
-                    ExecutableName = "StitchStart.Client.exe",
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
                 }, true);

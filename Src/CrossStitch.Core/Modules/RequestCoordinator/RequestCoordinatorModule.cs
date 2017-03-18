@@ -1,11 +1,11 @@
-﻿using System;
-using Acquaintance;
+﻿using Acquaintance;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.CoordinatedRequests;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
+using System;
 
 namespace CrossStitch.Core.Modules.RequestCoordinator
 {
@@ -187,7 +187,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 var response = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreate, instanceRequest);
                 if (response.IsSuccess == false)
                     return null;
-                instance.DirectoryPath = response.Data;
+                instance.Adaptor = response.Instance.Adaptor;
                 return instance;
             }
 

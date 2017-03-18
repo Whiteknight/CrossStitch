@@ -9,12 +9,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
         public IStitchAdaptor Create(StitchInstance stitchInstance)
         {
             var context = new CoreStitchContext(stitchInstance.Id);
-            switch (stitchInstance.Adaptor.RunMode)
+            switch (stitchInstance.Adaptor.Type)
             {
                 //case InstanceRunModeType.AppDomain:
                 //    return new AppDomainAppAdaptor(instance, _network);
-                case InstanceRunModeType.V1Process:
-                    return new V1ProcessStitchAdaptor(stitchInstance, context);
+                case AdaptorType.ProcessV1:
+                    return new ProcessV1StitchAdaptor(stitchInstance, context);
             }
 
             throw new Exception("Run mode not supported");

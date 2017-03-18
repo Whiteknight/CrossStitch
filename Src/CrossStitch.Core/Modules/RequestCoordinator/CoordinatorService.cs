@@ -163,6 +163,7 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 return new PackageFileUploadResponse(false, null);
             request.Application = application;
 
+            // TODO: Validate the file. It should be a .zip
             // Save the file and generate a unique Version name
             var response = _stitchRequests.UploadStitchPackageFile(request);
             if (!response.Success)
@@ -172,8 +173,8 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
             }
 
             // Update the Application record with the new Version
-            _data.Update<Application>(request.ApplicationId, a => a.AddVersion(request.Component, response.Version));
-            _log.LogDebug("Uploaded package file {0}:{1}:{2}", request.ApplicationId, request.Component, response.Version);
+            _data.Update<Application>(request.ApplicationId, a => a.AddVersion(request.Component, response.GroupName.Version));
+            _log.LogDebug("Uploaded package file {0}:{1}:{2}", request.ApplicationId, request.Component, response.GroupName.Version);
             return response;
         }
 

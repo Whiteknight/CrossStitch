@@ -1,5 +1,5 @@
-﻿using System.IO;
-using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Models;
+using System.IO;
 
 namespace CrossStitch.Core.Messages.Stitches
 {
@@ -15,13 +15,13 @@ namespace CrossStitch.Core.Messages.Stitches
 
     public class PackageFileUploadResponse
     {
-        public PackageFileUploadResponse(bool success, string version)
+        public PackageFileUploadResponse(bool success, StitchGroupName groupName)
         {
             Success = success;
-            Version = version;
+            GroupName = groupName;
         }
 
-        public bool Success { get; private set; }
-        public string Version { get; private set; }
+        public bool Success { get; }
+        public StitchGroupName GroupName { get; }
     }
 }

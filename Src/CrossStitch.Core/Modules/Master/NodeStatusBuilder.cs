@@ -1,6 +1,6 @@
 ﻿using CrossStitch.Core.Models;
-using System.Linq;
 using CrossStitch.Core.Utility;
+using System.Linq;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -24,8 +24,8 @@ namespace CrossStitch.Core.Modules.Master
 
             var message = new NodeStatus
             {
-                Id = _core.NodeId.ToString(),
-                Name = _core.NodeId.ToString(),
+                Id = _core.NodeId,
+                Name = _core.Name,
                 RunningModules = modules,
                 Instances = stitches
                     .Select(si => new Messages.Stitches.InstanceInformation

@@ -14,6 +14,8 @@ namespace CrossStitch.Core.Models
         public long StoreVersion { get; set; }
         public string Name { get; set; }
         public string Zone { get; set; }
+        public StitchGroupName GroupName => new StitchGroupName(Id, null, null);
+
         public List<ApplicationComponent> Components { get; set; }
 
         public bool AddComponent(string name)
@@ -25,7 +27,7 @@ namespace CrossStitch.Core.Models
             Components.Add(new ApplicationComponent
             {
                 Name = name,
-                FullName = Name + "." + name
+                GroupName = new StitchGroupName(Id, name, null)
             });
             return true;
         }

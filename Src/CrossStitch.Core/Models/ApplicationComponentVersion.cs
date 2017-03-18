@@ -3,6 +3,6 @@
     public class ApplicationComponentVersion
     {
         public string Version { get; set; }
-        public string FullName { get; set; }
+        public StitchGroupName GroupName { get; set; }
     }
 }

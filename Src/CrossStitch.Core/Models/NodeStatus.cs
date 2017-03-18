@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using CrossStitch.Core.Messages.Stitches;
-using CrossStitch.Core.Modules.Data;
+﻿using CrossStitch.Core.Messages.Stitches;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Models
 {

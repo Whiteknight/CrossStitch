@@ -1,6 +1,4 @@
-﻿using CrossStitch.Core.Modules.Data;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace CrossStitch.Core.Models
@@ -13,7 +11,7 @@ namespace CrossStitch.Core.Models
         }
 
         public string Name { get; set; }
-        public string FullName { get; set; }
+        public StitchGroupName GroupName { get; set; }
 
         public List<ApplicationComponentVersion> Versions { get; set; }
 
@@ -29,7 +27,7 @@ namespace CrossStitch.Core.Models
             Versions.Add(new ApplicationComponentVersion
             {
                 Version = versionId,
-                FullName = FullName + "." + versionId
+                GroupName = new StitchGroupName(GroupName.ApplicationId, GroupName.Component, versionId)
             });
         }
 

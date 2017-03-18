@@ -37,7 +37,8 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             // Save the file and generate a unique Version name
             string version = _fileSystem.SavePackageToLibrary(request.ApplicationId, request.Component, request.Contents);
-            return new PackageFileUploadResponse(true, version);
+
+            return new PackageFileUploadResponse(true, new Models.StitchGroupName(request.ApplicationId, request.Component, version));
         }
 
         // Creates an unzipped copy of the executable for the Stitch, and any other resource

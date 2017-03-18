@@ -21,6 +21,7 @@ namespace CrossStitch.Core
         {
             Configuration = configuration ?? NodeConfiguration.GetDefault();
             NodeId = GetNodeId(Configuration);
+            Name = GetFriendlyNodeName(Configuration, NodeId);
             MessageBus = new Acquaintance.MessageBus();
 
             CoreModule = new CoreModule(this, MessageBus);
@@ -30,6 +31,7 @@ namespace CrossStitch.Core
         }
 
         public string NodeId { get; }
+        public string Name { get; }
 
         public IMessageBus MessageBus { get; }
 
@@ -106,6 +108,25 @@ namespace CrossStitch.Core
             try
             {
                 System.IO.File.WriteAllText(nodeIdFilePath, nodeId);
+            }
+            catch { }
+            return nodeId;
+        }
+
+        private static string GetFriendlyNodeName(NodeConfiguration config, string nodeId)
+        {
+            const string fileName = "NODENAME";
+            string filePath = System.IO.Path.Combine(config.StateFileFolder, fileName);
+            if (System.IO.File.Exists(filePath))
+            {
+                var text = System.IO.File.ReadAllLines(filePath).FirstOrDefault();
+                if (text != null)
+                    return text;
+            }
+
+            try
+            {
+                System.IO.File.WriteAllText(filePath, nodeId);
             }
             catch { }
             return nodeId;

@@ -4,7 +4,9 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Utility;
 using System;
 using StitchDataMessage = CrossStitch.Core.Messages.StitchDataMessage;
@@ -79,6 +81,10 @@ namespace CrossStitch.Core.Modules.Master
                 .WithChannelName(CoreEvent.ChannelInitialized)
                 .Invoke(m => GenerateAndPublishNodeStatus()));
 
+            _subscriptions.Listen<CommandRequest, CommandResponse>(b => b
+                .OnDefaultChannel()
+                .Invoke(_service.DispatchCommandRequest));
+
             _subscriptions.Subscribe<ObjectsReceivedEvent<NodeStatus>>(b => b
                 .WithChannelName(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
                 .Invoke(m => _service.SaveNodeStatus(m.Object)));
@@ -122,6 +128,48 @@ namespace CrossStitch.Core.Modules.Master
         {
             foreach (var outMessage in _service.EnrichStitchDataMessageWithAddress(message))
                 _messageBus.PublishMessage(outMessage);
+        }
+
+        private class StitchRequestHandler : IStitchRequestHandler
+        {
+            private readonly IMessageBus _messageBus;
+            private readonly IModuleLog _log;
+
+            public StitchRequestHandler(IMessageBus messageBus, IModuleLog log)
+            {
+                _messageBus = messageBus;
+                _log = log;
+            }
+
+            public bool StartInstance(string instanceId)
+            {
+                var request = new InstanceRequest
+                {
+                    Id = instanceId
+                };
+                var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, request);
+                return response.IsSuccess;
+            }
+
+            public bool StopInstance(string instanceId)
+            {
+                var request = new InstanceRequest
+                {
+                    Id = instanceId
+                };
+                var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, request);
+                return response.IsSuccess;
+            }
+
+            public bool RemoveInstance(string instanceId)
+            {
+                var request = new InstanceRequest
+                {
+                    Id = instanceId
+                };
+                var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelDelete, request);
+                return response.IsSuccess;
+            }
         }
     }
 }

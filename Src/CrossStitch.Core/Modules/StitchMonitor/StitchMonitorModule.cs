@@ -80,14 +80,9 @@ namespace CrossStitch.Core.Modules.StitchMonitor
                 _messageBus = messageBus;
             }
 
-            public bool SendHeartbeat(StitchInstance instance, long heartbeatId)
+            public void SendHeartbeat(long heartbeatId)
             {
-                var request = new EnrichedInstanceRequest(instance.Id, instance)
-                {
-                    DataId = heartbeatId
-                };
-                var result = _messageBus.Request<EnrichedInstanceRequest, InstanceResponse>(InstanceRequest.ChannelSendHeartbeat, request);
-                return result.IsSuccess;
+                _messageBus.Publish(new SendHeartbeatEvent(heartbeatId));
             }
         }
     }

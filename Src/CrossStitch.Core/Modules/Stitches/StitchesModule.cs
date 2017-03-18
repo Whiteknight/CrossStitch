@@ -2,6 +2,8 @@
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Stitches;
+using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using System.Collections.Generic;
 
@@ -21,7 +23,9 @@ namespace CrossStitch.Core.Modules.Stitches
             var manager = new StitchInstanceManager(fileSystem);
             var log = new ModuleLog(_messageBus, Name);
             var observer = new StitchEventObserver(_messageBus, log);
-            _service = new StitchesService(fileSystem, manager, observer, log);
+            var data = new DataHelperClient(core.MessageBus);
+            var notifier = new StitchEventNotifier(_messageBus);
+            _service = new StitchesService(core, data, fileSystem, manager, observer, log, notifier);
         }
 
         public string Name => ModuleNames.Stitches;
@@ -29,31 +33,44 @@ namespace CrossStitch.Core.Modules.Stitches
         public void Start()
         {
             _subscriptions = new SubscriptionCollection(_messageBus);
+
+            // On Core initialization, startup all necessary Stitches
+            _subscriptions.Subscribe<CoreEvent>(b => b
+                .WithChannelName(CoreEvent.ChannelInitialized)
+                .Invoke(m => _service.StartRunningStitchesOnStartup())
+                .OnWorkerThread());
+
+            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
+                .OnDefaultChannel()
+                .Invoke(_service.UploadStitchPackageFile));
+
+            _subscriptions.Listen<CreateInstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelCreate)
+                .Invoke(_service.CreateNewInstance));
+
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelClone)
+                .Invoke(_service.CloneInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStart)
+                .Invoke(_service.StartInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelStop)
+                .Invoke(_service.StopInstance));
+
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(l => l
                 .OnDefaultChannel()
                 .Invoke(m => _service.GetInstanceInformation()));
-            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
-                .WithChannelName(PackageFileUploadRequest.ChannelUpload)
-                .Invoke(_service.UploadPackageFile));
-
-            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelCreate)
-                .Invoke(_service.CreateNewInstance));
-            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelStart)
-                .Invoke(_service.StartInstance));
-            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelStop)
-                .Invoke(_service.StopInstance));
-            _subscriptions.Listen<EnrichedInstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelSendHeartbeat)
-                .Invoke(_service.SendHeartbeat));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()
                 .Invoke(_service.SendDataMessageToStitch)
                 .OnWorkerThread()
                 .WithFilter(m => !string.IsNullOrEmpty(m.ToStitchInstanceId)));
+
+            _subscriptions.Subscribe<SendHeartbeatEvent>(b => b
+                .OnDefaultChannel()
+                .Invoke(m => _service.SendHeartbeat(m.HeartbeatId)));
         }
 
         public void Stop()
@@ -75,6 +92,32 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             Stop();
             _service.Dispose();
+        }
+
+        private class StitchEventNotifier : IStitchEventNotifier
+        {
+            private readonly IMessageBus _messageBus;
+
+            public StitchEventNotifier(IMessageBus messageBus)
+            {
+                _messageBus = messageBus;
+            }
+
+            public void StitchStarted(StitchInstance instance)
+            {
+                _messageBus.Publish(StitchInstanceEvent.ChannelStarted, new StitchInstanceEvent
+                {
+                    InstanceId = instance.Id
+                });
+            }
+
+            public void StitchStopped(StitchInstance instance)
+            {
+                _messageBus.Publish(StitchInstanceEvent.ChannelStopped, new StitchInstanceEvent
+                {
+                    InstanceId = instance.Id
+                });
+            }
         }
     }
 }

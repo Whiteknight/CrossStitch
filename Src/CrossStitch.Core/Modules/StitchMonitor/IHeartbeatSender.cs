@@ -1,9 +1,7 @@
-﻿using CrossStitch.Core.Models;
-
-namespace CrossStitch.Core.Modules.StitchMonitor
+﻿namespace CrossStitch.Core.Modules.StitchMonitor
 {
     public interface IHeartbeatSender
     {
-        bool SendHeartbeat(StitchInstance instance, long heartbeatId);
+        void SendHeartbeat(long heartbeatId);
     }
 }

@@ -12,4 +12,14 @@
         public string Id { get; set; }
         public long DataId { get; set; }
     }
+
+    public class SendHeartbeatEvent
+    {
+        public SendHeartbeatEvent(long heartbeatId)
+        {
+            HeartbeatId = heartbeatId;
+        }
+
+        public long HeartbeatId { get; }
+    }
 }

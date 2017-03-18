@@ -57,11 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\IModuleConfiguration.cs" />
+    <Compile Include="Messages\Master\CommandRequest.cs" />
     <Compile Include="Messages\Stitches\CreateInstanceRequest.cs" />
-    <Compile Include="Messages\Stitches\EnrichedInstanceRequest.cs" />
     <Compile Include="Modules\RequestCoordinator\CoordinatorService.cs" />
-    <Compile Include="Modules\RequestCoordinator\IStitchEventNotifier.cs" />
-    <Compile Include="Modules\RequestCoordinator\IStitchRequestHandler.cs" />
+    <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
+    <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
     <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1Parameters.cs" />
     <Compile Include="Modules\Stitches\StitchesService.cs" />
     <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
@@ -78,7 +78,6 @@
     <Compile Include="Messages\Data\DataResponseType.cs" />
     <Compile Include="Messages\Backplane\ClusterMemberEvent.cs" />
     <Compile Include="Messages\Backplane\ZoneMemberEvent.cs" />
-    <Compile Include="Messages\Master\StitchDataMessage.cs" />
     <Compile Include="Messages\StitchDataMessage.cs" />
     <Compile Include="Messages\Stitches\InstanceRequest.cs" />
     <Compile Include="Messages\StitchMonitor\StitchHealthRequest.cs" />

@@ -57,16 +57,5 @@ namespace CrossStitch.Core.Messages.Stitches
                 Instance = instance
             };
         }
-
-        public static InstanceResponse Create(EnrichedInstanceRequest request, bool success, string data = null)
-        {
-            return new InstanceResponse
-            {
-                IsSuccess = success,
-                Id = request.Id,
-                Instance = request.StitchInstance,
-                Data = data
-            };
-        }
     }
 }

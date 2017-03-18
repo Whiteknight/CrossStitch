@@ -7,6 +7,7 @@ using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -97,7 +98,7 @@ namespace CrossStitch.Core.Modules.Stitches
                         Success = true,
                         InstanceId = kvp.Key
                     });
-                } 
+                }
                 catch (Exception e)
                 {
                     results.Add(new InstanceActionResult
@@ -142,15 +143,12 @@ namespace CrossStitch.Core.Modules.Stitches
             throw new NotImplementedException();
         }
 
-        public InstanceActionResult SendHeartbeat(long heartbeatId, StitchInstance instance)
+        public void SendHeartbeat(long heartbeatId)
         {
-            IStitchAdaptor adaptor;
-            bool found = _adaptors.TryGetValue(instance.Id, out adaptor);
-            if (!found)
-                return InstanceActionResult.NotFound(instance.Id);
-
-            adaptor.SendHeartbeat(heartbeatId);
-            return InstanceActionResult.Result(instance.Id, true, instance);
+            foreach (var adaptor in _adaptors.Values.ToList())
+            {
+                adaptor.SendHeartbeat(heartbeatId);
+            }
         }
 
         public InstanceActionResult SendDataMessage(StitchDataMessage message)

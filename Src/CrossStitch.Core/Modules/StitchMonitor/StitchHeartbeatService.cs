@@ -2,7 +2,6 @@
 using CrossStitch.Core.Messages.StitchMonitor;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
-using System.Linq;
 using System.Threading;
 
 namespace CrossStitch.Core.Modules.StitchMonitor
@@ -44,16 +43,8 @@ namespace CrossStitch.Core.Modules.StitchMonitor
         {
             long id = Interlocked.Increment(ref _heartbeatId);
             _log.LogDebug("Sending heartbeat {0}", id);
-            var instances = _data.GetAll<StitchInstance>()
-                .Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started)
-                .ToList();
 
-            foreach (var instance in instances)
-            {
-                var ok = _sender.SendHeartbeat(instance, id);
-                if (!ok)
-                    _data.Update<StitchInstance>(instance.Id, si => si.State = InstanceStateType.Missing);
-            }
+            _sender.SendHeartbeat(id);
         }
 
         public StitchHealthResponse GetStitchHealthReport(StitchHealthRequest arg)

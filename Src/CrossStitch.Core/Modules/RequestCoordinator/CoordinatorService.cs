@@ -1,5 +1,4 @@
-﻿using CrossStitch.Core.Messages.Stitches;
-using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
 using System.Linq;
 
@@ -9,33 +8,13 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
     {
         private readonly IDataRepository _data;
         private readonly IModuleLog _log;
-        private readonly IStitchRequestHandler _stitchRequests;
-        private readonly IStitchEventNotifier _notifier;
         private readonly CrossStitchCore _core;
 
-        public CoordinatorService(CrossStitchCore core, IDataRepository data, IModuleLog log, IStitchRequestHandler stitchRequests, IStitchEventNotifier notifier)
+        public CoordinatorService(CrossStitchCore core, IDataRepository data, IModuleLog log)
         {
             _data = data;
             _log = log;
-            _stitchRequests = stitchRequests;
-            _notifier = notifier;
             _core = core;
-        }
-
-        // On Core Initialization, get all stitch instances from the data store and start them.
-        public void StartRunningStitchesOnStartup()
-        {
-            _log.LogDebug("Starting startup stitches");
-            var instances = _data.GetAll<StitchInstance>();
-            foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
-            {
-                var startedInstance = _stitchRequests.StartInstance(instance);
-                if (startedInstance.IsStartedOrRunning())
-                    _notifier.StitchStarted(instance);
-                else
-                    _data.Save(startedInstance);
-            }
-            _log.LogDebug("Startup stitches started");
         }
 
         public Application CreateApplication(string name)
@@ -99,179 +78,6 @@ namespace CrossStitch.Core.Modules.RequestCoordinator
                 updated = a.AddComponent(component);
             });
             return application != null && updated;
-        }
-
-        public bool DeleteStitchInstance(string stitchInstanceId)
-        {
-            var instance = _data.Get<StitchInstance>(stitchInstanceId);
-            if (instance == null)
-                return false;
-
-            // Tell the Stitches module to stop the Stitch
-            var stoppedInstance = _stitchRequests.StopInstance(instance);
-            if (stoppedInstance.State != InstanceStateType.Stopped)
-            {
-                _log.LogError("Instance {0} could not be stopped", stitchInstanceId);
-                return false;
-            }
-
-            // Delete the record from the Data module
-            bool deleted = _data.Delete<StitchInstance>(stitchInstanceId);
-            if (!deleted)
-            {
-                _log.LogError("Instance {0} could not be deleted", stitchInstanceId);
-                return false;
-            }
-
-            _log.LogInformation("Instance {0} stopped and deleted successfully", stitchInstanceId);
-
-            return true;
-        }
-
-        // TODO: Ability to CloneTo a local instance to a remote node
-        // TODO: Ability to CloneFrom a remote instance to the local node
-        // This will require handling Clone requests through the master node
-        public StitchInstance CloneStitchInstance(string stitchInstanceId)
-        {
-            // Get a copy of the instance data from the Data module
-            var instance = _data.Get<StitchInstance>(stitchInstanceId);
-            if (instance == null)
-            {
-                _log.LogError("Could not clone instance {0}, instance does not exist.", stitchInstanceId);
-                return null;
-            }
-
-            // Update the model to be fresh
-            instance.Id = null;
-            instance.StoreVersion = 0;
-
-            // Insert the fresh version to the Data module
-            instance = _data.Insert(instance);
-            if (instance == null)
-            {
-                _log.LogError("Could not clone instance {0}, data could not be saved.", stitchInstanceId);
-                return null;
-            }
-
-            // Report success
-            _log.LogInformation("Instance {0} cloned to {1}", stitchInstanceId, instance.Id);
-            return instance;
-        }
-
-        public PackageFileUploadResponse UploadStitchPackageFile(PackageFileUploadRequest request)
-        {
-            // Get the application and make sure we have a Component record
-            var application = _data.Get<Application>(request.ApplicationId);
-            if (application == null)
-                return new PackageFileUploadResponse(false, null);
-            if (application.Components.All(c => c.Name != request.Component))
-                return new PackageFileUploadResponse(false, null);
-            request.Application = application;
-
-            // TODO: Validate the file. It should be a .zip
-            // Save the file and generate a unique Version name
-            var response = _stitchRequests.UploadStitchPackageFile(request);
-            if (!response.Success)
-            {
-                _log.LogDebug("Package file upload  {0}:{1} failed", request.ApplicationId, request.Component);
-                return response;
-            }
-
-            // Update the Application record with the new Version
-            _data.Update<Application>(request.ApplicationId, a => a.AddVersion(request.Component, response.GroupName.Version));
-            _log.LogDebug("Uploaded package file {0}:{1}:{2}", request.ApplicationId, request.Component, response.GroupName.Version);
-            return response;
-        }
-
-        // TODO: We also need to broadcast these messages out over the backplane so other nodes keep
-        // track of applications. Actually, this might be included with node status broadcasts.
-        // Investigate further.
-
-        public InstanceResponse CreateNewInstance(CreateInstanceRequest request)
-        {
-            if (request == null || !request.IsValid())
-                return InstanceResponse.Failure(request);
-
-            string applicationId = request.GroupName.ApplicationId;
-            string component = request.GroupName.Component;
-            string version = request.GroupName.Version;
-
-            // Check to make sure we have a record for this version.
-            Application application = _data.Get<Application>(applicationId);
-            if (application == null)
-                return InstanceResponse.Failure(request);
-            if (!application.HasVersion(component, version))
-                return InstanceResponse.Failure(request);
-
-            // Insert the new instance to the data module
-            var instance = new StitchInstance
-            {
-                Id = null,
-                StoreVersion = 0,
-                Adaptor = request.Adaptor,
-                GroupName = request.GroupName,
-                LastHeartbeatReceived = 0,
-                Name = request.Name,
-                OwnerNodeName = _core.Name,
-                OwnerNodeId = _core.NodeId
-            };
-            instance = _data.Insert(instance);
-            if (instance == null)
-            {
-                _log.LogError("Could not save new stitch instance");
-                return InstanceResponse.Failure(request);
-            }
-
-            // Perform the actual create logic in the Stitches module
-            var createdInstance = _stitchRequests.CreateInstance(instance);
-            if (createdInstance == null)
-            {
-                _log.LogError("Stitch instance {0} could not be created", instance.GroupName);
-                _data.Delete<StitchInstance>(instance.Id);
-                return InstanceResponse.Failure(request);
-            }
-
-            // Update the stitch record with updated data from the adaptor
-            instance = _data.Update<StitchInstance>(createdInstance.Id, i => i.Adaptor = createdInstance.Adaptor);
-            _log.LogDebug("Stitch instance {0} Id={1} created", createdInstance.GroupName, createdInstance.Id);
-            return InstanceResponse.Success(request, createdInstance);
-        }
-
-        public InstanceResponse StartInstance(InstanceRequest request)
-        {
-            var instance = _data.Get<StitchInstance>(request.Id);
-            if (instance == null)
-                return InstanceResponse.Failure(request);
-
-            var startedInstance = _stitchRequests.StartInstance(instance);
-            if (!startedInstance.IsStartedOrRunning())
-            {
-                _notifier.StitchStarted(instance);
-                _log.LogDebug("Stitch instance {0} Id={1} started", instance.GroupName, instance.Id);
-            }
-
-            // The Stitches module will update status in all cases, so always save
-            _data.Save(startedInstance);
-            return InstanceResponse.Create(request, startedInstance.IsStartedOrRunning(), startedInstance);
-        }
-
-        public InstanceResponse StopInstance(InstanceRequest request)
-        {
-            var instance = _data.Get<StitchInstance>(request.Id);
-            if (instance == null)
-                return InstanceResponse.Failure(request);
-
-            var stoppedInstance = _stitchRequests.StopInstance(instance);
-            if (stoppedInstance.State != InstanceStateType.Stopped)
-            {
-                _log.LogError("Stitch instance {0} Id={3} could not be stopped", instance.GroupName, instance.Id);
-                return InstanceResponse.Failure(request);
-            }
-
-            _data.Save(stoppedInstance);
-            _notifier.StitchStopped(instance);
-            _log.LogDebug("Stitch instance {0} Id={3} stopped", instance.GroupName, instance.Id);
-            return InstanceResponse.Success(request, stoppedInstance);
         }
     }
 }

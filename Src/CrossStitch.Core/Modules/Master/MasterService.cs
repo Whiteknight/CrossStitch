@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Acquaintance.PubSub;
+﻿using Acquaintance.PubSub;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Utility;
+using System;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -12,6 +14,7 @@ namespace CrossStitch.Core.Modules.Master
         private readonly CrossStitchCore _core;
         private readonly IModuleLog _log;
         private readonly IDataRepository _data;
+        private readonly IStitchRequestHandler _stitchRequests;
 
         public MasterService(CrossStitchCore core, IModuleLog log, IDataRepository data)
         {
@@ -71,6 +74,29 @@ namespace CrossStitch.Core.Modules.Master
                 publishable.Add(new PublishableMessage<StitchDataMessage>(StitchDataMessage.ChannelSendLocal, outMessage));
             }
             return publishable;
+        }
+
+        public CommandResponse DispatchCommandRequest(CommandRequest arg)
+        {
+            bool ok = false;
+            switch (arg.Command)
+            {
+                case CommandType.StartStitchInstance:
+                    // TODO: Lookup the stitch ID. If it is remote, send the command over the backplane
+                    // If it is local, do InstanceRequest locally.
+                    ok = _stitchRequests.StartInstance(arg.Target);
+                    break;
+                case CommandType.StopStitchInstance:
+                    ok = _stitchRequests.StopInstance(arg.Target);
+                    break;
+                case CommandType.RemoveStitchInstance:
+                    ok = _stitchRequests.RemoveInstance(arg.Target);
+                    break;
+
+                default:
+                    break;
+            }
+            return CommandResponse.Create(ok);
         }
     }
 }

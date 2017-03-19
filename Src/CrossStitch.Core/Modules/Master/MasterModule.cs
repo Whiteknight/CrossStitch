@@ -6,31 +6,27 @@ using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.RequestCoordinator;
-using CrossStitch.Core.Utility;
 using System;
-using StitchDataMessage = CrossStitch.Core.Messages.StitchDataMessage;
 
 namespace CrossStitch.Core.Modules.Master
 {
-    // TODO: Rename to RouterModule?
     // The Master module coordinates multipart-commands across the cluster.
     public class MasterModule : IModule
     {
         private readonly MasterService _service;
         private readonly NodeConfiguration _configuration;
-        private readonly IModuleLog _log;
         private readonly IMessageBus _messageBus;
-
         private SubscriptionCollection _subscriptions;
 
         public MasterModule(CrossStitchCore core, NodeConfiguration configuration)
         {
             _configuration = configuration;
             _messageBus = core.MessageBus;
-            _log = new ModuleLog(core.MessageBus, Name);
+            var log = new ModuleLog(core.MessageBus, Name);
             var data = new DataHelperClient(core.MessageBus);
-            _service = new MasterService(core, _log, data);
+            var masterData = new MasterDataRepository(data);
+            var stitches = new StitchRequestHandler(core.MessageBus);
+            _service = new MasterService(core, log, masterData, stitches);
         }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
@@ -69,42 +65,52 @@ namespace CrossStitch.Core.Modules.Master
         {
             _subscriptions = new SubscriptionCollection(_messageBus);
 
+            // On startup, publish the node status
+            _subscriptions.Subscribe<CoreEvent>(b => b
+                .WithChannelName(CoreEvent.ChannelInitialized)
+                .Invoke(m => GenerateAndPublishNodeStatus()));
+
             // Publish the status of the node every 60 seconds
             int timerTickMultiple = (_configuration.StatusBroadcastIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
             _subscriptions.TimerSubscribe(timerTickMultiple, b => b
                 .Invoke(t => GenerateAndPublishNodeStatus())
                 .OnWorkerThread());
+
+            // Respond to requests for node status
             _subscriptions.Listen<NodeStatusRequest, NodeStatus>(b => b
                 .OnDefaultChannel()
                 .Invoke(m => _service.GetExistingNodeStatus(m.NodeId)));
-            _subscriptions.Subscribe<CoreEvent>(b => b
-                .WithChannelName(CoreEvent.ChannelInitialized)
-                .Invoke(m => GenerateAndPublishNodeStatus()));
 
-            _subscriptions.Listen<CommandRequest, CommandResponse>(b => b
-                .OnDefaultChannel()
-                .Invoke(_service.DispatchCommandRequest));
-
-            _subscriptions.Subscribe<ObjectsReceivedEvent<NodeStatus>>(b => b
+            // Save node status from other nodes
+            _subscriptions.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
                 .WithChannelName(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
                 .Invoke(m => _service.SaveNodeStatus(m.Object)));
 
+            // Handle incoming commands
+            _subscriptions.Listen<CommandRequest, CommandResponse>(b => b
+                .OnDefaultChannel()
+                .Invoke(_service.DispatchCommandRequest));
+            _subscriptions.Subscribe<ObjectReceivedEvent<CommandRequest>>(b => b
+                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .Invoke(ore => _service.ReceiveCommandFromRemote(ore, ore.Object)));
+
+            // Handle incoming command receipt messages
+            _subscriptions.Subscribe<ObjectReceivedEvent<CommandReceipt>>(b => b
+                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .Invoke(ore => _service.ReceiveReceiptFromRemote(ore, ore.Object)));
+
+            // Route StitchDataMessage to the correct node, if the message does not already have a NetworkNodeId specified
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()
-                .Invoke(EnrichStitchDataMessageWithAddress)
+                .Invoke(_service.EnrichStitchDataMessageWithAddress)
                 .OnWorkerThread()
                 .WithFilter(m => m.ToNodeId == Guid.Empty && string.IsNullOrEmpty(m.ToNetworkId)));
-
-            //messageBus.Subscribe<MessageEnvelope>(s => s
-            //    .WithChannelName(MessageEnvelope.SendEventName)
-            //    .Invoke(ResolveAppInstanceNodeIdAndSend)
-            //    .OnWorkerThread()
-            //    .WithFilter(IsMessageAddressedToAppInstance)
-            //);
         }
 
         public void Stop()
         {
+            _subscriptions.Dispose();
+            _subscriptions = null;
         }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
@@ -124,21 +130,13 @@ namespace CrossStitch.Core.Modules.Master
                 _messageBus.Publish(NodeStatus.BroadcastEvent, message);
         }
 
-        private void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
-        {
-            foreach (var outMessage in _service.EnrichStitchDataMessageWithAddress(message))
-                _messageBus.PublishMessage(outMessage);
-        }
-
         private class StitchRequestHandler : IStitchRequestHandler
         {
             private readonly IMessageBus _messageBus;
-            private readonly IModuleLog _log;
 
-            public StitchRequestHandler(IMessageBus messageBus, IModuleLog log)
+            public StitchRequestHandler(IMessageBus messageBus)
             {
                 _messageBus = messageBus;
-                _log = log;
             }
 
             public bool StartInstance(string instanceId)
@@ -169,6 +167,12 @@ namespace CrossStitch.Core.Modules.Master
                 };
                 var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelDelete, request);
                 return response.IsSuccess;
+            }
+
+            public void SendStitchData(StitchDataMessage message, bool remote)
+            {
+                string channelName = remote ? null : StitchDataMessage.ChannelSendLocal;
+                _messageBus.Publish(channelName, message);
             }
         }
     }

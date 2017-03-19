@@ -1,15 +1,8 @@
-﻿using CrossStitch.Core.Models;
+﻿using System.Collections.Generic;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.ProcessV1;
-using CrossStitch.Stitch.V1;
-using CrossStitch.Stitch.V1.Core;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
 
-namespace CrossStitch.Core.Modules.Stitches.Adaptors
+namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 {
     public class ProcessV1Parameters
     {

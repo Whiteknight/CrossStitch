@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Backplane.Zyre.Networking
+﻿namespace CrossStitch.Core.Messages.Backplane
 {
     public enum MessagePayloadType
     {

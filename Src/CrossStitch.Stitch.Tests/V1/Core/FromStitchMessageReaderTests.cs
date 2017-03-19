@@ -1,9 +1,9 @@
-﻿using CrossStitch.Stitch.V1.Core;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using System.IO;
 using System.Text;
 using System.Threading;
+using CrossStitch.Stitch.ProcessV1.Core;
 
 namespace CrossStitch.Stitch.Tests.V1.Core
 {

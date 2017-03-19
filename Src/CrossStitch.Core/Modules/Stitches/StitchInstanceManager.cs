@@ -3,11 +3,11 @@ using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Stitch.Events;
-using CrossStitch.Stitch.V1.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Stitch.ProcessV1.Core;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

@@ -1,11 +1,14 @@
-﻿using Acquaintance.PubSub;
+﻿using Acquaintance;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.RequestCoordinator;
+using CrossStitch.Core.Modules.Master.Handlers;
 using CrossStitch.Core.Utility;
+using CrossStitch.Core.Utility.Extensions;
 using System;
 using System.Collections.Generic;
+using System.ServiceModel.Security.Tokens;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -13,14 +16,26 @@ namespace CrossStitch.Core.Modules.Master
     {
         private readonly CrossStitchCore _core;
         private readonly IModuleLog _log;
-        private readonly IDataRepository _data;
-        private readonly IStitchRequestHandler _stitchRequests;
+        private readonly MasterDataRepository _data;
+        private readonly IStitchRequestHandler _stitches;
+        private readonly Dictionary<CommandType, ICommandHandler> _commandHandlers;
+        private readonly IClusterMessageSender _clusterSender;
 
-        public MasterService(CrossStitchCore core, IModuleLog log, IDataRepository data)
+        public MasterService(CrossStitchCore core, IModuleLog log, MasterDataRepository data, IStitchRequestHandler stitches)
         {
             _core = core;
             _log = log;
             _data = data;
+            _stitches = stitches;
+            _clusterSender = new ClusterMessageSender(core.MessageBus);
+
+            _commandHandlers = new Dictionary<CommandType, ICommandHandler>
+            {
+                { CommandType.Ping, new PingCommandHandler(data, _clusterSender) },
+                { CommandType.StartStitchInstance, new StartStitchCommandHandler(data, stitches, _clusterSender) },
+                { CommandType.StopStitchInstance, new StopStitchCommandHandler(data, stitches, _clusterSender) },
+                { CommandType.RemoveStitchInstance, new RemoveStitchCommandHandler(data, stitches, _clusterSender) }
+            };
         }
 
         public NodeStatus GenerateCurrentNodeStatus()
@@ -56,47 +71,83 @@ namespace CrossStitch.Core.Modules.Master
                 _log.LogDebug("Received NodeStatus from NodeId={0} and saved it", status.Id);
         }
 
-        public IEnumerable<IPublishableMessage> EnrichStitchDataMessageWithAddress(StitchDataMessage message)
+        public void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
         {
-            var publishable = new List<IPublishableMessage>();
             var messages = new DataMessageAddresser(_data).AddressMessage(message);
             foreach (var outMessage in messages)
             {
                 // If it has a Node id, publish it. The filter will stop it from coming back
                 // and the Backplane will pick it up.
-                if (outMessage.ToNodeId != Guid.Empty)
-                {
-                    publishable.Add(new PublishableMessage<StitchDataMessage>(null, outMessage));
-                    continue;
-                }
-
                 // Otherwise, publish it locally for a local stitch instance to grab it.
-                publishable.Add(new PublishableMessage<StitchDataMessage>(StitchDataMessage.ChannelSendLocal, outMessage));
+                _stitches.SendStitchData(outMessage, outMessage.ToNodeId != Guid.Empty);
             }
-            return publishable;
+        }
+
+        public void ReceiveCommandFromRemote(ReceivedEvent received, CommandRequest request)
+        {
+            var handler = _commandHandlers.GetOrDefault(request.Command);
+            // TODO: Alert back that we can't handle this case?
+            if (handler == null)
+            {
+                if (request.RequestsReceipt())
+                    _clusterSender.SendReceipt(false, received.FromNetworkId, request.ReplyToJobId, request.ReplyToTaskId);
+                return;
+            }
+
+            bool ok = handler.HandleLocal(request);
+            if (request.RequestsReceipt())
+                _clusterSender.SendReceipt(ok, received.FromNetworkId, request.ReplyToJobId, request.ReplyToTaskId);
+        }
+
+        public void ReceiveReceiptFromRemote(ReceivedEvent received, CommandReceipt receipt)
+        {
+            if (string.IsNullOrEmpty(receipt.ReplyToJobId) || string.IsNullOrEmpty(receipt.ReplyToTaskId))
+            {
+                _log.LogWarning("Received job receipt from Node {0} without necessary job information", received.FromNodeId);
+                return;
+            }
+
+            _log.LogDebug("Received receipt Job={0} Task={1} from node {2}", receipt.ReplyToJobId, receipt.ReplyToTaskId, received.FromNodeId);
+            _data.Update<CommandJob>(receipt.ReplyToJobId, j => j.MarkTaskComplete(receipt.ReplyToTaskId, receipt.Success));
         }
 
         public CommandResponse DispatchCommandRequest(CommandRequest arg)
         {
-            bool ok = false;
-            switch (arg.Command)
-            {
-                case CommandType.StartStitchInstance:
-                    // TODO: Lookup the stitch ID. If it is remote, send the command over the backplane
-                    // If it is local, do InstanceRequest locally.
-                    ok = _stitchRequests.StartInstance(arg.Target);
-                    break;
-                case CommandType.StopStitchInstance:
-                    ok = _stitchRequests.StopInstance(arg.Target);
-                    break;
-                case CommandType.RemoveStitchInstance:
-                    ok = _stitchRequests.RemoveInstance(arg.Target);
-                    break;
+            var handler = _commandHandlers.GetOrDefault(arg.Command);
+            if (handler == null)
+                return CommandResponse.Create(false);
 
-                default:
-                    break;
+            return handler.Handle(arg);
+        }
+
+        private class ClusterMessageSender : IClusterMessageSender
+        {
+            private readonly IMessageBus _messageBus;
+
+            public ClusterMessageSender(IMessageBus messageBus)
+            {
+                _messageBus = messageBus;
             }
-            return CommandResponse.Create(ok);
+
+            public void Send(ClusterMessage message)
+            {
+                _messageBus.Publish(ClusterMessage.SendEventName, message);
+            }
+
+            public void SendReceipt(bool success, string networkNodeId, string jobId, string taskId)
+            {
+                var message = new ClusterMessageBuilder()
+                    .FromNode()
+                    .ToNode(networkNodeId)
+                    .WithObjectPayload(new CommandReceipt
+                    {
+                        Success = success,
+                        ReplyToJobId = jobId,
+                        ReplyToTaskId = taskId
+                    })
+                    .Build();
+                _messageBus.Publish(ClusterMessage.SendEventName, message);
+            }
         }
     }
 }

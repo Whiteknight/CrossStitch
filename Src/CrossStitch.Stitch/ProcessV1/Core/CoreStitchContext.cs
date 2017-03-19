@@ -1,7 +1,7 @@
-﻿using CrossStitch.Stitch.Events;
-using System;
+﻿using System;
+using CrossStitch.Stitch.Events;
 
-namespace CrossStitch.Stitch.V1.Core
+namespace CrossStitch.Stitch.ProcessV1.Core
 {
     public class CoreStitchContext
     {

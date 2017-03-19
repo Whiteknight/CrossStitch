@@ -3,7 +3,6 @@ using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using System.Collections.Generic;
 

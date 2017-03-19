@@ -7,7 +7,7 @@ namespace CrossStitch.Backplane.Zyre
 {
     public interface IClusterBackplane : IDisposable
     {
-        event EventHandler<PayloadEventArgs<MessageEnvelope>> MessageReceived;
+        event EventHandler<PayloadEventArgs<ClusterMessage>> MessageReceived;
         event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
         event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
 
@@ -15,7 +15,7 @@ namespace CrossStitch.Backplane.Zyre
         void Stop();
 
         // Responsible for communication between nodes in the cluster
-        void Send(MessageEnvelope envelope);
+        void Send(ClusterMessage envelope);
         //TResponse Send<TRequest, TResponse>(NodeCommunicationInformation recipient, TRequest request);
         //Task<TResponse> SendAsync<TRequest, TResponse>(NodeCommunicationInformation recipient, TRequest request, CancellationToken cancellation);
     }

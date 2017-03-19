@@ -63,14 +63,8 @@
     <Compile Include="BackplaneModule.cs" />
     <Compile Include="IClusterBackplane.cs" />
     <Compile Include="MessageHeaderExtensions.cs" />
-    <Compile Include="Networking\MessageEnvelope.cs" />
-    <Compile Include="Networking\MessageEnvelopeBuilder.cs" />
-    <Compile Include="Networking\MessageEnvelopeBuilderFactory.cs" />
-    <Compile Include="Networking\MessageHeader.cs" />
-    <Compile Include="Networking\MessagePayloadType.cs" />
     <Compile Include="Networking\MessageReceivedEventArgs.cs" />
     <Compile Include="Networking\NetMq\NetMqMessageMapper.cs" />
-    <Compile Include="Networking\TargetType.cs" />
     <Compile Include="PayloadObjectDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZyreBackplane.cs" />

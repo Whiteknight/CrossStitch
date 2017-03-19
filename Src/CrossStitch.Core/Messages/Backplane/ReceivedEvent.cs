@@ -4,6 +4,8 @@ namespace CrossStitch.Core.Messages.Backplane
 {
     public abstract class ReceivedEvent
     {
+        public const string ChannelReceived = "Received";
+
         public Guid MessageId { get; set; }
         public string FromNodeId { get; set; }
         public string FromNetworkId { get; set; }
@@ -17,7 +19,7 @@ namespace CrossStitch.Core.Messages.Backplane
         }
     }
 
-    public class ObjectsReceivedEvent<TPayload> : ReceivedEvent
+    public class ObjectReceivedEvent<TPayload> : ReceivedEvent
     {
         public TPayload Object { get; set; }
     }

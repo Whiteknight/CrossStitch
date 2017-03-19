@@ -1,8 +1,8 @@
-﻿using CrossStitch.Stitch.V1;
-using CrossStitch.Stitch.V1.Stitch;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
+using CrossStitch.Stitch.ProcessV1;
+using CrossStitch.Stitch.ProcessV1.Stitch;
 
 namespace PingPong.Pong
 {

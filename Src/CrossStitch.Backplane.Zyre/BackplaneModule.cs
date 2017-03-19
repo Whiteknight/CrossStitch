@@ -4,12 +4,12 @@ using CrossStitch.Core;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.Events;
 using System;
 using System.Linq;
-using CrossStitch.Core.Models;
 
 namespace CrossStitch.Backplane.Zyre
 {
@@ -25,7 +25,6 @@ namespace CrossStitch.Backplane.Zyre
         private int _workerThreadId;
         private SubscriptionCollection _subscriptions;
         private Guid _nodeNetworkId;
-        private MessageEnvelopeBuilderFactory _envelopeFactory;
 
         public BackplaneModule(CrossStitchCore core, IClusterBackplane backplane = null, BackplaneConfiguration configuration = null)
         {
@@ -52,8 +51,8 @@ namespace CrossStitch.Backplane.Zyre
             // Setup subscriptions
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(_messageBus);
-            _subscriptions.Subscribe<MessageEnvelope>(s => s
-                .WithChannelName(MessageEnvelope.SendEventName)
+            _subscriptions.Subscribe<ClusterMessage>(s => s
+                .WithChannelName(ClusterMessage.SendEventName)
                 .Invoke(e => _backplane.Send(e))
                 .OnThread(_workerThreadId)
                 .WithFilter(IsMessageSendable));
@@ -69,7 +68,6 @@ namespace CrossStitch.Backplane.Zyre
 
             var context = _backplane.Start();
             _nodeNetworkId = context.NodeNetworkId;
-            _envelopeFactory = context.EnvelopeFactory;
             _log.LogInformation("Joined cluster with NetworkNodeId={0}", _nodeNetworkId);
             _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeNetworkId.ToString() });
         }
@@ -110,7 +108,7 @@ namespace CrossStitch.Backplane.Zyre
         {
             nodeStatus.Zones = _configuration.Zones.OrEmptyIfNull().ToList();
             nodeStatus.NetworkNodeId = _nodeNetworkId.ToString();
-            var envelope = _envelopeFactory.CreateNew()
+            var envelope = new ClusterMessageBuilder()
                 .ToCluster()
                 .FromNode()
                 .WithEventName(NodeStatus.BroadcastEvent)
@@ -141,7 +139,7 @@ namespace CrossStitch.Backplane.Zyre
                 _log.LogInformation("Node has left cluster NodeId={0}", e.Payload.NodeUuid);
         }
 
-        private void MessageReceivedHandler(object sender, PayloadEventArgs<MessageEnvelope> e)
+        private void MessageReceivedHandler(object sender, PayloadEventArgs<ClusterMessage> e)
         {
             if (_messageBus == null || e == null || e.Payload == null)
                 return;
@@ -158,7 +156,7 @@ namespace CrossStitch.Backplane.Zyre
             }
         }
 
-        private void PublishPayloadObjects(string channel, MessageEnvelope envelope)
+        private void PublishPayloadObjects(string channel, ClusterMessage envelope)
         {
             if (envelope.PayloadObject == null)
                 return;
@@ -176,7 +174,7 @@ namespace CrossStitch.Backplane.Zyre
             }
         }
 
-        private static bool IsMessageSendable(MessageEnvelope envelope)
+        private static bool IsMessageSendable(ClusterMessage envelope)
         {
             return envelope.Header.ToType == TargetType.Node ||
                    envelope.Header.ToType == TargetType.Zone ||

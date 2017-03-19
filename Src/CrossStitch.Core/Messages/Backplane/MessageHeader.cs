@@ -1,7 +1,6 @@
-﻿using CrossStitch.Core.Messages.Backplane;
-using System;
+﻿using System;
 
-namespace CrossStitch.Backplane.Zyre.Networking
+namespace CrossStitch.Core.Messages.Backplane
 {
     public class MessageHeader
     {
@@ -31,6 +30,17 @@ namespace CrossStitch.Backplane.Zyre.Networking
             receivedEvent.MessageId = MessageId;
             receivedEvent.ToNetworkId = ToNetworkId;
             receivedEvent.ToNodeId = ToNodeId;
+        }
+
+        public bool IsSendable()
+        {
+            if (string.IsNullOrEmpty(FromNetworkId) || string.IsNullOrEmpty(FromNodeId))
+                return false;
+            if (ToType == TargetType.Node && string.IsNullOrEmpty(ToNetworkId))
+                return false;
+            if (ToType == TargetType.Zone && string.IsNullOrEmpty(ZoneName))
+                return false;
+            return true;
         }
     }
 }

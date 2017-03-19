@@ -1,6 +1,6 @@
 using CrossStitch.Core.Models;
 
-namespace CrossStitch.Core.Modules.RequestCoordinator
+namespace CrossStitch.Core.Modules.Stitches
 {
     public interface IStitchEventNotifier
     {

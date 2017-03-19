@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Stitch.V1.Core
+namespace CrossStitch.Stitch.ProcessV1.Core
 {
     // Processor class to run on the Core, to coordinate communications with the Stitch. There 
     // should be once instance of this for every stitch.

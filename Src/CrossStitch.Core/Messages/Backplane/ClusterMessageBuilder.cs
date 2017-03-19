@@ -1,32 +1,24 @@
-﻿using CrossStitch.Core.Utility.Extensions;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Utility.Extensions;
 
-namespace CrossStitch.Backplane.Zyre.Networking
+namespace CrossStitch.Core.Messages.Backplane
 {
-
-    public class MessageEnvelopeBuilder
+    public class ClusterMessageBuilder
     {
-        private readonly MessageEnvelope _envelope;
-        private readonly Guid _networkNodeId;
-        private readonly string _nodeId;
+        private readonly ClusterMessage _envelope;
 
-        public MessageEnvelopeBuilder(Guid networkNodeId, string nodeId)
+        public ClusterMessageBuilder()
         {
-            _networkNodeId = networkNodeId;
-            _nodeId = nodeId;
-            _envelope = new MessageEnvelope();
-            _envelope.Header.FromNodeId = nodeId;
-            _envelope.Header.FromNetworkId = networkNodeId.ToString();
+            _envelope = new ClusterMessage();
         }
 
-        public MessageEnvelope Build()
+        public ClusterMessage Build()
         {
             return _envelope;
         }
 
-        public MessageEnvelopeBuilder ResponseTo(MessageEnvelope request)
+        public ClusterMessageBuilder ResponseTo(ClusterMessage request)
         {
             _envelope.Header.FromNetworkId = request.Header.ToNetworkId;
             _envelope.Header.FromNodeId = request.Header.ToNodeId;
@@ -40,20 +32,20 @@ namespace CrossStitch.Backplane.Zyre.Networking
             return this;
         }
 
-        public MessageEnvelopeBuilder FailureResponseTo(MessageEnvelope request)
+        public ClusterMessageBuilder FailureResponseTo(ClusterMessage request)
         {
             _envelope.Header.PayloadType = MessagePayloadType.FailureResponse;
             return ResponseTo(request);
         }
 
-        public MessageEnvelopeBuilder WithObjectPayload(object payloadObject)
+        public ClusterMessageBuilder WithObjectPayload(object payloadObject)
         {
             _envelope.Header.PayloadType = MessagePayloadType.Object;
             _envelope.PayloadObject = payloadObject;
             return this;
         }
 
-        public MessageEnvelopeBuilder WithCommandStrings(IEnumerable<string> commandStrings)
+        public ClusterMessageBuilder WithCommandStrings(IEnumerable<string> commandStrings)
         {
             _envelope.Header.PayloadType = MessagePayloadType.CommandString;
             if (_envelope.CommandStrings == null)
@@ -62,7 +54,7 @@ namespace CrossStitch.Backplane.Zyre.Networking
             return this;
         }
 
-        public MessageEnvelopeBuilder WithCommandString(string commandString)
+        public ClusterMessageBuilder WithCommandString(string commandString)
         {
             _envelope.Header.PayloadType = MessagePayloadType.CommandString;
             if (_envelope.CommandStrings == null)
@@ -71,49 +63,40 @@ namespace CrossStitch.Backplane.Zyre.Networking
             return this;
         }
 
-        public MessageEnvelopeBuilder WithRawFrames(IEnumerable<byte[]> frames)
+        public ClusterMessageBuilder WithRawFrames(IEnumerable<byte[]> frames)
         {
             _envelope.Header.PayloadType = MessagePayloadType.Raw;
             _envelope.RawFrames = frames.OrEmptyIfNull().ToList();
             return this;
         }
 
-        public MessageEnvelopeBuilder ToCluster()
+        public ClusterMessageBuilder ToCluster()
         {
             _envelope.Header.ToType = TargetType.Cluster;
             return this;
         }
 
-        public MessageEnvelopeBuilder ToNode(string networkId, string nodeId)
+        public ClusterMessageBuilder ToNode(string networkNodeId)
         {
             _envelope.Header.ToType = TargetType.Node;
-            _envelope.Header.ToNetworkId = networkId;
-            _envelope.Header.ToNodeId = nodeId;
+            _envelope.Header.ToNetworkId = networkNodeId;
             return this;
         }
 
-        public MessageEnvelopeBuilder ToZone(string zoneName)
+        public ClusterMessageBuilder ToZone(string zoneName)
         {
             _envelope.Header.ToType = TargetType.Zone;
             _envelope.Header.ZoneName = zoneName;
             return this;
         }
 
-        public MessageEnvelopeBuilder FromNode()
+        public ClusterMessageBuilder FromNode()
         {
             _envelope.Header.FromType = TargetType.Node;
-            _envelope.Header.FromEntityId = _nodeId.ToString();
             return this;
         }
 
-        public MessageEnvelopeBuilder FromNode(Guid nodeId)
-        {
-            _envelope.Header.FromType = TargetType.Node;
-            _envelope.Header.FromEntityId = nodeId.ToString();
-            return this;
-        }
-
-        public MessageEnvelopeBuilder WithEventName(string eventName)
+        public ClusterMessageBuilder WithEventName(string eventName)
         {
             _envelope.Header.EventName = eventName;
             return this;

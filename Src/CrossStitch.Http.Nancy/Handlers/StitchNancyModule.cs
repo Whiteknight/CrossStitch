@@ -37,14 +37,14 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 });
             };
 
-            Post["/{StitchId}/clone"] = _ =>
-            {
-                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
-                {
-                    Command = CommandType.CloneStitchInstance,
-                    Target = _.StitchId.ToString()
-                });
-            };
+            //Post["/{StitchId}/clone"] = _ =>
+            //{
+            //    return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
+            //    {
+            //        Command = CommandType.CloneStitchInstance,
+            //        Target = _.StitchId.ToString()
+            //    });
+            //};
 
             Delete["/{StitchId}"] = _ =>
             {

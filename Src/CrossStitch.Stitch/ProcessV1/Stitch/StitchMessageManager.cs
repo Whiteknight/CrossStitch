@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-namespace CrossStitch.Stitch.V1.Stitch
+namespace CrossStitch.Stitch.ProcessV1.Stitch
 {
     public class StitchMessageManager : IDisposable
     {

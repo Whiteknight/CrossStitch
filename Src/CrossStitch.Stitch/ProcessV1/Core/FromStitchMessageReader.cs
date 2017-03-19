@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace CrossStitch.Stitch.V1.Core
+namespace CrossStitch.Stitch.ProcessV1.Core
 {
     // Message reader to read messages from the Stitch to the Core
     public class FromStitchMessageReader : IDisposable

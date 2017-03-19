@@ -1,4 +1,4 @@
-namespace CrossStitch.Stitch.V1.Stitch
+namespace CrossStitch.Stitch.ProcessV1.Stitch
 {
     public interface IToStitchMessageProcessor
     {

@@ -1,8 +1,8 @@
-using CrossStitch.Stitch.Utility;
 using System;
 using System.IO;
+using CrossStitch.Stitch.Utility;
 
-namespace CrossStitch.Stitch.V1.Stitch
+namespace CrossStitch.Stitch.ProcessV1.Stitch
 {
     // Message sender for the Stitch to send responses to the Core
     public class FromStitchMessageSender : IDisposable

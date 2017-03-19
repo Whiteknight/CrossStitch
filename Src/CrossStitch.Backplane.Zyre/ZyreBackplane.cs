@@ -40,7 +40,7 @@ namespace CrossStitch.Backplane.Zyre
             _zyre.ShoutEvent += ZyreShoutEvent;
         }
 
-        public event EventHandler<PayloadEventArgs<MessageEnvelope>> MessageReceived;
+        public event EventHandler<PayloadEventArgs<ClusterMessage>> MessageReceived;
         public event EventHandler<PayloadEventArgs<ZoneMemberEvent>> ZoneMember;
         public event EventHandler<PayloadEventArgs<ClusterMemberEvent>> ClusterMember;
 
@@ -55,13 +55,11 @@ namespace CrossStitch.Backplane.Zyre
             foreach (string zone in _config.Zones.OrEmptyIfNull().Where(z => z != Zones.ZoneAll))
                 _zyre.Join(zone);
 
-            var envelopeFactory = new MessageEnvelopeBuilderFactory(_uuid, _core.NodeId);
-            _mapper = new NetMqMessageMapper(_serializer, envelopeFactory);
+            _mapper = new NetMqMessageMapper(_serializer);
 
             _connected = true;
             return new BackplaneContext
             {
-                EnvelopeFactory = envelopeFactory,
                 NodeNetworkId = _uuid
             };
         }
@@ -78,8 +76,15 @@ namespace CrossStitch.Backplane.Zyre
             _connected = false;
         }
 
-        public void Send(MessageEnvelope envelope)
+        public void Send(ClusterMessage envelope)
         {
+            envelope.Header.FromNetworkId = _uuid.ToString();
+            envelope.Header.FromNodeId = _core.NodeId;
+            if (envelope.Header.FromType == TargetType.Node)
+                envelope.Header.FromEntityId = _core.NodeId;
+            if (!envelope.IsSendable())
+                return;
+
             var message = _mapper.Map(envelope);
 
             // If we have a proxy node ID, send the message there and let the proxy sort out

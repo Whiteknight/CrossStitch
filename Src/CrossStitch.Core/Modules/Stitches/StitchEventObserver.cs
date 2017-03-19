@@ -2,7 +2,7 @@
 using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Utility;
-using CrossStitch.Stitch.V1.Core;
+using CrossStitch.Stitch.ProcessV1.Core;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

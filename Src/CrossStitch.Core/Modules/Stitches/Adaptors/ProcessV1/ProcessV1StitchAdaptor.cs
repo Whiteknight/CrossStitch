@@ -1,12 +1,12 @@
-﻿using CrossStitch.Core.Models;
-using CrossStitch.Stitch.V1;
-using CrossStitch.Stitch.V1.Core;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using CrossStitch.Core.Models;
+using CrossStitch.Stitch.ProcessV1;
+using CrossStitch.Stitch.ProcessV1.Core;
 
-namespace CrossStitch.Core.Modules.Stitches.Adaptors
+namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 {
     public class ProcessV1StitchAdaptor : IStitchAdaptor
     {

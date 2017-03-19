@@ -23,16 +23,4 @@ namespace CrossStitch.Http.NancyFx.Handlers
             };
         }
     }
-
-    public class StitchGroupsNancyModule : NancyModule
-    {
-        public StitchGroupsNancyModule()
-            : base("/stitchgroups")
-        {
-            // TODO: Get all groups?
-            Get["/"] = _ => { return null; };
-
-            Get["/"] = _ => { return null; };
-        }
-    }
 }

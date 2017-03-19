@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CrossStitch.Stitch.V1.Stitch
+namespace CrossStitch.Stitch.ProcessV1.Stitch
 {
     public class HeartbeatReceivedEventArgs : EventArgs
     {

@@ -1,7 +1,6 @@
 ﻿using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Utility;
 using CrossStitch.Stitch.ProcessV1;
 using System;

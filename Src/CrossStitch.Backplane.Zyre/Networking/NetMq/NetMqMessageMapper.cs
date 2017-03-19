@@ -3,23 +3,22 @@ using CrossStitch.Core.Utility.Serialization;
 using NetMQ;
 using System.Linq;
 using System.Text;
+using CrossStitch.Core.Messages.Backplane;
 
 namespace CrossStitch.Backplane.Zyre.Networking.NetMq
 {
-    public class NetMqMessageMapper : IMapper<NetMQMessage, MessageEnvelope>, IMapper<MessageEnvelope, NetMQMessage>
+    public class NetMqMessageMapper : IMapper<NetMQMessage, ClusterMessage>, IMapper<ClusterMessage, NetMQMessage>
     {
         private readonly ISerializer _serializer;
-        private readonly MessageEnvelopeBuilderFactory _envelopeFactory;
 
-        public NetMqMessageMapper(ISerializer serializer, MessageEnvelopeBuilderFactory envelopeFactory)
+        public NetMqMessageMapper(ISerializer serializer)
         {
             _serializer = serializer;
-            _envelopeFactory = envelopeFactory;
         }
 
-        public MessageEnvelope Map(NetMQMessage source)
+        public ClusterMessage Map(NetMQMessage source)
         {
-            var envelope = _envelopeFactory.CreateNew().Build();
+            var envelope = new ClusterMessageBuilder().Build();
             envelope.Header = _serializer.Deserialize<MessageHeader>(source.Pop().Buffer);
             if (envelope.Header.PayloadType == MessagePayloadType.Raw)
                 envelope.RawFrames = source.Select(f => f.ToByteArray()).ToList();
@@ -39,7 +38,7 @@ namespace CrossStitch.Backplane.Zyre.Networking.NetMq
             return envelope;
         }
 
-        public NetMQMessage Map(MessageEnvelope envelope)
+        public NetMQMessage Map(ClusterMessage envelope)
         {
             var message = new NetMQMessage();
             byte[] headerFrame = _serializer.Serialize(envelope.Header);

@@ -48,7 +48,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public Result UnzipLibraryPackageToRunningBase(StitchGroupName groupName, string instanceId)
         {
-            string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, groupName.ApplicationId, groupName.Component);
+            string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, groupName.Application, groupName.Component);
             if (!Directory.Exists(libraryDirectoryPath))
                 return Result.Failure();
             string libraryFilePath = Path.Combine(libraryDirectoryPath, groupName.Version + ".zip");

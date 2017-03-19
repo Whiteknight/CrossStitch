@@ -7,10 +7,18 @@ namespace CrossStitch.Core.Messages.Stitches
     {
         public const string ChannelUpload = "Upload";
 
-        public string ApplicationId { get; set; }
-        public Application Application { get; set; }
-        public string Component { get; set; }
+        public StitchGroupName GroupName { get; set; }
+        public string FileName { get; set; }
         public Stream Contents { get; set; }
+
+        public bool IsValid()
+        {
+            return GroupName != null
+                && GroupName.IsComponentGroup()
+                && Contents != null
+                && !string.IsNullOrEmpty(FileName)
+                && Path.GetExtension(FileName).ToLowerInvariant() == ".zip";
+        }
     }
 
     public class PackageFileUploadResponse

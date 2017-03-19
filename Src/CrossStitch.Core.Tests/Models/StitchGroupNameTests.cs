@@ -11,7 +11,7 @@ namespace CrossStitch.Core.Tests.Models
         public void ConstructFromGroupName_Version_Test()
         {
             var target = new StitchGroupName("A.B.C");
-            target.ApplicationId.Should().Be("A");
+            target.Application.Should().Be("A");
             target.Component.Should().Be("B");
             target.Version.Should().Be("C");
         }
@@ -20,7 +20,7 @@ namespace CrossStitch.Core.Tests.Models
         public void ConstructFromGroupName_Component_Test()
         {
             var target = new StitchGroupName("A.B");
-            target.ApplicationId.Should().Be("A");
+            target.Application.Should().Be("A");
             target.Component.Should().Be("B");
             target.Version.Should().BeNull();
         }
@@ -29,7 +29,7 @@ namespace CrossStitch.Core.Tests.Models
         public void ConstructFromGroupName_Application_Test()
         {
             var target = new StitchGroupName("A");
-            target.ApplicationId.Should().Be("A");
+            target.Application.Should().Be("A");
             target.Component.Should().BeNull();
             target.Version.Should().BeNull();
         }
@@ -38,7 +38,7 @@ namespace CrossStitch.Core.Tests.Models
         public void ConstructFromParts_Application_Test()
         {
             var target = new StitchGroupName("A", null, null);
-            target.ApplicationId.Should().Be("A");
+            target.Application.Should().Be("A");
             target.Component.Should().BeNull();
             target.Version.Should().BeNull();
         }
@@ -47,7 +47,7 @@ namespace CrossStitch.Core.Tests.Models
         public void ConstructFromParts_Component_Test()
         {
             var target = new StitchGroupName("A", "B", null);
-            target.ApplicationId.Should().Be("A");
+            target.Application.Should().Be("A");
             target.Component.Should().Be("B");
             target.Version.Should().BeNull();
         }
@@ -56,7 +56,7 @@ namespace CrossStitch.Core.Tests.Models
         public void ConstructFromParts_Version_Test()
         {
             var target = new StitchGroupName("A", "B", "C");
-            target.ApplicationId.Should().Be("A");
+            target.Application.Should().Be("A");
             target.Component.Should().Be("B");
             target.Version.Should().Be("C");
         }

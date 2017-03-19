@@ -3,7 +3,6 @@ using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Master;
-using CrossStitch.Core.Modules.RequestCoordinator;
 using CrossStitch.Core.Modules.StitchMonitor;
 using CrossStitch.Core.Modules.Timer;
 using System;
@@ -49,8 +48,6 @@ namespace CrossStitch.Core
             // These core modules are almost always auto-created and don't require warnings
             if (!_modules.ContainsKey(ModuleNames.Timer))
                 Add(new MessageTimerModule(core.MessageBus));
-            if (!_modules.ContainsKey(ModuleNames.RequestCoordinator))
-                Add(new RequestCoordinatorModule(core));
             if (!_modules.ContainsKey(ModuleNames.StitchMonitor))
                 Add(new StitchMonitorModule(core, core.Configuration));
             if (!_modules.ContainsKey(ModuleNames.Master))

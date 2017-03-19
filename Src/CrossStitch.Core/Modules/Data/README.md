@@ -4,7 +4,7 @@ The data module is responsible for storing persistant state of the CrossStitch n
 
 The Data module should have a name "Data". If a data module isn't provided by the startup application, the Core may create one.
 
-The `DataModule` receives all request on a single thread, to simplify storage scenarios for simple storage engines. From that single thread, the `IDataStorage` engine handles all requests.
+The `DataModule` receives all request on a single thread, to simplify storage scenarios for simple storage engines. In fact, considering the relatively small amount of data which needs to be persisted by the application, the storage system of the Data module is designed with simple storage systems in mind. More complicated storage systems such as ACID-compliant SQL or redundant NoSQL stores are possible to use, but CrossStitch explicitly does not make use of many of the advanced or specific features of these.
 
 ### IDataStorage
 

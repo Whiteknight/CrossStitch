@@ -52,7 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Handlers\ApplicationModule.cs" />
     <Compile Include="Handlers\StitchNancyModule.cs" />
     <Compile Include="Handlers\ModulesNancyModule.cs" />
     <Compile Include="Handlers\NodeRequestHandler.cs" />

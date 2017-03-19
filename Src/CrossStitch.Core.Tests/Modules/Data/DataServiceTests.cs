@@ -13,15 +13,15 @@ namespace CrossStitch.Core.Tests.Modules.Data
         private static DataService CreateTarget()
         {
             var storage = new InMemoryDataStorage();
-            storage.Save(new Application()
+            storage.Save(new StitchInstance()
             {
                 Name = "A"
             }, true);
-            storage.Save(new Application()
+            storage.Save(new StitchInstance()
             {
                 Name = "B"
             }, true);
-            storage.Save(new Application()
+            storage.Save(new StitchInstance()
             {
                 Name = "C"
             }, true);
@@ -32,7 +32,7 @@ namespace CrossStitch.Core.Tests.Modules.Data
         public void HandleRequest_GetAll_Test()
         {
             var target = CreateTarget();
-            var result = target.HandleRequest(DataRequest<Application>.GetAll());
+            var result = target.HandleRequest(DataRequest<StitchInstance>.GetAll());
             result.Type.Should().Be(DataResponseType.Success);
             result.Entities.Count.Should().Be(3);
         }
@@ -41,7 +41,7 @@ namespace CrossStitch.Core.Tests.Modules.Data
         public void HandleRequest_Get_Test()
         {
             var storage = new InMemoryDataStorage();
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
@@ -49,7 +49,7 @@ namespace CrossStitch.Core.Tests.Modules.Data
             var id = entity.Id;
             var target = new DataService(storage, null);
 
-            var result = target.HandleRequest(DataRequest<Application>.Get(id));
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Get(id));
             result.Type.Should().Be(DataResponseType.Success);
             result.Entity.Name.Should().Be("A");
         }
@@ -58,7 +58,7 @@ namespace CrossStitch.Core.Tests.Modules.Data
         public void HandleRequest_Delete_Test()
         {
             var storage = new InMemoryDataStorage();
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
@@ -66,10 +66,10 @@ namespace CrossStitch.Core.Tests.Modules.Data
             var id = entity.Id;
             var target = new DataService(storage, null);
 
-            var result = target.HandleRequest(DataRequest<Application>.Delete(id));
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Delete(id));
             result.Type.Should().Be(DataResponseType.Success);
 
-            var result2 = storage.Get<Application>(id);
+            var result2 = storage.Get<StitchInstance>(id);
             result2.Should().BeNull();
         }
 
@@ -78,11 +78,11 @@ namespace CrossStitch.Core.Tests.Modules.Data
         {
             var target = new DataService(new InMemoryDataStorage(), null);
 
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
-            var result = target.HandleRequest(DataRequest<Application>.Save(entity));
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Save(entity));
             result.Type.Should().Be(DataResponseType.Success);
             result.Entity.Name.Should().Be("A");
         }
@@ -93,7 +93,7 @@ namespace CrossStitch.Core.Tests.Modules.Data
             var target = new DataService(new InMemoryDataStorage(), null);
 
 
-            var result = target.HandleRequest(DataRequest<Application>.Save(null));
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Save(null));
             result.Type.Should().Be(DataResponseType.GeneralFailure);
         }
 
@@ -103,13 +103,13 @@ namespace CrossStitch.Core.Tests.Modules.Data
         {
             var target = new DataService(new InMemoryDataStorage(), null);
 
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
-            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
+            entity = target.HandleRequest(DataRequest<StitchInstance>.Save(entity)).Entity;
             entity.Name = "B";
-            var result = target.HandleRequest(DataRequest<Application>.Save(entity));
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Save(entity));
             result.Type.Should().Be(DataResponseType.Success);
             result.Entity.Name.Should().Be("B");
         }
@@ -119,14 +119,14 @@ namespace CrossStitch.Core.Tests.Modules.Data
         {
             var target = new DataService(new InMemoryDataStorage(), null);
 
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
-            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
+            entity = target.HandleRequest(DataRequest<StitchInstance>.Save(entity)).Entity;
             entity.Name = "B";
             entity.StoreVersion = 0;
-            var result = target.HandleRequest(DataRequest<Application>.Save(entity));
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Save(entity));
             result.Type.Should().Be(DataResponseType.VersionMismatch);
         }
 
@@ -135,12 +135,12 @@ namespace CrossStitch.Core.Tests.Modules.Data
         {
             var target = new DataService(new InMemoryDataStorage(), null);
 
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
-            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
-            var result = target.HandleRequest(DataRequest<Application>.Save(entity.Id, a => a.Name = "B"));
+            entity = target.HandleRequest(DataRequest<StitchInstance>.Save(entity)).Entity;
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Save(entity.Id, a => a.Name = "B"));
             result.Type.Should().Be(DataResponseType.Success);
             result.Entity.Name.Should().Be("B");
         }
@@ -150,12 +150,12 @@ namespace CrossStitch.Core.Tests.Modules.Data
         {
             var target = new DataService(new InMemoryDataStorage(), null);
 
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
-            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
-            var result = target.HandleRequest(DataRequest<Application>.Save("GARBAGE", a => a.Name = "B"));
+            entity = target.HandleRequest(DataRequest<StitchInstance>.Save(entity)).Entity;
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Save("GARBAGE", a => a.Name = "B"));
             result.Type.Should().Be(DataResponseType.NotFound);
         }
 
@@ -164,12 +164,12 @@ namespace CrossStitch.Core.Tests.Modules.Data
         {
             var target = new DataService(new InMemoryDataStorage(), null);
 
-            var entity = new Application()
+            var entity = new StitchInstance()
             {
                 Name = "A"
             };
-            entity = target.HandleRequest(DataRequest<Application>.Save(entity)).Entity;
-            var result = target.HandleRequest(DataRequest<Application>.Save(entity.Id, null));
+            entity = target.HandleRequest(DataRequest<StitchInstance>.Save(entity)).Entity;
+            var result = target.HandleRequest(DataRequest<StitchInstance>.Save(entity.Id, null));
             result.Type.Should().Be(DataResponseType.GeneralFailure);
         }
     }

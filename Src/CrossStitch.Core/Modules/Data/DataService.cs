@@ -1,7 +1,7 @@
-﻿using System;
-using CrossStitch.Core.Messages.Data;
+﻿using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
+using System;
 
 namespace CrossStitch.Core.Modules.Data
 {

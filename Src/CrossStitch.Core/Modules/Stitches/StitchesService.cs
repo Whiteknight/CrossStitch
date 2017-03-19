@@ -60,21 +60,14 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public PackageFileUploadResponse UploadStitchPackageFile(PackageFileUploadRequest request)
         {
-            // Get the application and make sure we have a Component record
-            var application = _data.Get<Application>(request.ApplicationId);
-            if (application == null)
+            if (!request.IsValid())
                 return new PackageFileUploadResponse(false, null);
-            if (application.Components.All(c => c.Name != request.Component))
-                return new PackageFileUploadResponse(false, null);
-            request.Application = application;
 
             // TODO: Validate the file. It should be a .zip
             // Save the file and generate a unique Version name
-            string version = _fileSystem.SavePackageToLibrary(request.ApplicationId, request.Component, request.Contents);
-            var groupName = new StitchGroupName(request.ApplicationId, request.Component, version);
+            string version = _fileSystem.SavePackageToLibrary(request.GroupName.Application, request.GroupName.Component, request.Contents);
+            var groupName = new StitchGroupName(request.GroupName.Application, request.GroupName.Component, version);
 
-            // Update the Application record with the new Version
-            _data.Update<Application>(request.ApplicationId, a => a.AddVersion(request.Component, version));
             _log.LogDebug("Uploaded package file {0}", groupName);
             return new PackageFileUploadResponse(true, groupName);
         }
@@ -84,17 +77,6 @@ namespace CrossStitch.Core.Modules.Stitches
         public InstanceResponse CreateNewInstance(CreateInstanceRequest request)
         {
             if (request == null || !request.IsValid())
-                return InstanceResponse.Failure(request);
-
-            string applicationId = request.GroupName.ApplicationId;
-            string component = request.GroupName.Component;
-            string version = request.GroupName.Version;
-
-            // Check to make sure we have a record for this version.
-            Application application = _data.Get<Application>(applicationId);
-            if (application == null)
-                return InstanceResponse.Failure(request);
-            if (!application.HasVersion(component, version))
                 return InstanceResponse.Failure(request);
 
             // Insert the new instance to the data module

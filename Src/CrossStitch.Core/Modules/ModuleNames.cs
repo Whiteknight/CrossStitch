@@ -8,7 +8,6 @@
         public const string Data = "Data";
         public const string Log = "Log";
         public const string Master = "Master";
-        public const string RequestCoordinator = "RequestCoordinator";
         public const string Stitches = "Stitches";
         public const string StitchMonitor = "StitchMonitor";
         public const string Timer = "Timer";

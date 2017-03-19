@@ -73,7 +73,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Models\ApplicationTests.cs" />
     <Compile Include="Models\StitchGroupNameTests.cs" />
     <Compile Include="Modules\Data\DataServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

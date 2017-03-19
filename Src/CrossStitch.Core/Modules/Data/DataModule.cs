@@ -1,9 +1,9 @@
 ﻿using Acquaintance;
+using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Data;
 using CrossStitch.Core.Models;
-using System.Collections.Generic;
-using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules.Data.InMemory;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Data
 {
@@ -28,10 +28,7 @@ namespace CrossStitch.Core.Modules.Data
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
             _subscriptions = new SubscriptionCollection(_messageBus);
-            _subscriptions.Listen<DataRequest<Application>, DataResponse<Application>>(l => l
-                .OnDefaultChannel()
-                .Invoke(_service.HandleRequest)
-                .OnThread(_workerThreadId));
+
             _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l
                 .OnDefaultChannel()
                 .Invoke(_service.HandleRequest)

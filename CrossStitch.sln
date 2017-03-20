@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core", "Src\CrossStitch.Core\CrossStitch.Core.csproj", "{A9A30EDF-7047-4D0F-A756-816EB85D0384}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90BBD862-7C6A-4F2D-B028-4AFA5B52D490}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\README.md = Tests\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Master", "Tests\ClusterTest.Master\ClusterTest.Master.csproj", "{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}"
 EndProject

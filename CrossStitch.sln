@@ -3,57 +3,67 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch", "Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj", "{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core", "Src\CrossStitch.Core\CrossStitch.Core.csproj", "{A9A30EDF-7047-4D0F-A756-816EB85D0384}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90BBD862-7C6A-4F2D-B028-4AFA5B52D490}"
-	ProjectSection(SolutionItems) = preProject
-		Tests\README.md = Tests\README.md
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Master", "Tests\ClusterTest.Master\ClusterTest.Master.csproj", "{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClusterTest", "ClusterTest", "{5A83AEED-DC87-4E40-91A1-93F29F442278}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core.Tests", "src\CrossStitch.Core.Tests\CrossStitch.Core.Tests.csproj", "{B948FD42-51B2-4700-B785-FEBDED260848}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Client", "Tests\ClusterTest.Client\ClusterTest.Client.csproj", "{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StitchStart", "StitchStart", "{F9726972-F257-4C9A-BCA5-145726867E1A}"
+
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D3382E8E-25E0-43E1-BF41-9AE916E10A10}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Http.NancyFx", "src\CrossStitch.Http.Nancy\CrossStitch.Http.NancyFx.csproj", "{1ABDC1B3-7213-44A7-A4AE-0AB40606C827}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpTest", "HttpTest", "{700E4D25-B6BE-4011-9A48-6B9FF76D4694}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Backplane.Zyre", "Src\CrossStitch.Backplane.Zyre\CrossStitch.Backplane.Zyre.csproj", "{4FCBE339-B357-4F32-937D-4AB1D1196B67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpTest.Server", "Tests\HttpTest.Server\HttpTest.Server.csproj", "{7CB85F13-7FC1-40BC-881F-5220DE6069EC}"
-EndProject
+
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BD2CE792-ED97-433E-80D7-C1D90B708AEE}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch", "Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj", "{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}"
+
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90BBD862-7C6A-4F2D-B028-4AFA5B52D490}"
+	ProjectSection(SolutionItems) = preProject
+		Tests\README.md = Tests\README.md
+	EndProjectSection
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core.Tests", "src\CrossStitch.Core.Tests\CrossStitch.Core.Tests.csproj", "{B948FD42-51B2-4700-B785-FEBDED260848}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch.Tests", "Src\CrossStitch.Stitch.Tests\CrossStitch.Stitch.Tests.csproj", "{15B56932-9606-41D4-BF7A-8638FD40904B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D3382E8E-25E0-43E1-BF41-9AE916E10A10}"
+
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ClusterTest", "ClusterTest", "{5A83AEED-DC87-4E40-91A1-93F29F442278}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchStart.Client", "Tests\StitchStart.Client\StitchStart.Client.csproj", "{CE85AB31-310A-4A64-B433-7FD1732914D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Master", "Tests\ClusterTest\ClusterTest.Master\ClusterTest.Master.csproj", "{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchStart.Server", "Tests\StitchStart.Server\StitchStart.Server.csproj", "{722C8DDF-6F4B-4320-A927-19C9E6224361}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClusterTest.Client", "Tests\ClusterTest\ClusterTest.Client\ClusterTest.Client.csproj", "{4567B48F-F5F9-49D2-AB06-9C43D0DC7B06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Backplane.Zyre", "Src\CrossStitch.Backplane.Zyre\CrossStitch.Backplane.Zyre.csproj", "{4FCBE339-B357-4F32-937D-4AB1D1196B67}"
+
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StitchStart", "StitchStart", "{F9726972-F257-4C9A-BCA5-145726867E1A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchStart.Client", "Tests\StitchStart\StitchStart.Client\StitchStart.Client.csproj", "{CE85AB31-310A-4A64-B433-7FD1732914D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchStart.Server", "Tests\StitchStart\StitchStart.Server\StitchStart.Server.csproj", "{722C8DDF-6F4B-4320-A927-19C9E6224361}"
+EndProject
+
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpTest", "HttpTest", "{700E4D25-B6BE-4011-9A48-6B9FF76D4694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpTest.Server", "Tests\HttpTest\HttpTest.Server\HttpTest.Server.csproj", "{7CB85F13-7FC1-40BC-881F-5220DE6069EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpTest.Stitch", "Tests\HttpTest\HttpTest.Stitch\HttpTest.Stitch.csproj", "{5E546ED6-1BB4-476F-9A51-AF26910C6AA2}"
+EndProject
+
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PingPong", "PingPong", "{0FEE5375-57B2-4D8C-849E-665F2B3A5CCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Server", "Tests\PingPong.Server\PingPong.Server.csproj", "{E17271EF-8229-4129-9F7F-009258C29AA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Server", "Tests\PingPong\PingPong.Server\PingPong.Server.csproj", "{E17271EF-8229-4129-9F7F-009258C29AA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Ping", "Tests\PingPong.Ping\PingPong.Ping.csproj", "{BB150058-BCB2-462B-8858-3556BE6E36FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Ping", "Tests\PingPong\PingPong.Ping\PingPong.Ping.csproj", "{BB150058-BCB2-462B-8858-3556BE6E36FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Pong", "Tests\PingPong.Pong\PingPong.Pong.csproj", "{0D51F9AA-78D1-4893-A877-EB3ADDB0B716}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPong.Pong", "Tests\PingPong\PingPong.Pong\PingPong.Pong.csproj", "{0D51F9AA-78D1-4893-A877-EB3ADDB0B716}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpTest.Stitch", "Tests\HttpTest.Stitch\HttpTest.Stitch.csproj", "{5E546ED6-1BB4-476F-9A51-AF26910C6AA2}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

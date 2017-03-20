@@ -1,9 +1,9 @@
-﻿using System;
-using CrossStitch.Stitch.ProcessV1.Stitch;
+﻿using CrossStitch.Stitch.ProcessV1.Stitch;
+using System;
 
 namespace HttpTest.Stitch
 {
-    class Program
+    public class Program
     {
         private static StitchMessageManager _manager;
 

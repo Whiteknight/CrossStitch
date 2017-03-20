@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\JavaScriptEnumConverter.cs" />
     <Compile Include="Handlers\CommandJobsNancyModule.cs" />
     <Compile Include="Handlers\StitchNancyModule.cs" />
     <Compile Include="Handlers\ModulesNancyModule.cs" />

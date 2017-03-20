@@ -37,6 +37,12 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 });
             };
 
+            Get["/{StitchId}/logs"] = _ =>
+            {
+                // Get last N log messages from the stitch
+                return null;
+            };
+
             //Post["/{StitchId}/clone"] = _ =>
             //{
             //    return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest

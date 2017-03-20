@@ -17,13 +17,17 @@
     {
         public StitchHealthType Status { get; set; }
         public string StitchId { get; set; }
+        public long LastHeartbeatReceived { get; set; }
+        public long HeartbeatsMissed { get; set; }
 
-        public static StitchHealthResponse Create(StitchHealthRequest request, StitchHealthType type)
+        public static StitchHealthResponse Create(StitchHealthRequest request, long lastHeartbeatId, long currentHeartbeatId, StitchHealthType type)
         {
             return new StitchHealthResponse
             {
                 Status = type,
-                StitchId = request.StitchId
+                StitchId = request.StitchId,
+                LastHeartbeatReceived = lastHeartbeatId,
+                HeartbeatsMissed = currentHeartbeatId - lastHeartbeatId
             };
         }
 

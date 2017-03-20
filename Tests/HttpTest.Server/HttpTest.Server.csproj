@@ -7,8 +7,8 @@
     <ProjectGuid>{7CB85F13-7FC1-40BC-881F-5220DE6069EC}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HttpTest</RootNamespace>
-    <AssemblyName>HttpTest</AssemblyName>
+    <RootNamespace>HttpTest.Server</RootNamespace>
+    <AssemblyName>HttpTest.Server</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

@@ -52,10 +52,10 @@ namespace CrossStitch.Core.Modules.StitchMonitor
             var heartbeatId = GetCurrentHeartbeatId();
             var stitch = _data.Get<StitchInstance>(arg.StitchId);
             if (stitch == null)
-                return StitchHealthResponse.Create(arg, StitchHealthType.Missing);
+                return StitchHealthResponse.Create(arg, 0, 0, StitchHealthType.Missing);
 
             var health = StitchHealthResponse.CalculateHealth(heartbeatId, stitch.LastHeartbeatReceived);
-            return StitchHealthResponse.Create(arg, health);
+            return StitchHealthResponse.Create(arg, stitch.LastHeartbeatReceived, heartbeatId, health);
         }
     }
 }

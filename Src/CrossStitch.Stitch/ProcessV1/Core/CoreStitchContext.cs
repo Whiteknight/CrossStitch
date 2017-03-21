@@ -5,6 +5,11 @@ namespace CrossStitch.Stitch.ProcessV1.Core
 {
     public class CoreStitchContext
     {
+        public CoreStitchContext(string stitchId)
+        {
+            StitchInstanceId = stitchId;
+        }
+
         public event EventHandler<StitchProcessEventArgs> StitchStateChange;
         public event EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
         public event EventHandler<RequestResponseReceivedEventArgs> RequestResponseReceived;
@@ -14,11 +19,7 @@ namespace CrossStitch.Stitch.ProcessV1.Core
         public long LastHeartbeatReceived { get; private set; }
 
         public string StitchInstanceId { get; }
-
-        public CoreStitchContext(string stitchId)
-        {
-            StitchInstanceId = stitchId;
-        }
+        public string DataDirectory { get; set; }
 
         public void RaiseProcessEvent(bool isRunning, bool wasRequested)
         {

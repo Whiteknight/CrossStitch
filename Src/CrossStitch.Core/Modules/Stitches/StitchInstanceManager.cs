@@ -196,6 +196,7 @@ namespace CrossStitch.Core.Modules.Stitches
             if (!added)
                 return null;
 
+            adaptor.StitchContext.DataDirectory = _fileSystem.GetInstanceDataDirectoryPath(stitchInstance.Id);
             adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
             adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
             adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;

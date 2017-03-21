@@ -71,14 +71,14 @@ namespace CrossStitch.Core.Modules.Stitches
             };
         }
 
+        public string GetInstanceDataDirectoryPath(string instanceId)
+        {
+            return Path.Combine(_config.DataBasePath, instanceId);
+        }
+
         private string GetInstanceRunningDirectory(string instanceId)
         {
             return Path.Combine(_config.RunningAppBasePath, instanceId);
-        }
-
-        private string GetInstanceDataDirectoryPath(string instanceId)
-        {
-            return Path.Combine(_config.DataBasePath, instanceId);
         }
 
         public bool DeleteRunningInstanceDirectory(string instanceId)

@@ -70,10 +70,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
         {
             var sb = new StringBuilder();
             AddArgument(sb, Arguments.CorePid, parentPid.ToString());
+            AddArgument(sb, Arguments.InstanceId, _stitchInstance.Id);
             AddArgument(sb, Arguments.Application, _stitchInstance.GroupName.Application);
             AddArgument(sb, Arguments.Component, _stitchInstance.GroupName.Component);
             AddArgument(sb, Arguments.Version, _stitchInstance.GroupName.Version);
             AddArgument(sb, Arguments.GroupName, _stitchInstance.GroupName.ToString());
+            AddArgument(sb, Arguments.DataDirectory, StitchContext.DataDirectory);
             if (!string.IsNullOrEmpty(_parameters.ExecutableArguments))
             {
                 sb.Append("-- ");

@@ -105,7 +105,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
         }
 
         // TODO: Convert this to take some kind of object instead of all these primitive values
-        public void SendMessage(long messageId, string channel, string data, Guid nodeId, string senderStitchInstanceId)
+        public void SendMessage(long messageId, string channel, string data, string nodeId, string senderStitchInstanceId)
         {
             _channel.SendMessage(new ToStitchMessage
             {

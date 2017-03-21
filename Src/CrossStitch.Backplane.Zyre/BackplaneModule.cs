@@ -1,8 +1,6 @@
 ﻿using Acquaintance;
-using CrossStitch.Backplane.Zyre.Networking;
 using CrossStitch.Core;
 using CrossStitch.Core.MessageBus;
-using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules;
@@ -60,11 +58,6 @@ namespace CrossStitch.Backplane.Zyre
                 .WithChannelName(NodeStatus.BroadcastEvent)
                 .Invoke(BroadcastNodeStatus)
                 .OnThread(_workerThreadId));
-            _subscriptions.Subscribe<StitchDataMessage>(b => b
-                .OnDefaultChannel()
-                .Invoke(SendDataMessage)
-                .OnWorkerThread()
-                .WithFilter(m => !string.IsNullOrEmpty(m.ToNetworkId)));
 
             var context = _backplane.Start();
             _nodeNetworkId = context.NodeNetworkId;
@@ -99,11 +92,6 @@ namespace CrossStitch.Backplane.Zyre
             Stop();
         }
 
-        private void SendDataMessage(StitchDataMessage obj)
-        {
-            throw new NotImplementedException();
-        }
-
         private void BroadcastNodeStatus(NodeStatus nodeStatus)
         {
             nodeStatus.Zones = _configuration.Zones.OrEmptyIfNull().ToList();
@@ -111,7 +99,6 @@ namespace CrossStitch.Backplane.Zyre
             var envelope = new ClusterMessageBuilder()
                 .ToCluster()
                 .FromNode()
-                .WithEventName(NodeStatus.BroadcastEvent)
                 .WithObjectPayload(nodeStatus)
                 .Build();
             _backplane.Send(envelope);
@@ -131,12 +118,12 @@ namespace CrossStitch.Backplane.Zyre
 
         private void ClusterMemberHandler(object sender, PayloadEventArgs<ClusterMemberEvent> e)
         {
-            _messageBus?.Publish(e);
-
             if (e.Command == ClusterMemberEvent.EnteringEvent)
-                _log.LogInformation("New node added to cluster NodeId={0}", e.Payload.NodeUuid);
+                _log.LogInformation("New node added to cluster NodeId={0}", e.Payload.NetworkNodeId);
             if (e.Command == ClusterMemberEvent.ExitingEvent)
-                _log.LogInformation("Node has left cluster NodeId={0}", e.Payload.NodeUuid);
+                _log.LogInformation("Node has left cluster NodeId={0}", e.Payload.NetworkNodeId);
+
+            _messageBus.Publish(e.Command, e.Payload);
         }
 
         private void MessageReceivedHandler(object sender, PayloadEventArgs<ClusterMessage> e)

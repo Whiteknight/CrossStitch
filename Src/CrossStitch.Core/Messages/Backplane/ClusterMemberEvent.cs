@@ -6,7 +6,8 @@ namespace CrossStitch.Core.Messages.Backplane
     {
         public const string ExitingEvent = "Exiting";
         public const string EnteringEvent = "Entering";
-        public Guid NodeUuid { get; set; }
-        public string NodeName { get; set; }
+
+        public string NetworkNodeId { get; set; }
+        public string NodeId { get; set; }
     }
 }

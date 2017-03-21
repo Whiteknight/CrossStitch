@@ -6,9 +6,7 @@ using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Handlers;
 using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;
-using System;
 using System.Collections.Generic;
-using System.ServiceModel.Security.Tokens;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -48,7 +46,6 @@ namespace CrossStitch.Core.Modules.Master
                 _log.LogError("Could not save node status");
                 return null;
             }
-            _log.LogDebug("Published node status");
             return message;
         }
 
@@ -73,13 +70,16 @@ namespace CrossStitch.Core.Modules.Master
 
         public void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
         {
-            var messages = new DataMessageAddresser(_data).AddressMessage(message);
+            var messages = new DataMessageAddresser(_core.NodeId, _data).AddressMessage(message);
             foreach (var outMessage in messages)
             {
+                bool isRemote = !string.IsNullOrEmpty(outMessage.ToNodeId);
                 // If it has a Node id, publish it. The filter will stop it from coming back
                 // and the Backplane will pick it up.
                 // Otherwise, publish it locally for a local stitch instance to grab it.
-                _stitches.SendStitchData(outMessage, outMessage.ToNodeId != Guid.Empty);
+                _stitches.SendStitchData(outMessage, isRemote);
+                if (isRemote)
+                    _log.LogDebug("Routing StitchDataMessage to node Id={0}, StitchId={1}", outMessage.ToNodeId, outMessage.ToStitchInstanceId);
             }
         }
 

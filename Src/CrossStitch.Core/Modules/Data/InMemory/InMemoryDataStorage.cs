@@ -63,12 +63,16 @@ namespace CrossStitch.Core.Modules.Data.InMemory
             if (string.IsNullOrEmpty(entity.Id))
                 return SaveNew(entity) ? entity.StoreVersion : DataService.InvalidId;
 
+            if (force)
+            {
+                SaveExisting(entity);
+                return entity.StoreVersion;
+            }
+
             var stored = Get<TEntity>(entity.Id);
             if (stored == null)
                 return SaveNew(entity) ? entity.StoreVersion : DataService.InvalidId;
 
-            if (force)
-                entity.StoreVersion = stored.StoreVersion;
             if (entity.StoreVersion != stored.StoreVersion)
                 return DataService.VersionMismatch;
 

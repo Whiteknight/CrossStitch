@@ -16,6 +16,15 @@ HttpTest is a proving ground for the NancyFx HTTP API module. It consists of two
 1. HttpTest.Server, a CrossStitch node which hosts the HTTP server and a stitches module
 2. HttpTest.Stitch, a stitch, which can be used to test basic commands and queries on stitches.
 
+### PenPal
+
+PenPal test is a combination of ClusterTest and PingPong test ideas. It establishes two nodes in a cluster, each with a running stitch. These stitches communicate together across the cluster. This test consists of the following components:
+
+1. PenPal.ServerA is the first CrossStitch node, and host of StitchA
+2. PenPal.ServerB is the second CrossStitch node, and host of StitchB
+3. PenPal.StitchA is a stitch which runs on ServerA. On every heartbeat, it sends a message "A" to all stitches in the "PenPal" application
+4. PenPal.StitchB is a stitch which runs on ServerB. When it receives a message "A", it responds to the sender with data "B"
+
 ### PingPong
 
 PingPong is a test to show communications between stitches in a single CrossStitch node. It has three components:

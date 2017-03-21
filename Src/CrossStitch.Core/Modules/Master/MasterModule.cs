@@ -6,7 +6,6 @@ using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using System;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -17,16 +16,17 @@ namespace CrossStitch.Core.Modules.Master
         private readonly NodeConfiguration _configuration;
         private readonly IMessageBus _messageBus;
         private SubscriptionCollection _subscriptions;
+        private readonly ModuleLog _log;
 
         public MasterModule(CrossStitchCore core, NodeConfiguration configuration)
         {
             _configuration = configuration;
             _messageBus = core.MessageBus;
-            var log = new ModuleLog(core.MessageBus, Name);
+            _log = new ModuleLog(core.MessageBus, Name);
             var data = new DataHelperClient(core.MessageBus);
             var masterData = new MasterDataRepository(data);
             var stitches = new StitchRequestHandler(core.MessageBus);
-            _service = new MasterService(core, log, masterData, stitches);
+            _service = new MasterService(core, _log, masterData, stitches);
         }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
@@ -77,13 +77,17 @@ namespace CrossStitch.Core.Modules.Master
                 .OnWorkerThread());
 
             // Respond to requests for node status
+            // TODO: Publish NodeStatus to cluster when Modules or StitchInstances change
             _subscriptions.Listen<NodeStatusRequest, NodeStatus>(b => b
                 .OnDefaultChannel()
                 .Invoke(m => _service.GetExistingNodeStatus(m.NodeId)));
+            _subscriptions.Subscribe<ClusterMemberEvent>(b => b
+                .WithChannelName(ClusterMemberEvent.EnteringEvent)
+                .Invoke(SendNodeStatusToNewClusterNode));
 
             // Save node status from other nodes
             _subscriptions.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
-                .WithChannelName(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
+                .WithChannelName(ReceivedEvent.ChannelReceived)
                 .Invoke(m => _service.SaveNodeStatus(m.Object)));
 
             // Handle incoming commands
@@ -99,12 +103,10 @@ namespace CrossStitch.Core.Modules.Master
                 .WithChannelName(ReceivedEvent.ChannelReceived)
                 .Invoke(ore => _service.ReceiveReceiptFromRemote(ore, ore.Object)));
 
-            // Route StitchDataMessage to the correct node, if the message does not already have a NetworkNodeId specified
+            // Route StitchDataMessage to the correct node
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()
-                .Invoke(_service.EnrichStitchDataMessageWithAddress)
-                .OnWorkerThread()
-                .WithFilter(m => m.ToNodeId == Guid.Empty && string.IsNullOrEmpty(m.ToNetworkId)));
+                .Invoke(_service.EnrichStitchDataMessageWithAddress));
         }
 
         public void Stop()
@@ -127,7 +129,25 @@ namespace CrossStitch.Core.Modules.Master
         {
             var message = _service.GenerateCurrentNodeStatus();
             if (message != null)
+            {
                 _messageBus.Publish(NodeStatus.BroadcastEvent, message);
+                _log.LogDebug("Published node status to cluster");
+            }
+        }
+
+        private void SendNodeStatusToNewClusterNode(ClusterMemberEvent obj)
+        {
+            var message = _service.GenerateCurrentNodeStatus();
+            if (message == null)
+                return;
+
+            var envelope = new ClusterMessageBuilder()
+                .FromNode()
+                .ToNode(obj.NetworkNodeId)
+                .WithObjectPayload(message)
+                .Build();
+            _messageBus.Publish(ClusterMessage.SendEventName, envelope);
+            _log.LogDebug("Published node status to node Id={0}", obj.NodeId);
         }
 
         private class StitchRequestHandler : IStitchRequestHandler
@@ -171,8 +191,17 @@ namespace CrossStitch.Core.Modules.Master
 
             public void SendStitchData(StitchDataMessage message, bool remote)
             {
-                string channelName = remote ? null : StitchDataMessage.ChannelSendLocal;
-                _messageBus.Publish(channelName, message);
+                if (remote)
+                {
+                    var envelope = new ClusterMessageBuilder()
+                        .ToNode(message.ToNetworkId)
+                        .FromNode()
+                        .WithObjectPayload(message)
+                        .Build();
+                    _messageBus.Publish(ClusterMessage.SendEventName, envelope);
+                }
+                else
+                    _messageBus.Publish(StitchDataMessage.ChannelSendLocal, message);
             }
         }
     }

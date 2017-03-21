@@ -1,0 +1,4 @@
+﻿{
+    "ListenPort": 8081,
+    "SendTimeoutMs": 1000
+}

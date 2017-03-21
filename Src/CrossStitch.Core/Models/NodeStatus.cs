@@ -1,9 +1,10 @@
 ﻿using CrossStitch.Core.Messages.Stitches;
 using System.Collections.Generic;
+using CrossStitch.Core.Messages.Backplane;
 
 namespace CrossStitch.Core.Models
 {
-    public class NodeStatus : IDataEntity
+    public class NodeStatus : IDataEntity, IRequiresNetworkNodeId
     {
         public const string BroadcastEvent = "NodeStatusBroadcast";
 

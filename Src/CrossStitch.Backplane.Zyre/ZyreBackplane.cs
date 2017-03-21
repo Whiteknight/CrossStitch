@@ -1,5 +1,4 @@
-﻿using CrossStitch.Backplane.Zyre.Networking;
-using CrossStitch.Backplane.Zyre.Networking.NetMq;
+﻿using CrossStitch.Backplane.Zyre.Networking.NetMq;
 using CrossStitch.Core;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules.Master;
@@ -29,7 +28,10 @@ namespace CrossStitch.Backplane.Zyre
             _config = config ?? BackplaneConfiguration.GetDefault();
             _serializer = serializer ?? new JsonSerializer();
 
-            _zyre = new NetMQ.Zyre.Zyre(core.NodeId.ToString());
+            // TODO: Need to expose more zyre options in the config, including broadcast port, broadcast interface, 
+            // and beacon interval.
+
+            _zyre = new NetMQ.Zyre.Zyre(core.NodeId);
             _zyre.EnterEvent += ZyreEnterEvent;
             _zyre.StopEvent += ZyreStopEvent;
             _zyre.ExitEvent += ZyreExitEvent;
@@ -84,6 +86,7 @@ namespace CrossStitch.Backplane.Zyre
                 envelope.Header.FromEntityId = _core.NodeId;
             if (!envelope.IsSendable())
                 return;
+            envelope.FillInNetworkNodeId(envelope.Header.FromNetworkId);
 
             var message = _mapper.Map(envelope);
 
@@ -173,8 +176,8 @@ namespace CrossStitch.Backplane.Zyre
             // A peer node has joined the cluster
             ClusterMember.Raise(this, ClusterMemberEvent.EnteringEvent, new ClusterMemberEvent
             {
-                NodeName = e.SenderName,
-                NodeUuid = e.SenderUuid
+                NodeId = e.SenderName,
+                NetworkNodeId = e.SenderUuid.ToString()
             });
         }
 
@@ -183,8 +186,8 @@ namespace CrossStitch.Backplane.Zyre
             // A peer node has left the cluster
             ClusterMember.Raise(this, ClusterMemberEvent.ExitingEvent, new ClusterMemberEvent
             {
-                NodeName = e.SenderName,
-                NodeUuid = e.SenderUuid
+                NodeId = e.SenderName,
+                NetworkNodeId = e.SenderUuid.ToString()
             });
         }
     }

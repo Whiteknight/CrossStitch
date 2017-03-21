@@ -5,6 +5,7 @@ using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using System.Collections.Generic;
+using CrossStitch.Core.Messages.Backplane;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -66,6 +67,9 @@ namespace CrossStitch.Core.Modules.Stitches
                 .Invoke(_service.SendDataMessageToStitch)
                 .OnWorkerThread()
                 .WithFilter(m => !string.IsNullOrEmpty(m.ToStitchInstanceId)));
+            _subscriptions.Subscribe<ObjectReceivedEvent<StitchDataMessage>>(b => b
+                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .Invoke(m => _service.SendDataMessageToStitch(m.Object)));
 
             _subscriptions.Subscribe<SendHeartbeatEvent>(b => b
                 .OnDefaultChannel()

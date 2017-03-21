@@ -40,5 +40,17 @@ namespace CrossStitch.Core.Messages.Backplane
                 return false;
             return Header.IsSendable();
         }
+
+        public void FillInNetworkNodeId(string networkNodeId)
+        {
+            if (Header.PayloadType != MessagePayloadType.Object || PayloadObject == null)
+                return;
+
+            var needsNetworkId = PayloadObject as IRequiresNetworkNodeId;
+            if (needsNetworkId == null)
+                return;
+
+            needsNetworkId.NetworkNodeId = networkNodeId;
+        }
     }
 }

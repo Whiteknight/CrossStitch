@@ -1,7 +1,5 @@
-﻿using CrossStitch.Core.MessageBus;
-using CrossStitch.Core.Messages;
+﻿using CrossStitch.Core.Messages;
 using CrossStitch.Core.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.Core.Utility;
@@ -10,16 +8,18 @@ namespace CrossStitch.Core.Modules.Master
 {
     public class DataMessageAddresser
     {
+        private readonly string _nodeId;
         private readonly IDataRepository _data;
 
-        public DataMessageAddresser(IDataRepository data)
+        public DataMessageAddresser(string nodeId, IDataRepository data)
         {
+            _nodeId = nodeId;
             _data = data;
         }
 
         public IEnumerable<StitchDataMessage> AddressMessage(StitchDataMessage message)
         {
-            if (!string.IsNullOrEmpty(message.ToStitchInstanceId))
+            if (!string.IsNullOrEmpty(message.ToStitchInstanceId) && message.ToStitchInstanceId != message.FromStitchInstanceId)
             {
                 message = AddressInstanceMessage(message);
                 return message == null ? Enumerable.Empty<StitchDataMessage>() : new[] { message };
@@ -34,7 +34,10 @@ namespace CrossStitch.Core.Modules.Master
         {
             var messages = new List<StitchDataMessage>();
             var groupName = new StitchGroupName(message.ToStitchGroup);
-            var stitches = _data.GetAll<StitchInstance>().Where(si => groupName.Contains(si.GroupName)).ToList();
+            var stitches = _data.GetAll<StitchInstance>()
+                .Where(si => groupName.Contains(si.GroupName))
+                .Where(si => si.Id != message.FromStitchInstanceId)
+                .ToList();
             foreach (var stitch in stitches)
             {
                 messages.Add(new StitchDataMessage
@@ -49,12 +52,18 @@ namespace CrossStitch.Core.Modules.Master
             }
 
             // TODO: We need to filter out the current node, and only look at remote nodes
-            var nodes = _data.GetAll<NodeStatus>();
+            var nodes = _data.GetAll<NodeStatus>()
+                .Where(n => n.Id != _nodeId)
+                .ToList();
             foreach (var node in nodes)
             {
-                var nodeStitchInstances = node.Instances.Where(i => groupName.Contains(i.GroupName));
+                var nodeStitchInstances = node.Instances
+                    .Where(i => groupName.Contains(i.GroupName))
+                    .Where(si => si.Id != message.FromStitchInstanceId)
+                    .ToList();
+
                 foreach (var stitch in nodeStitchInstances)
-                {
+                {   
                     messages.Add(new StitchDataMessage
                     {
                         Data = message.Data,
@@ -64,7 +73,7 @@ namespace CrossStitch.Core.Modules.Master
                         FromStitchInstanceId = message.FromStitchInstanceId,
 
                         // Fill in destination node details, so it gets sent over the backplane
-                        ToNodeId = Guid.Parse(node.Id),
+                        ToNodeId = node.Id,
                         ToNetworkId = node.NetworkNodeId
                     });
                 }
@@ -80,13 +89,15 @@ namespace CrossStitch.Core.Modules.Master
             {
                 // Clear out recipient node info, to make clear that this is a local delivery
                 // Otherwise reuse the same object instance
-                message.ToNodeId = Guid.Empty;
+                message.ToNodeId = null;
                 message.ToNetworkId = null;
                 return message;
             }
 
             // TODO: This is inefficient
-            var nodes = _data.GetAll<NodeStatus>();
+            var nodes = _data.GetAll<NodeStatus>()
+                .Where(n => n.Id != _nodeId)
+                .ToList();
             foreach (var node in nodes)
             {
                 var remoteInstance = node.Instances.FirstOrDefault(i => i.Id == message.ToStitchInstanceId);
@@ -101,7 +112,7 @@ namespace CrossStitch.Core.Modules.Master
                         FromStitchInstanceId = message.FromStitchInstanceId,
 
                         // Fill in node details to send over the Backplane
-                        ToNodeId = Guid.Parse(node.Id),
+                        ToNodeId = node.Id,
                         ToNetworkId = node.NetworkNodeId
                     };
                 }

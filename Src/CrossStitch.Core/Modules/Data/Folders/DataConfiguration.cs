@@ -10,6 +10,7 @@ namespace CrossStitch.Core.Modules.Data.Folders
         }
 
         public string DataPath { get; set; }
+
         public void ValidateAndSetDefaults()
         {
 

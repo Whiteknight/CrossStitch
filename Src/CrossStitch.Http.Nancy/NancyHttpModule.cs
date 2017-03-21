@@ -14,7 +14,7 @@ namespace CrossStitch.Http.NancyFx
         private readonly HttpConfiguration _httpConfiguration;
         private readonly ModuleLog _log;
 
-        public NancyHttpModule(HttpConfiguration httpConfiguration, IMessageBus messageBus)
+        public NancyHttpModule(IMessageBus messageBus, HttpConfiguration httpConfiguration = null)
         {
             var bootstrapper = new HttpModuleBootstrapper(messageBus);
             var hostConfig = new HostConfiguration
@@ -24,6 +24,7 @@ namespace CrossStitch.Http.NancyFx
                     CreateAutomatically = true
                 }
             };
+            httpConfiguration = httpConfiguration ?? HttpConfiguration.GetDefault();
             _host = new NancyHost(new Uri("http://localhost:" + httpConfiguration.Port), bootstrapper, hostConfig);
             _httpConfiguration = httpConfiguration;
             _log = new ModuleLog(messageBus, Name);

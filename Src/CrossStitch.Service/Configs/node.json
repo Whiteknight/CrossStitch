@@ -1,0 +1,6 @@
+﻿{
+  "HeartbeatIntervalMinutes": 1,
+  "StitchMonitorIntervalMinutes": 1,
+  "StatusBroadcastIntervalMinutes": 2,
+  "StateFileFolder": "."
+}

@@ -9,7 +9,8 @@ using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Master
 {
-    // The Master module coordinates multipart-commands across the cluster.
+    // The Master module keeps track of node/cluster state and routes messages to the appropriate
+    // destinations
     public class MasterModule : IModule
     {
         private readonly MasterService _service;
@@ -50,14 +51,13 @@ namespace CrossStitch.Core.Modules.Master
          * Whether we want to represent these things by command objects or by some kind of parsible command script is to be determined.
          */
 
-        // TODO: When we convert an input command to a stream of output commands, we will need some
-        // kind of a Job object that we can use to keep track of state. The status of the Job can be
-        // queried externally, and the job can be polled regularly to find jobs which are running 
-        // very late and need to be alerted about.
-        // TODO: A Job should have an ability to be rolled-back, by issuing a sequence of inverse 
+        // TODO: A CommandJob should have an ability to be rolled-back, by issuing a sequence of inverse 
         // commands.
 
-        // TODO: Method to lookup NodeId by NetworkNodeId and vice-versa
+        // TODO: Method to lookup NodeId by NetworkNodeId and vice-versa. Maybe maintain a cache
+        // here instead of looking it up in the DataModule each time?
+
+        // TODO: Cache for StitchId->NodeId/NodeNetworkId to speed up routing
 
         public string Name => ModuleNames.Master;
 

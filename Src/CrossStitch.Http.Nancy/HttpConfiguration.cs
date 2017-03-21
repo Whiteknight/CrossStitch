@@ -10,6 +10,7 @@ namespace CrossStitch.Http.NancyFx
         }
 
         public int Port { get; set; }
+
         public void ValidateAndSetDefaults()
         {
             if (Port <= 0)

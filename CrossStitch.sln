@@ -64,6 +64,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PenPal.ServerB", "Tests\Pen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PenPal.StitchB", "Tests\PenPal\PenPal.StitchB\PenPal.StitchB.csproj", "{DC9824A2-BF7E-4F76-8F47-73B64990FFBC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Service", "Src\CrossStitch.Service\CrossStitch.Service.csproj", "{E156A692-3BC7-4FA5-9FCD-76B92FC5A739}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -185,6 +187,12 @@ Global
 		{DC9824A2-BF7E-4F76-8F47-73B64990FFBC}.Release 4.5|Any CPU.Build.0 = Release|Any CPU
 		{DC9824A2-BF7E-4F76-8F47-73B64990FFBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC9824A2-BF7E-4F76-8F47-73B64990FFBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E156A692-3BC7-4FA5-9FCD-76B92FC5A739}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E156A692-3BC7-4FA5-9FCD-76B92FC5A739}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E156A692-3BC7-4FA5-9FCD-76B92FC5A739}.Release 4.5|Any CPU.ActiveCfg = Release|Any CPU
+		{E156A692-3BC7-4FA5-9FCD-76B92FC5A739}.Release 4.5|Any CPU.Build.0 = Release|Any CPU
+		{E156A692-3BC7-4FA5-9FCD-76B92FC5A739}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E156A692-3BC7-4FA5-9FCD-76B92FC5A739}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,9 @@
-﻿using CrossStitch.Stitch.Utility;
+﻿using CrossStitch.Core.Models;
+using CrossStitch.Stitch.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CrossStitch.Core.Models;
 
 namespace CrossStitch.Core.Modules.Data.Folders
 {
@@ -13,11 +13,11 @@ namespace CrossStitch.Core.Modules.Data.Folders
     {
         private readonly Configuration _config;
 
-        public FolderDataStorage(Configuration config)
+        public FolderDataStorage(Configuration config = null)
         {
-            _config = config;
-            if (!Directory.Exists(config.DataPath))
-                Directory.CreateDirectory(config.DataPath);
+            _config = config ?? Configuration.GetDefault();
+            if (!Directory.Exists(_config.DataPath))
+                Directory.CreateDirectory(_config.DataPath);
         }
 
         public bool Delete<TEntity>(string id)

@@ -1,11 +1,11 @@
 ﻿using Acquaintance;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using System.Collections.Generic;
-using CrossStitch.Core.Messages.Backplane;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -16,9 +16,10 @@ namespace CrossStitch.Core.Modules.Stitches
 
         private SubscriptionCollection _subscriptions;
 
-        public StitchesModule(CrossStitchCore core, StitchesConfiguration configuration)
+        public StitchesModule(CrossStitchCore core, StitchesConfiguration configuration = null)
         {
             _messageBus = core.MessageBus;
+            configuration = configuration ?? StitchesConfiguration.GetDefault();
             var fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
             var manager = new StitchInstanceManager(fileSystem);
             var log = new ModuleLog(_messageBus, Name);

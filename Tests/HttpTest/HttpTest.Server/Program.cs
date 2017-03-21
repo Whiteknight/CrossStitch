@@ -1,13 +1,12 @@
 ﻿using CrossStitch.Core;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Data;
-using CrossStitch.Core.Modules.Data.Folders;
+using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Http.NancyFx;
 using System;
 using System.Collections.Generic;
-using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.Data.InMemory;
 
 namespace HttpTest
 {
@@ -19,8 +18,7 @@ namespace HttpTest
 
             using (var core = new CrossStitchCore(nodeConfig))
             {
-                var httpConfiguration = HttpConfiguration.GetDefault();
-                var httpServer = new NancyHttpModule(httpConfiguration, core.MessageBus);
+                var httpServer = new NancyHttpModule(core.MessageBus);
                 core.AddModule(httpServer);
 
                 var dataStorage = new InMemoryDataStorage();

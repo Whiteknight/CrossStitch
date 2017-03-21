@@ -12,6 +12,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public string DataBasePath { get; set; }
         public string AppLibraryBasePath { get; set; }
         public string RunningAppBasePath { get; set; }
+
         public void ValidateAndSetDefaults()
         {
         }

@@ -11,8 +11,8 @@ namespace CrossStitch.Backplane.Zyre
         }
 
         public int ListenPort { get; set; }
-        public double SendTimeoutMs { get; set; }
         public List<string> Zones { get; set; }
+
         public void ValidateAndSetDefaults()
         {
             // TODO: Default ListenPort

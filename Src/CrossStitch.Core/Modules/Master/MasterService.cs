@@ -1,5 +1,4 @@
-﻿using Acquaintance;
-using CrossStitch.Core.Messages;
+﻿using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
@@ -14,18 +13,18 @@ namespace CrossStitch.Core.Modules.Master
     {
         private readonly CrossStitchCore _core;
         private readonly IModuleLog _log;
-        private readonly MasterDataRepository _data;
         private readonly IStitchRequestHandler _stitches;
-        private readonly Dictionary<CommandType, ICommandHandler> _commandHandlers;
         private readonly IClusterMessageSender _clusterSender;
+        private readonly MasterDataRepository _data;
+        private readonly Dictionary<CommandType, ICommandHandler> _commandHandlers;
 
-        public MasterService(CrossStitchCore core, IModuleLog log, MasterDataRepository data, IStitchRequestHandler stitches)
+        public MasterService(CrossStitchCore core, IModuleLog log, MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender clusterSender)
         {
             _core = core;
             _log = log;
             _data = data;
             _stitches = stitches;
-            _clusterSender = new ClusterMessageSender(core.MessageBus);
+            _clusterSender = clusterSender;
 
             _commandHandlers = new Dictionary<CommandType, ICommandHandler>
             {
@@ -40,15 +39,8 @@ namespace CrossStitch.Core.Modules.Master
 
         public NodeStatus GenerateCurrentNodeStatus()
         {
-            var message = new NodeStatusBuilder(_core, _data).Build();
-
-            bool ok = _data.Save(message, true);
-            if (!ok)
-            {
-                _log.LogError("Could not save node status");
-                return null;
-            }
-            return message;
+            var stitches = _data.GetAll<StitchInstance>();
+            return new NodeStatusBuilder(_core.NodeId, _core.Name, _core.Modules.AddedModules, stitches).Build();
         }
 
         public NodeStatus GetExistingNodeStatus(string id)
@@ -72,10 +64,11 @@ namespace CrossStitch.Core.Modules.Master
 
         public void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
         {
-            var messages = new DataMessageAddresser(_core.NodeId, _data).AddressMessage(message);
+            var stitches = _data.GetAllStitchSummaries();
+            var messages = new DataMessageAddresser(stitches).AddressMessage(message);
             foreach (var outMessage in messages)
             {
-                bool isRemote = !string.IsNullOrEmpty(outMessage.ToNodeId);
+                bool isRemote = !string.IsNullOrEmpty(outMessage.ToNodeId) && outMessage.ToNodeId != _core.NodeId;
                 // If it has a Node id, publish it. The filter will stop it from coming back
                 // and the Backplane will pick it up.
                 // Otherwise, publish it locally for a local stitch instance to grab it.
@@ -120,36 +113,6 @@ namespace CrossStitch.Core.Modules.Master
                 return CommandResponse.Create(false);
 
             return handler.Handle(arg);
-        }
-
-        private class ClusterMessageSender : IClusterMessageSender
-        {
-            private readonly IMessageBus _messageBus;
-
-            public ClusterMessageSender(IMessageBus messageBus)
-            {
-                _messageBus = messageBus;
-            }
-
-            public void Send(ClusterMessage message)
-            {
-                _messageBus.Publish(ClusterMessage.SendEventName, message);
-            }
-
-            public void SendReceipt(bool success, string networkNodeId, string jobId, string taskId)
-            {
-                var message = new ClusterMessageBuilder()
-                    .FromNode()
-                    .ToNode(networkNodeId)
-                    .WithObjectPayload(new CommandReceipt
-                    {
-                        Success = success,
-                        ReplyToJobId = jobId,
-                        ReplyToTaskId = taskId
-                    })
-                    .Build();
-                _messageBus.Publish(ClusterMessage.SendEventName, message);
-            }
         }
     }
 }

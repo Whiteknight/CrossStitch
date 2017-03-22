@@ -95,6 +95,9 @@ namespace CrossStitch.Core
 
         private static string GetNodeId(NodeConfiguration config)
         {
+            if (!string.IsNullOrEmpty(config.NodeId))
+                return config.NodeId;
+
             const string nodeIdFile = "NODEID";
             string nodeIdFilePath = System.IO.Path.Combine(config.StateFileFolder, nodeIdFile);
             if (System.IO.File.Exists(nodeIdFilePath))
@@ -115,6 +118,9 @@ namespace CrossStitch.Core
 
         private static string GetFriendlyNodeName(NodeConfiguration config, string nodeId)
         {
+            if (!string.IsNullOrEmpty(config.NodeName))
+                return config.NodeName;
+
             const string fileName = "NODENAME";
             string filePath = System.IO.Path.Combine(config.StateFileFolder, fileName);
             if (System.IO.File.Exists(filePath))

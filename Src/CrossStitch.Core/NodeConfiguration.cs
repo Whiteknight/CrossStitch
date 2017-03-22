@@ -9,6 +9,8 @@ namespace CrossStitch.Core
             return ConfigurationLoader.GetConfiguration<NodeConfiguration>("node.json");
         }
 
+        public string NodeId { get; set; }
+        public string NodeName { get; set; }
         public int HeartbeatIntervalMinutes { get; set; }
         public int StitchMonitorIntervalMinutes { get; set; }
         public int StatusBroadcastIntervalMinutes { get; set; }

@@ -1,32 +1,37 @@
-﻿using CrossStitch.Core.Models;
+﻿using System.Collections.Generic;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
 using System.Linq;
+using CrossStitch.Core.Utility.Extensions;
 
 namespace CrossStitch.Core.Modules.Master
 {
     public class NodeStatusBuilder
     {
-        private readonly CrossStitchCore _core;
-        private readonly IDataRepository _data;
+        private readonly string _nodeId;
+        private readonly string _nodeName;
+        private readonly IEnumerable<string> _addedModules;
+        private readonly IEnumerable<StitchInstance> _stitchInstances;
 
-        public NodeStatusBuilder(CrossStitchCore core, IDataRepository data)
+        public NodeStatusBuilder(string nodeId, string nodeName, IEnumerable<string> addedModules, IEnumerable<StitchInstance> stitchInstances)
         {
-            _core = core;
-            _data = data;
+            _nodeId = nodeId;
+            _nodeName = nodeName;
+            _addedModules = addedModules;
+            _stitchInstances = stitchInstances;
         }
 
         public NodeStatus Build()
         {
-            var modules = _core.Modules.AddedModules.ToList();
-            var stitches = _data.GetAll<StitchInstance>()
+            var stitches = _stitchInstances
                 .Where(si => si.State == InstanceStateType.Running || si.State == InstanceStateType.Started)
                 .ToList();
 
             var message = new NodeStatus
             {
-                Id = _core.NodeId,
-                Name = _core.Name,
-                RunningModules = modules,
+                Id = _nodeId,
+                Name = _nodeName,
+                RunningModules = _addedModules.OrEmptyIfNull().ToList(),
                 Instances = stitches
                     .Select(si => new Messages.Stitches.InstanceInformation
                     {

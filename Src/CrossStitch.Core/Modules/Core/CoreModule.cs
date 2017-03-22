@@ -25,7 +25,7 @@ namespace CrossStitch.Core.Modules.Core
             return new Dictionary<string, string>
             {
                 { "Modules", modules },
-                { "NodeId", _core.NodeId.ToString() },
+                { "NodeId", _core.NodeId },
             };
         }
 

@@ -34,6 +34,8 @@ namespace CrossStitch.Core.Messages.Backplane
 
         public bool IsSendable()
         {
+            if (PayloadType == MessagePayloadType.None)
+                return false;
             if (string.IsNullOrEmpty(FromNetworkId) || string.IsNullOrEmpty(FromNodeId))
                 return false;
             if (ToType == TargetType.Node && string.IsNullOrEmpty(ToNetworkId))

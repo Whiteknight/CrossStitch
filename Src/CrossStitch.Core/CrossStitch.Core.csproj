@@ -72,7 +72,7 @@
     <Compile Include="Modules\Master\IClusterMessageSender.cs" />
     <Compile Include="Messages\Stitches\CreateInstanceRequest.cs" />
     <Compile Include="Models\CommandJob.cs" />
-    <Compile Include="Modules\Master\FoundStitch.cs" />
+    <Compile Include="Modules\Master\Models\FoundStitch.cs" />
     <Compile Include="Modules\Master\Handlers\ICommandHandler.cs" />
     <Compile Include="Modules\Master\Handlers\PingCommandHandler.cs" />
     <Compile Include="Modules\Master\Handlers\RemoveStitchCommandHandler.cs" />
@@ -81,7 +81,7 @@
     <Compile Include="Modules\Master\Handlers\StopStitchCommandHandler.cs" />
     <Compile Include="Modules\Master\MasterDataRepository.cs" />
     <Compile Include="Modules\Master\Models\StitchSummary.cs" />
-    <Compile Include="Modules\Master\StitchLocaleType.cs" />
+    <Compile Include="Modules\Master\Models\StitchLocaleType.cs" />
     <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
     <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
     <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1Parameters.cs" />

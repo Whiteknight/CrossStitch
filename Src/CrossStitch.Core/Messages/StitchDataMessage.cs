@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CrossStitch.Core.Messages
+﻿namespace CrossStitch.Core.Messages
 {
     public class StitchDataMessage
     {

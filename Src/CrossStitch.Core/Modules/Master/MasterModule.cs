@@ -6,6 +6,7 @@ using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -16,18 +17,21 @@ namespace CrossStitch.Core.Modules.Master
         private readonly MasterService _service;
         private readonly NodeConfiguration _configuration;
         private readonly IMessageBus _messageBus;
-        private SubscriptionCollection _subscriptions;
         private readonly ModuleLog _log;
+        private readonly IDataRepository _data;
+
+        private SubscriptionCollection _subscriptions;
 
         public MasterModule(CrossStitchCore core, NodeConfiguration configuration)
         {
             _configuration = configuration;
             _messageBus = core.MessageBus;
             _log = new ModuleLog(core.MessageBus, Name);
-            var data = new DataHelperClient(core.MessageBus);
-            var masterData = new MasterDataRepository(data);
+            _data = new DataHelperClient(core.MessageBus);
+            var masterData = new MasterDataRepository(_data);
             var stitches = new StitchRequestHandler(core.MessageBus);
-            _service = new MasterService(core, _log, masterData, stitches);
+            var sender = new ClusterMessageSender(core.MessageBus);
+            _service = new MasterService(core, _log, masterData, stitches, sender);
         }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
@@ -130,6 +134,7 @@ namespace CrossStitch.Core.Modules.Master
             var message = _service.GenerateCurrentNodeStatus();
             if (message != null)
             {
+                _data.Save(message, true);
                 _messageBus.Publish(NodeStatus.BroadcastEvent, message);
                 _log.LogDebug("Published node status to cluster");
             }
@@ -202,6 +207,36 @@ namespace CrossStitch.Core.Modules.Master
                 }
                 else
                     _messageBus.Publish(StitchDataMessage.ChannelSendLocal, message);
+            }
+        }
+
+        private class ClusterMessageSender : IClusterMessageSender
+        {
+            private readonly IMessageBus _messageBus;
+
+            public ClusterMessageSender(IMessageBus messageBus)
+            {
+                _messageBus = messageBus;
+            }
+
+            public void Send(ClusterMessage message)
+            {
+                _messageBus.Publish(ClusterMessage.SendEventName, message);
+            }
+
+            public void SendReceipt(bool success, string networkNodeId, string jobId, string taskId)
+            {
+                var message = new ClusterMessageBuilder()
+                    .FromNode()
+                    .ToNode(networkNodeId)
+                    .WithObjectPayload(new CommandReceipt
+                    {
+                        Success = success,
+                        ReplyToJobId = jobId,
+                        ReplyToTaskId = taskId
+                    })
+                    .Build();
+                _messageBus.Publish(ClusterMessage.SendEventName, message);
             }
         }
     }

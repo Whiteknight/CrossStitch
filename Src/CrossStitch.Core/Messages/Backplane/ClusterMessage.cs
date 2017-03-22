@@ -25,7 +25,7 @@ namespace CrossStitch.Core.Messages.Backplane
         {
             if (string.IsNullOrEmpty(Header?.EventName))
                 return ReceiveEventName;
-            return $"{ReceiveEventName}:{Header.EventName}";
+            return $"{ReceiveEventName}.{Header.EventName}";
         }
 
         public bool IsSendable()

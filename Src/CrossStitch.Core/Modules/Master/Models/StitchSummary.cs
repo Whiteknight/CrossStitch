@@ -8,5 +8,6 @@ namespace CrossStitch.Core.Modules.Master.Models
         public string NodeId { get; set; }
         public string NetworkNodeId { get; set; }
         public StitchGroupName GroupName { get; set; }
+        public StitchLocaleType Locale { get; set; }
     }
 }

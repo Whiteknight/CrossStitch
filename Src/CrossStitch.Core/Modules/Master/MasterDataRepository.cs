@@ -103,6 +103,44 @@ namespace CrossStitch.Core.Modules.Master
             {
                 foreach (var instance in node.Instances)
                 {
+                    var groupName = new StitchGroupName(instance.GroupName);
+                    if (seenLocal.Contains(instance.Id) || !group.Contains(groupName))
+                        continue;
+                    summaries.Add(new StitchSummary
+                    {
+                        Id = instance.Id,
+                        NodeId = node.Id,
+                        NetworkNodeId = node.NetworkNodeId,
+                        GroupName = groupName
+                    });
+                }
+            }
+            return summaries;
+        }
+
+        public List<StitchSummary> GetAllStitchSummaries()
+        {
+            var seenLocal = new HashSet<string>();
+            var summaries = new List<StitchSummary>();
+            var instances = _data.GetAll<StitchInstance>().ToList();
+            foreach (var instance in instances)
+            {
+                summaries.Add(new StitchSummary
+                {
+                    Id = instance.Id,
+                    NodeId = null,  // TODO
+                    NetworkNodeId = null,   // TODO
+                    GroupName = instance.GroupName,
+                    Locale = StitchLocaleType.Local
+                });
+                seenLocal.Add(instance.Id);
+            }
+
+            var nodes = _data.GetAll<NodeStatus>();
+            foreach (var node in nodes)
+            {
+                foreach (var instance in node.Instances)
+                {
                     if (seenLocal.Contains(instance.Id))
                         continue;
                     summaries.Add(new StitchSummary
@@ -110,7 +148,8 @@ namespace CrossStitch.Core.Modules.Master
                         Id = instance.Id,
                         NodeId = node.Id,
                         NetworkNodeId = node.NetworkNodeId,
-                        GroupName = new StitchGroupName(instance.GroupName)
+                        GroupName = new StitchGroupName(instance.GroupName),
+                        Locale = StitchLocaleType.Remote
                     });
                 }
             }

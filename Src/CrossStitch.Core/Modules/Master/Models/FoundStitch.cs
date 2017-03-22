@@ -1,4 +1,4 @@
-namespace CrossStitch.Core.Modules.Master
+namespace CrossStitch.Core.Modules.Master.Models
 {
     public class FoundStitch
     {

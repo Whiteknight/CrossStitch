@@ -15,7 +15,7 @@ namespace CrossStitch.Core.Messages.Backplane
 
         public static string ReceivedEventName(string eventName)
         {
-            return "Received:" + eventName;
+            return "Received." + eventName;
         }
     }
 

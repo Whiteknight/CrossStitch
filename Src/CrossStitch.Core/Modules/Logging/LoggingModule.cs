@@ -4,6 +4,7 @@ using CrossStitch.Core.Messages.Logging;
 
 namespace CrossStitch.Core.Modules.Logging
 {
+    // This module serves as an adaptor between the ILog and IMessageBus
     public class LoggingModule : IModule
     {
         private readonly IMessageBus _messageBus;

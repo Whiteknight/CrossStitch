@@ -1,4 +1,6 @@
-﻿namespace CrossStitch.Core.Messages.Stitches
+﻿using CrossStitch.Core.Models;
+
+namespace CrossStitch.Core.Messages.Stitches
 {
     // Event message for announcing events related to Stitch instances
     public class StitchInstanceEvent
@@ -9,5 +11,6 @@
 
         public string InstanceId { get; set; }
         public long DataId { get; set; }
+        public StitchGroupName GroupName { get; set; }
     }
 }

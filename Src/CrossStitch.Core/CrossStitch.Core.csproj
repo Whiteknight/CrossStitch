@@ -72,7 +72,7 @@
     <Compile Include="Modules\Master\IClusterMessageSender.cs" />
     <Compile Include="Messages\Stitches\CreateInstanceRequest.cs" />
     <Compile Include="Models\CommandJob.cs" />
-    <Compile Include="Modules\Master\Models\FoundStitch.cs" />
+    <Compile Include="Modules\Master\MasterStitchCache.cs" />
     <Compile Include="Modules\Master\Handlers\ICommandHandler.cs" />
     <Compile Include="Modules\Master\Handlers\PingCommandHandler.cs" />
     <Compile Include="Modules\Master\Handlers\RemoveStitchCommandHandler.cs" />

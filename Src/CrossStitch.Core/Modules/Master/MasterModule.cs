@@ -6,7 +6,6 @@ using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -17,9 +16,10 @@ namespace CrossStitch.Core.Modules.Master
         private readonly MasterService _service;
         private readonly NodeConfiguration _configuration;
         private readonly IMessageBus _messageBus;
+        private readonly MasterDataRepository _data;
         private readonly ModuleLog _log;
-        private readonly IDataRepository _data;
 
+        private int _cacheThreadId;
         private SubscriptionCollection _subscriptions;
 
         public MasterModule(CrossStitchCore core, NodeConfiguration configuration)
@@ -27,11 +27,11 @@ namespace CrossStitch.Core.Modules.Master
             _configuration = configuration;
             _messageBus = core.MessageBus;
             _log = new ModuleLog(core.MessageBus, Name);
-            _data = new DataHelperClient(core.MessageBus);
-            var masterData = new MasterDataRepository(_data);
+            var data = new DataHelperClient(core.MessageBus);
+            _data = new MasterDataRepository(core.NodeId, data);
             var stitches = new StitchRequestHandler(core.MessageBus);
             var sender = new ClusterMessageSender(core.MessageBus);
-            _service = new MasterService(core, _log, masterData, stitches, sender);
+            _service = new MasterService(core, _log, _data, stitches, sender);
         }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
@@ -61,13 +61,12 @@ namespace CrossStitch.Core.Modules.Master
         // TODO: Method to lookup NodeId by NetworkNodeId and vice-versa. Maybe maintain a cache
         // here instead of looking it up in the DataModule each time?
 
-        // TODO: Cache for StitchId->NodeId/NodeNetworkId to speed up routing
-
         public string Name => ModuleNames.Master;
 
         public void Start()
         {
             _subscriptions = new SubscriptionCollection(_messageBus);
+            _cacheThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
             // On startup, publish the node status
             _subscriptions.Subscribe<CoreEvent>(b => b
@@ -93,6 +92,23 @@ namespace CrossStitch.Core.Modules.Master
             _subscriptions.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
                 .WithChannelName(ReceivedEvent.ChannelReceived)
                 .Invoke(m => _service.SaveNodeStatus(m.Object)));
+
+            // Subscribe to events for caching stitch status
+            _subscriptions.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
+                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .Invoke(m => _data.StitchCache.AddNodeStatus(m, m.Object))
+                .OnThread(_cacheThreadId));
+            _subscriptions.Subscribe<StitchInstanceEvent>(b => b
+                .WithChannelName(StitchInstanceEvent.ChannelStarted)
+                .Invoke(m => _data.StitchCache.AddLocalStitch(m.InstanceId, m.GroupName))
+                .OnThread(_cacheThreadId));
+            _subscriptions.Subscribe<StitchInstanceEvent>(b => b
+                .WithChannelName(StitchInstanceEvent.ChannelStopped)
+                .Invoke(m => _data.StitchCache.AddLocalStitch(m.InstanceId, m.GroupName))
+                .OnThread(_cacheThreadId));
+
+            // TODO: On Stitch Started/Stopped we should publish notification to the cluster so other Master nodes can update their
+            // caches.
 
             // Handle incoming commands
             _subscriptions.Listen<CommandRequest, CommandResponse>(b => b

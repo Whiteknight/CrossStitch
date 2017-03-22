@@ -1,4 +1,5 @@
-﻿using CrossStitch.Core.Messages.Backplane;
+﻿using System.Linq;
+using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Models;
@@ -22,27 +23,27 @@ namespace CrossStitch.Core.Modules.Master.Handlers
 
         public CommandResponse Handle(CommandRequest request)
         {
-            var stitchLocation = _data.FindStitchInstance(request.Target);
-            if (stitchLocation.Locale == StitchLocaleType.NotFound)
+            var stitch = _data.GetAllStitchSummaries().FirstOrDefault(ss => ss.Id == request.Target);
+            if (stitch == null || stitch.Locale == StitchLocaleType.NotFound)
                 return CommandResponse.Create(false);
 
-            if (stitchLocation.Locale == StitchLocaleType.Local)
+            if (stitch.Locale == StitchLocaleType.Local)
             {
                 // Send the request to the local Stitches module
                 var ok = HandleLocal(request);
                 return CommandResponse.Create(ok);
             }
 
-            if (stitchLocation.Locale == StitchLocaleType.Remote)
+            if (stitch.Locale == StitchLocaleType.Remote)
             {
-                string nodeId = stitchLocation.OwnerNodeId;
+                string nodeId = stitch.NodeId;
                 var node = _data.Get<NodeStatus>(nodeId);
                 if (node == null)
                     return CommandResponse.Create(false);
 
                 // Create a job to track status
                 var job = new CommandJob();
-                var subtask = job.CreateSubtask(request.Command, request.Target, stitchLocation.OwnerNodeId);
+                var subtask = job.CreateSubtask(request.Command, request.Target, stitch.NodeId);
                 job = _data.Insert(job);
 
                 // Create the message and send it over the backplane

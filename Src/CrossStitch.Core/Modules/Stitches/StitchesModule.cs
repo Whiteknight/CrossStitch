@@ -111,7 +111,8 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 _messageBus.Publish(StitchInstanceEvent.ChannelStarted, new StitchInstanceEvent
                 {
-                    InstanceId = instance.Id
+                    InstanceId = instance.Id,
+                    GroupName = instance.GroupName
                 });
             }
 
@@ -119,7 +120,8 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 _messageBus.Publish(StitchInstanceEvent.ChannelStopped, new StitchInstanceEvent
                 {
-                    InstanceId = instance.Id
+                    InstanceId = instance.Id,
+                    GroupName = instance.GroupName
                 });
             }
         }

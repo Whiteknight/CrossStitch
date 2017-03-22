@@ -1,5 +1,4 @@
-﻿using CrossStitch.Backplane.Zyre.Networking;
-using CrossStitch.Core.Messages.Backplane;
+﻿using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Stitch.Events;
 using System;
 

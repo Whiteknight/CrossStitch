@@ -27,7 +27,6 @@ namespace CrossStitch.Core.Modules.Master
             return Enumerable.Empty<StitchDataMessage>();
         }
 
-        // TODO: This is going to be slow without some kind of indexing in the data module
         private IEnumerable<StitchDataMessage> AddressApplicationMessage(StitchDataMessage message)
         {
             var messages = new List<StitchDataMessage>();

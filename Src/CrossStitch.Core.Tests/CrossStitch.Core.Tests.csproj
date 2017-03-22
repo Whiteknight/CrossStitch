@@ -79,6 +79,9 @@
     <Compile Include="Models\StitchGroupNameTests.cs" />
     <Compile Include="Modules\Core\CoreModuleTests.cs" />
     <Compile Include="Modules\Data\DataServiceTests.cs" />
+    <Compile Include="Modules\Master\DataMessageAddresserTests.cs" />
+    <Compile Include="Modules\Master\MasterStitchCacheTests.cs" />
+    <Compile Include="Modules\Master\NodeStatusBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

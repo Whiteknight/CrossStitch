@@ -63,10 +63,10 @@
     <Compile Include="BackplaneModule.cs" />
     <Compile Include="IClusterBackplane.cs" />
     <Compile Include="MessageHeaderExtensions.cs" />
-    <Compile Include="Networking\MessageReceivedEventArgs.cs" />
-    <Compile Include="Networking\NetMq\NetMqMessageMapper.cs" />
+    <Compile Include="NetMqMessageMapper.cs" />
     <Compile Include="PayloadObjectDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Zones.cs" />
     <Compile Include="ZyreBackplane.cs" />
   </ItemGroup>
   <ItemGroup>

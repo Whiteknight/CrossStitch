@@ -116,7 +116,6 @@
     <Compile Include="Modules\Master\DataMessageAddresser.cs" />
     <Compile Include="Modules\Master\MasterService.cs" />
     <Compile Include="Modules\Master\NodeStatusBuilder.cs" />
-    <Compile Include="Modules\Master\Zones.cs" />
     <Compile Include="Modules\ModuleNames.cs" />
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
     <Compile Include="Modules\Stitches\StitchResourceUsage.cs" />
@@ -158,7 +157,6 @@
     <Compile Include="Messages\Master\NodeStatusRequest.cs" />
     <Compile Include="NodeConfiguration.cs" />
     <Compile Include="CrossStitchCore.cs" />
-    <Compile Include="Modules\Master\MasterConfiguration.cs" />
     <Compile Include="Modules\Master\MasterModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />

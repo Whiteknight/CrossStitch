@@ -1,11 +1,11 @@
-﻿using CrossStitch.Core.Utility;
-using CrossStitch.Core.Utility.Serialization;
-using NetMQ;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using CrossStitch.Core.Messages.Backplane;
+using CrossStitch.Core.Utility;
+using CrossStitch.Core.Utility.Serialization;
+using NetMQ;
 
-namespace CrossStitch.Backplane.Zyre.Networking.NetMq
+namespace CrossStitch.Backplane.Zyre
 {
     public class NetMqMessageMapper : IMapper<NetMQMessage, ClusterMessage>, IMapper<ClusterMessage, NetMQMessage>
     {

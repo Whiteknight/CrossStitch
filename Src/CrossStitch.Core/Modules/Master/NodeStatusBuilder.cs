@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Utility;
 using System.Linq;
 using CrossStitch.Core.Utility.Extensions;
 

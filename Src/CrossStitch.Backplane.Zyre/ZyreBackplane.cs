@@ -1,5 +1,4 @@
-﻿using CrossStitch.Backplane.Zyre.Networking.NetMq;
-using CrossStitch.Core;
+﻿using CrossStitch.Core;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules.Master;
 using CrossStitch.Core.Utility.Extensions;

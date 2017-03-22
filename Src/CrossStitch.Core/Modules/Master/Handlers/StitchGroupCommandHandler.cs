@@ -5,7 +5,6 @@ using CrossStitch.Core.Modules.Master.Models;
 
 namespace CrossStitch.Core.Modules.Master.Handlers
 {
-
     public abstract class StitchGroupCommandHandler : ICommandHandler
     {
         protected readonly IStitchRequestHandler _stitches;

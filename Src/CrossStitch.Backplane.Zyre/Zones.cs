@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Modules.Master
+﻿namespace CrossStitch.Backplane.Zyre
 {
     public class Zones
     {

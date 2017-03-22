@@ -1,5 +1,4 @@
 ﻿using System;
-using CrossStitch.Backplane.Zyre.Networking;
 using CrossStitch.Core.Messages.Backplane;
 
 namespace CrossStitch.Backplane.Zyre

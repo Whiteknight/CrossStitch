@@ -1,5 +1,4 @@
 ﻿using Acquaintance.PubSub;
-using CrossStitch.Backplane.Zyre.Networking;
 using CrossStitch.Core.Messages.Backplane;
 using System;
 

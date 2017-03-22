@@ -64,6 +64,7 @@ namespace CrossStitch.Core.Modules.Master
 
         public void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
         {
+            // TODO: Make sure FromNodeId and FromNetworkNodeId are filled in
             var stitches = _data.GetAllStitchSummaries();
             var messages = new DataMessageAddresser(stitches).AddressMessage(message);
             foreach (var outMessage in messages)

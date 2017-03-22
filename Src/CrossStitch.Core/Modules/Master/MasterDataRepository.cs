@@ -1,8 +1,9 @@
+using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.Master.Models;
+using CrossStitch.Core.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Models;
-using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -78,6 +79,42 @@ namespace CrossStitch.Core.Modules.Master
             {
                 Locale = StitchLocaleType.NotFound
             };
+        }
+
+        public List<StitchSummary> GetStitchesInGroup(StitchGroupName group)
+        {
+            var seenLocal = new HashSet<string>();
+            var summaries = new List<StitchSummary>();
+            var instances = _data.GetAll<StitchInstance>().Where(si => group.Contains(si.GroupName)).ToList();
+            foreach (var instance in instances)
+            {
+                summaries.Add(new StitchSummary
+                {
+                    Id = instance.Id,
+                    NodeId = null,  // TODO
+                    NetworkNodeId = null,   // TODO
+                    GroupName = instance.GroupName
+                });
+                seenLocal.Add(instance.Id);
+            }
+
+            var nodes = _data.GetAll<NodeStatus>();
+            foreach (var node in nodes)
+            {
+                foreach (var instance in node.Instances)
+                {
+                    if (seenLocal.Contains(instance.Id))
+                        continue;
+                    summaries.Add(new StitchSummary
+                    {
+                        Id = instance.Id,
+                        NodeId = node.Id,
+                        NetworkNodeId = node.NetworkNodeId,
+                        GroupName = new StitchGroupName(instance.GroupName)
+                    });
+                }
+            }
+            return summaries;
         }
     }
 }

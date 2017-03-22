@@ -68,6 +68,7 @@
     <Compile Include="Messages\Master\CommandResponse.cs" />
     <Compile Include="Messages\Master\CommandResultType.cs" />
     <Compile Include="Messages\Master\CommandType.cs" />
+    <Compile Include="Modules\Master\Handlers\StitchGroupCommandHandler.cs" />
     <Compile Include="Modules\Master\IClusterMessageSender.cs" />
     <Compile Include="Messages\Stitches\CreateInstanceRequest.cs" />
     <Compile Include="Models\CommandJob.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Modules\Master\Handlers\StitchCommandHandler.cs" />
     <Compile Include="Modules\Master\Handlers\StopStitchCommandHandler.cs" />
     <Compile Include="Modules\Master\MasterDataRepository.cs" />
+    <Compile Include="Modules\Master\Models\StitchSummary.cs" />
     <Compile Include="Modules\Master\StitchLocaleType.cs" />
     <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
     <Compile Include="Modules\Master\IStitchRequestHandler.cs" />

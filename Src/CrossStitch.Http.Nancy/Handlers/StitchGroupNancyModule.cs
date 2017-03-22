@@ -1,4 +1,5 @@
 ﻿using Acquaintance;
+using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using Nancy;
@@ -20,8 +21,20 @@ namespace CrossStitch.Http.NancyFx.Handlers
 
             Post["/{GroupName}/stopall"] = _ =>
             {
-                // TODO: Stop all instances in the group
-                return null;
+                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
+                {
+                    Command = CommandType.StopStitchGroup,
+                    Target = _.GroupName.ToString()
+                });
+            };
+
+            Post["/{GroupName}/startall"] = _ =>
+            {
+                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
+                {
+                    Command = CommandType.StartStitchGroup,
+                    Target = _.GroupName.ToString()
+                });
             };
 
             Post["/{GroupName}/stopoldversions"] = _ =>

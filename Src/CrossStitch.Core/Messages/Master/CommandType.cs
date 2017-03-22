@@ -3,8 +3,13 @@
     public enum CommandType
     {
         Ping,
+
         StartStitchInstance,
+        StartStitchGroup,
+
         StopStitchInstance,
+        StopStitchGroup,
+
         RemoveStitchInstance,
         //CloneStitchInstance
     }

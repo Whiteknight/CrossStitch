@@ -32,7 +32,9 @@ namespace CrossStitch.Core.Modules.Master
                 { CommandType.Ping, new PingCommandHandler(data, _clusterSender) },
                 { CommandType.StartStitchInstance, new StartStitchCommandHandler(data, stitches, _clusterSender) },
                 { CommandType.StopStitchInstance, new StopStitchCommandHandler(data, stitches, _clusterSender) },
-                { CommandType.RemoveStitchInstance, new RemoveStitchCommandHandler(data, stitches, _clusterSender) }
+                { CommandType.RemoveStitchInstance, new RemoveStitchCommandHandler(data, stitches, _clusterSender) },
+                { CommandType.StartStitchGroup, new StartAllStitchGroupCommandHandler(core.NodeId, data, stitches, _clusterSender) },
+                { CommandType.StopStitchGroup, new StopAllStitchGroupCommandHandler(core.NodeId, data, stitches, _clusterSender) }
             };
         }
 

@@ -16,6 +16,6 @@ namespace CrossStitch.Core.Models
 
         public List<string> RunningModules { get; set; }
         public List<string> Zones { get; set; }
-        public List<InstanceInformation> Instances { get; set; }
+        public List<InstanceInformation> StitchInstances { get; set; }
     }
 }

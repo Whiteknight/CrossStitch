@@ -129,7 +129,7 @@ namespace CrossStitch.Core.Modules.Master
             foreach (var node in nodes)
             {
                 var summaries = new List<StitchSummary>();
-                foreach (var instance in node.Instances)
+                foreach (var instance in node.StitchInstances)
                 {
                     summaries.Add(new StitchSummary
                     {

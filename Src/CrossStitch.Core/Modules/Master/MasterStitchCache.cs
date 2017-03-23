@@ -26,10 +26,13 @@ namespace CrossStitch.Core.Modules.Master
 
         public void AddNodeStatus(ReceivedEvent received, NodeStatus status)
         {
+            // TODO: Should we enforce ordering? If a node status with an older version comes after one with a newer
+            // version, should we reject it?
             if (status.Id == _nodeId)
                 return;
 
-            var summaries = status.Instances
+            var summaries = status.StitchInstances
+                .Where(ii => ii.State == InstanceStateType.Running || ii.State == InstanceStateType.Started)
                 .Select(si => new StitchSummary
                 {
                     Id = si.Id,
@@ -65,7 +68,7 @@ namespace CrossStitch.Core.Modules.Master
             _allStitches = null;
         }
 
-        public void RemoveLocalStitch(string id, StitchGroupName groupName)
+        public void RemoveLocalStitch(string id)
         {
             var locals = _localStitches
                 .Where(si => si.Id != id)

@@ -111,5 +111,17 @@ namespace CrossStitch.Core.Tests.Modules.Master
             var result = target.AddressMessage(message).OrderBy(si => si.Id).ToList();
             result.Count.Should().Be(0);
         }
+
+        [Test]
+        public void AddressMessage_NoAddressee()
+        {
+            var target = CreateTarget();
+            var message = new StitchDataMessage
+            {
+                Data = "ABC"
+            };
+            var result = target.AddressMessage(message).OrderBy(si => si.Id).ToList();
+            result.Count.Should().Be(0);
+        }
     }
 }

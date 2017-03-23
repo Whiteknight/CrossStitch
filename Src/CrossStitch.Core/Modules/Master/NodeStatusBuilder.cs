@@ -31,7 +31,7 @@ namespace CrossStitch.Core.Modules.Master
                 Id = _nodeId,
                 Name = _nodeName,
                 RunningModules = _addedModules.OrEmptyIfNull().ToList(),
-                Instances = stitches
+                StitchInstances = stitches
                     .Select(si => new Messages.Stitches.InstanceInformation
                     {
                         Id = si.Id,

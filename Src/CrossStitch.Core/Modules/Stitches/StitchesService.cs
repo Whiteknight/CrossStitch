@@ -21,17 +21,17 @@ namespace CrossStitch.Core.Modules.Stitches
         public StitchesService(CrossStitchCore core, IDataRepository data, StitchFileSystem fileSystem, StitchInstanceManager stitchInstanceManager, StitchEventObserver observer, IModuleLog log, IStitchEventNotifier notifier)
         {
             _fileSystem = fileSystem;
-            _stitchInstanceManager = stitchInstanceManager;
+            _data = data;
+            _core = core;
+            _notifier = notifier;
             _log = log;
 
+            _stitchInstanceManager = stitchInstanceManager;
             _stitchInstanceManager.StitchStateChange += observer.StitchInstancesOnStitchStateChanged;
             _stitchInstanceManager.HeartbeatReceived += observer.StitchInstanceManagerOnHeartbeatReceived;
             _stitchInstanceManager.LogsReceived += observer.StitchInstanceManagerOnLogsReceived;
             _stitchInstanceManager.RequestResponseReceived += observer.StitchInstanceManagerOnRequestResponseReceived;
             _stitchInstanceManager.DataMessageReceived += observer.StitchInstanceManagerOnDataMessageReceived;
-            _data = data;
-            _core = core;
-            _notifier = notifier;
         }
 
         public int NumberOfRunningStitches => _stitchInstanceManager.GetNumberOfRunningStitches();
@@ -79,17 +79,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 return InstanceResponse.Failure(request);
 
             // Insert the new instance to the data module
-            var instance = new StitchInstance
-            {
-                Id = null,
-                StoreVersion = 0,
-                Adaptor = request.Adaptor,
-                GroupName = request.GroupName,
-                LastHeartbeatReceived = 0,
-                Name = request.Name,
-                OwnerNodeName = _core.Name,
-                OwnerNodeId = _core.NodeId
-            };
+            var instance = new StitchInstanceMapper(_core.NodeId, _core.Name).Map(request);
             instance = _data.Insert(instance);
             if (instance == null)
             {
@@ -104,9 +94,10 @@ namespace CrossStitch.Core.Modules.Stitches
                 _log.LogError("Could not unzip library package for new stitch {0}", instance.GroupName);
                 return InstanceResponse.Failure(request);
             }
+
             // TODO: We should move this into a class specific to ProcessV1 types.
             instance.Adaptor.Parameters[Parameters.DirectoryPath] = result.Path;
-            var ok = _data.Save<StitchInstance>(instance);
+            instance = _data.Insert(instance);
 
             // StitchInstanceManager auto-creates the necessary adaptor on Start. We don't need to do anything for it here.
             return InstanceResponse.Success(request, instance);
@@ -151,6 +142,11 @@ namespace CrossStitch.Core.Modules.Stitches
             return StartInstanceInternal(request, instance);
         }
 
+        public StitchResourceUsage GetInstanceResources(string instanceId)
+        {
+            return _stitchInstanceManager.GetInstanceResources(instanceId);
+        }
+
         private InstanceResponse StartInstanceInternal(InstanceRequest request, StitchInstance instance)
         {
             if (instance == null)
@@ -183,6 +179,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 return InstanceResponse.Failure(request);
             }
 
+            bool success = true;
             var stopResult = _stitchInstanceManager.Stop(instance);
             if (stopResult.Success && stopResult.StitchInstance.State == InstanceStateType.Stopped)
             {
@@ -190,25 +187,29 @@ namespace CrossStitch.Core.Modules.Stitches
                 _notifier.StitchStopped(instance);
             }
             else
+            {
                 _log.LogError("Could not stop stitch {0}", request.Id);
+                success = false;
+            }
 
             _data.Save(stopResult.StitchInstance);
-            return InstanceResponse.Create(request, stopResult.Success);
+            return InstanceResponse.Create(request, success);
         }
 
         public InstanceResponse DeleteStitchInstance(InstanceRequest request)
         {
+            bool success = true;
             var instanceId = request.Id;
             var instance = _data.Get<StitchInstance>(instanceId);
 
             // Tell the Stitches module to stop the Stitch
             var stopResponse = StopInstanceInternal(request, instance);
-            if (!stopResponse.IsSuccess)
-                return stopResponse;
-            if (instance.State != InstanceStateType.Stopped)
+            if (!stopResponse.IsSuccess || instance.State != InstanceStateType.Stopped)
             {
-                _log.LogError("Instance {0} could not be stopped", instanceId);
-                return InstanceResponse.Failure(request);
+                // We will continue to delete the record from the data store. When the node is restarted, this stitch
+                // will not be brought back
+                _log.LogError("Instance {0} could not be stopped. Deletion of records will continue.", instanceId);
+                success = false;
             }
 
             // Delete the record from the Data module
@@ -216,12 +217,19 @@ namespace CrossStitch.Core.Modules.Stitches
             if (!deleted)
             {
                 _log.LogError("Instance {0} could not be deleted", instanceId);
-                return InstanceResponse.Failure(request);
+                success = false;
+            }
+
+            // Remove resources related to the stitch, including directories.
+            var removeResult = _stitchInstanceManager.RemoveInstance(instance.Id);
+            if (!removeResult.Success)
+            {
+                _log.LogError("Could not remove resources related to Stitch Id={0}", instance.Id);
+                success = false;
             }
 
             _log.LogInformation("Instance {0} stopped and deleted successfully", instanceId);
-
-            return InstanceResponse.Success(request, instance);
+            return InstanceResponse.Create(request, success, instance);
         }
 
         public void SendHeartbeat(long heartbeatId)

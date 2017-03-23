@@ -85,8 +85,10 @@
     <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
     <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
     <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1Parameters.cs" />
+    <Compile Include="Modules\Stitches\StitchAdaptorCollection.cs" />
     <Compile Include="Modules\Stitches\StitchesService.cs" />
     <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
+    <Compile Include="Modules\Stitches\StitchInstanceMapper.cs" />
     <Compile Include="Modules\StitchMonitor\IHeartbeatSender.cs" />
     <Compile Include="Modules\StitchMonitor\StitchHeartbeatService.cs" />
     <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
@@ -118,7 +120,7 @@
     <Compile Include="Modules\Master\NodeStatusBuilder.cs" />
     <Compile Include="Modules\ModuleNames.cs" />
     <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
-    <Compile Include="Modules\Stitches\StitchResourceUsage.cs" />
+    <Compile Include="Messages\Stitches\StitchResourceUsage.cs" />
     <Compile Include="Modules\Stitches\StitchesConfiguration.cs" />
     <Compile Include="Modules\Stitches\StitchesModule.cs" />
     <Compile Include="Modules\Stitches\Versions\DateTimeVersionManager.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="Utility\IFactory.cs" />
     <Compile Include="Utility\IMapper.cs" />
     <Compile Include="Utility\IModuleLog.cs" />
+    <Compile Include="Utility\NullModuleLog.cs" />
     <Compile Include="Utility\Serialization\ISerializer.cs" />
     <Compile Include="Utility\Serialization\JsonSerializer.cs" />
   </ItemGroup>

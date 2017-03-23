@@ -3,6 +3,7 @@ using CrossStitch.Core.Modules.Stitches.Versions;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

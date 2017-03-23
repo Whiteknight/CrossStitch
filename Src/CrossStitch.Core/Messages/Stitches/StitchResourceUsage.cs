@@ -1,8 +1,12 @@
 ﻿using System;
 
-namespace CrossStitch.Core.Modules.Stitches
+namespace CrossStitch.Core.Messages.Stitches
 {
-    // TODO: Move this to the Messages or Models namespace?
+    public class StitchResourceUsageRequest
+    {
+        public string StitchInstanceId { get; set; }
+    }
+
     public class StitchResourceUsage
     {
         public int ProcessId { get; set; }

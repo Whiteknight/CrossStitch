@@ -7,7 +7,6 @@
         public const string ChannelClone = "Clone";
         public const string ChannelDelete = "Delete";
         public const string ChannelCreate = "Create";
-        public const string ChannelSendHeartbeat = "SendHeartbeat";
 
         public string Id { get; set; }
         public long DataId { get; set; }

@@ -5,16 +5,18 @@ using CrossStitch.Core.Messages.StitchMonitor;
 using CrossStitch.Core.Models;
 using Nancy;
 using System.Linq;
+using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
-    public class StitchNancyModule : NancyModule
+    public class StitchesNancyModule : NancyModule
     {
-        public StitchNancyModule(IMessageBus messageBus)
+        public StitchesNancyModule(IMessageBus messageBus)
             : base("/stitches")
         {
             var data = new DataHelperClient(messageBus);
 
+            // TODO: Method to get all StitchSummaries from the entire cluster (MasterModule)
             Get["/"] = _ => data.GetAll<StitchInstance>().ToList();
 
             Get["/{StitchId}"] = _ => data.Get<StitchInstance>(_.StitchId.ToString());
@@ -41,6 +43,14 @@ namespace CrossStitch.Http.NancyFx.Handlers
             {
                 // Get last N log messages from the stitch
                 return null;
+            };
+
+            Get["/{StitchId}/resources"] = _ =>
+            {
+                return messageBus.Request<StitchResourceUsageRequest, StitchResourceUsage>(new StitchResourceUsageRequest
+                {
+                    StitchInstanceId = _.StitchId.ToString()
+                });
             };
 
             //Post["/{StitchId}/clone"] = _ =>

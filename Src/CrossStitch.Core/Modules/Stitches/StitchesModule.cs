@@ -58,10 +58,16 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
                 .WithChannelName(InstanceRequest.ChannelStop)
                 .Invoke(_service.StopInstance));
+            _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
+                .WithChannelName(InstanceRequest.ChannelDelete)
+                .Invoke(_service.DeleteStitchInstance));
 
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(l => l
                 .OnDefaultChannel()
                 .Invoke(m => _service.GetInstanceInformation()));
+            _subscriptions.Listen<StitchResourceUsageRequest, StitchResourceUsage>(l => l
+                .OnDefaultChannel()
+                .Invoke(m => _service.GetInstanceResources(m.StitchInstanceId)));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()

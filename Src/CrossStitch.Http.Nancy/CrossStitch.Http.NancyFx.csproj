@@ -54,7 +54,7 @@
   <ItemGroup>
     <Compile Include="Converters\JavaScriptEnumConverter.cs" />
     <Compile Include="Handlers\CommandJobsNancyModule.cs" />
-    <Compile Include="Handlers\StitchNancyModule.cs" />
+    <Compile Include="Handlers\StitchesNancyModule.cs" />
     <Compile Include="Handlers\ModulesNancyModule.cs" />
     <Compile Include="Handlers\NodeRequestHandler.cs" />
     <Compile Include="Handlers\StitchGroupNancyModule.cs" />

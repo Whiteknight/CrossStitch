@@ -1,5 +1,6 @@
 ﻿using CrossStitch.Core.Models;
 using System;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Stitch.ProcessV1.Core;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors

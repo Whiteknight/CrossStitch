@@ -19,6 +19,12 @@ namespace CrossStitch.Http.NancyFx.Handlers
                     NodeId = _.NodeId.ToString()
                 });
             };
+
+            Get["/{NodeId}/stitches"] = _ =>
+            {
+                // TODO: Get all StitchSummaries from this node in the MasterModule
+                return null;
+            };
         }
     }
 }

@@ -104,7 +104,7 @@ namespace CrossStitch.Core.Modules.Master
                 .OnThread(_cacheThreadId));
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
                 .WithChannelName(StitchInstanceEvent.ChannelStopped)
-                .Invoke(m => _data.StitchCache.AddLocalStitch(m.InstanceId, m.GroupName))
+                .Invoke(m => _data.StitchCache.RemoveLocalStitch(m.InstanceId))
                 .OnThread(_cacheThreadId));
 
             // TODO: On Stitch Started/Stopped we should publish notification to the cluster so other Master nodes can update their

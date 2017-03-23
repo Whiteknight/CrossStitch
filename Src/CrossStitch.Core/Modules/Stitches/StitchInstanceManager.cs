@@ -4,9 +4,7 @@ using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
 using CrossStitch.Stitch.Events;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using CrossStitch.Stitch.ProcessV1.Core;
 
 namespace CrossStitch.Core.Modules.Stitches
@@ -15,14 +13,14 @@ namespace CrossStitch.Core.Modules.Stitches
     {
         private readonly StitchFileSystem _fileSystem;
         private readonly StitchAdaptorFactory _adaptorFactory;
-        private ConcurrentDictionary<string, IStitchAdaptor> _adaptors;
+        private readonly StitchAdaptorCollection _adaptors;
 
         public StitchInstanceManager(StitchFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             // TODO: We need a way to get the unique string name of the node at this point.
             _adaptorFactory = new StitchAdaptorFactory();
-            _adaptors = new ConcurrentDictionary<string, IStitchAdaptor>();
+            _adaptors = new StitchAdaptorCollection();
         }
 
         public event EventHandler<StitchProcessEventArgs> StitchStateChange;
@@ -44,7 +42,10 @@ namespace CrossStitch.Core.Modules.Stitches
                 stitchInstance.State = InstanceStateType.Stopped;
                 adaptor = GetOrCreateStitchAdaptor(stitchInstance);
                 if (adaptor == null)
+                {
+                    stitchInstance.State = InstanceStateType.Missing;
                     return InstanceActionResult.NotFound(instanceId);
+                }
 
                 // TODO: On Stitch start, we should send it information about the application topology
                 // TODO: We should also send application topology change notifications to every Stitch 
@@ -65,12 +66,12 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public InstanceActionResult Stop(StitchInstance stitchInstance)
         {
-            IStitchAdaptor adaptor = null;
             try
             {
-                bool found = _adaptors.TryGetValue(stitchInstance.Id, out adaptor);
-                if (!found)
+                var adaptor = _adaptors.Get(stitchInstance.Id);
+                if (adaptor == null)
                     return InstanceActionResult.NotFound(stitchInstance.Id);
+
                 adaptor.Stop();
                 stitchInstance.State = InstanceStateType.Stopped;
 
@@ -78,7 +79,7 @@ namespace CrossStitch.Core.Modules.Stitches
             }
             catch (Exception e)
             {
-                return InstanceActionResult.Failure(stitchInstance.Id, adaptor != null, stitchInstance, e);
+                return InstanceActionResult.Failure(stitchInstance.Id, true, stitchInstance, e);
             }
         }
 
@@ -86,17 +87,16 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             var results = new List<InstanceActionResult>();
 
-            foreach (var kvp in _adaptors)
+            _adaptors.ForEach((id, adaptor) =>
             {
                 try
                 {
-                    var adaptor = kvp.Value;
                     adaptor.Stop();
                     results.Add(new InstanceActionResult
                     {
                         Found = true,
                         Success = true,
-                        InstanceId = kvp.Key
+                        InstanceId = id
                     });
                 }
                 catch (Exception e)
@@ -105,32 +105,29 @@ namespace CrossStitch.Core.Modules.Stitches
                     {
                         Found = true,
                         Success = false,
-                        InstanceId = kvp.Key,
+                        InstanceId = id,
                         Exception = e
                     });
                 }
-            }
+            });
 
             return results;
         }
 
         public InstanceActionResult RemoveInstance(string instanceId)
         {
-            IStitchAdaptor adaptor;
-            bool removed = _adaptors.TryRemove(instanceId, out adaptor);
-            if (removed)
-                adaptor.Dispose();
+            var adaptor = _adaptors.Remove(instanceId);
+            adaptor?.Dispose();
 
             _fileSystem.DeleteRunningInstanceDirectory(instanceId);
             _fileSystem.DeleteDataInstanceDirectory(instanceId);
-            return InstanceActionResult.Result(instanceId, true);
+            return InstanceActionResult.Result(instanceId, adaptor != null);
         }
 
         public StitchResourceUsage GetInstanceResources(string instanceId)
         {
-            IStitchAdaptor adaptor;
-            bool found = _adaptors.TryGetValue(instanceId, out adaptor);
-            if (!found)
+            var adaptor = _adaptors.Get(instanceId);
+            if (adaptor == null)
                 return StitchResourceUsage.Empty();
 
             var usage = adaptor.GetResources();
@@ -145,17 +142,16 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public void SendHeartbeat(long heartbeatId)
         {
-            foreach (var adaptor in _adaptors.Values.ToList())
+            _adaptors.ForEach((id, adaptor) =>
             {
                 adaptor.SendHeartbeat(heartbeatId);
-            }
+            });
         }
 
         public InstanceActionResult SendDataMessage(StitchDataMessage message)
         {
-            IStitchAdaptor adaptor;
-            bool found = _adaptors.TryGetValue(message.ToStitchInstanceId, out adaptor);
-            if (!found)
+            var adaptor = _adaptors.Get(message.ToStitchInstanceId);
+            if (adaptor == null)
                 return InstanceActionResult.NotFound(message.ToStitchInstanceId);
 
             adaptor.SendMessage(message.Id, message.DataChannelName, message.Data, message.FromNodeId, message.FromStitchInstanceId);
@@ -171,37 +167,23 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             StopAll();
             _adaptors.Clear();
-            _adaptors = null;
         }
 
         private IStitchAdaptor GetOrCreateStitchAdaptor(StitchInstance stitchInstance)
         {
-            IStitchAdaptor adaptor;
-            bool found = _adaptors.TryGetValue(stitchInstance.Id, out adaptor);
-            if (found)
-                return adaptor;
-
-            adaptor = CreateStitchAdaptor(stitchInstance);
+            var adaptor = _adaptors.Get(stitchInstance.Id);
             if (adaptor != null)
                 return adaptor;
 
-            stitchInstance.State = InstanceStateType.Missing;
-            return null;
-        }
-
-        private IStitchAdaptor CreateStitchAdaptor(StitchInstance stitchInstance)
-        {
-            var adaptor = _adaptorFactory.Create(stitchInstance);
-            bool added = _adaptors.TryAdd(stitchInstance.Id, adaptor);
-            if (!added)
-                return null;
-
+            adaptor = _adaptorFactory.Create(stitchInstance);
             adaptor.StitchContext.DataDirectory = _fileSystem.GetInstanceDataDirectoryPath(stitchInstance.Id);
             adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
             adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
             adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;
             adaptor.StitchContext.RequestResponseReceived += OnStitchResponseReceived;
             adaptor.StitchContext.DataMessageReceived += OnDataMessageReceived;
+
+            _adaptors.Add(stitchInstance.Id, adaptor);
             return adaptor;
         }
 

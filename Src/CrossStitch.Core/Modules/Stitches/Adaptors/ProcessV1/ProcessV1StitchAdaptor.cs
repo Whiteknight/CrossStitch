@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Stitch.ProcessV1;
 using CrossStitch.Stitch.ProcessV1.Core;

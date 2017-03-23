@@ -2,12 +2,11 @@
 using CrossStitch.Core;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Backplane;
-using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.Events;
 using System;
-using System.Linq;
+using CrossStitch.Core.Messages;
 
 namespace CrossStitch.Backplane.Zyre
 {
@@ -49,20 +48,23 @@ namespace CrossStitch.Backplane.Zyre
             // Setup subscriptions
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
             _subscriptions = new SubscriptionCollection(_messageBus);
+
             _subscriptions.Subscribe<ClusterMessage>(s => s
                 .WithChannelName(ClusterMessage.SendEventName)
                 .Invoke(e => _backplane.Send(e))
                 .OnThread(_workerThreadId)
                 .WithFilter(IsMessageSendable));
-            _subscriptions.Subscribe<NodeStatus>(s => s
-                .WithChannelName(NodeStatus.BroadcastEvent)
-                .Invoke(BroadcastNodeStatus)
-                .OnThread(_workerThreadId));
+            _subscriptions.Subscribe<CoreEvent>(b => b
+                .WithChannelName(CoreEvent.ChannelInitialized)
+                .Invoke(BroadcastNetworkInformation));
+
+            // TODO: Listen to requests to get current network id, zones, etc.
+            // TODO: Request to get info on known peers/zones?
+            // TODO: Uptime/connected stats?
 
             var context = _backplane.Start();
             _nodeNetworkId = context.NodeNetworkId;
             _log.LogInformation("Joined cluster with NetworkNodeId={0}", _nodeNetworkId);
-            _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeNetworkId.ToString() });
         }
 
         public void Stop()
@@ -92,16 +94,17 @@ namespace CrossStitch.Backplane.Zyre
             Stop();
         }
 
-        private void BroadcastNodeStatus(NodeStatus nodeStatus)
+        private void BroadcastNetworkInformation(CoreEvent obj)
         {
-            nodeStatus.Zones = _configuration.Zones.OrEmptyIfNull().ToList();
-            nodeStatus.NetworkNodeId = _nodeNetworkId.ToString();
-            var envelope = new ClusterMessageBuilder()
-                .ToCluster()
-                .FromNode()
-                .WithObjectPayload(nodeStatus)
-                .Build();
-            _backplane.Send(envelope);
+            // Publish the network node id of this node, so other modules (especially Master) can have it
+            _messageBus.Publish(BackplaneEvent.ChannelNetworkIdChanged, new BackplaneEvent { Data = _nodeNetworkId.ToString() });
+
+            // Publish the list of zones that this node belongs to so other modules (Master) know.
+            var zones = string.Join(",", _configuration.Zones.OrEmptyIfNull());
+            _messageBus.Publish(BackplaneEvent.ChannelSetZones, new BackplaneEvent
+            {
+                Data = zones
+            });
         }
 
         // TODO: These event types are very Zyre-specific. Come up with new event types which are

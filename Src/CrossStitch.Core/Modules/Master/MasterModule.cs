@@ -68,10 +68,16 @@ namespace CrossStitch.Core.Modules.Master
             _subscriptions = new SubscriptionCollection(_messageBus);
             _cacheThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
-            // On startup, publish the node status
+            // On startup, publish the node status and get info from the backplane
             _subscriptions.Subscribe<CoreEvent>(b => b
                 .WithChannelName(CoreEvent.ChannelInitialized)
                 .Invoke(m => GenerateAndPublishNodeStatus()));
+            _subscriptions.Subscribe<BackplaneEvent>(b => b
+                .WithChannelName(BackplaneEvent.ChannelNetworkIdChanged)
+                .Invoke(m => _service.SetNetworkNodeId(m.Data)));
+            _subscriptions.Subscribe<BackplaneEvent>(b => b
+                .WithChannelName(BackplaneEvent.ChannelSetZones)
+                .Invoke(m => _service.SetClusterZones((m.Data ?? string.Empty).Split(','))));
 
             // Publish the status of the node every 60 seconds
             int timerTickMultiple = (_configuration.StatusBroadcastIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
@@ -148,12 +154,24 @@ namespace CrossStitch.Core.Modules.Master
         private void GenerateAndPublishNodeStatus()
         {
             var message = _service.GenerateCurrentNodeStatus();
-            if (message != null)
-            {
-                _data.Save(message, true);
-                _messageBus.Publish(NodeStatus.BroadcastEvent, message);
-                _log.LogDebug("Published node status to cluster");
-            }
+            if (message == null)
+                return;
+
+            // Save it to the data module, for quick lookup
+            _data.Save(message, true);
+
+            // Broadcast it locally, so any modules can get it if they want
+            _messageBus.Publish(NodeStatus.BroadcastEvent, message);
+
+            // Send it over the backplane, so all other nodes can be aware of it.
+            var envelope = new ClusterMessageBuilder()
+                .ToCluster()
+                .FromNode()
+                .WithObjectPayload(message)
+                .Build();
+            _messageBus.Publish(ClusterMessage.SendEventName, envelope);
+
+            _log.LogDebug("Published updated node status");
         }
 
         private void SendNodeStatusToNewClusterNode(ClusterMemberEvent obj)

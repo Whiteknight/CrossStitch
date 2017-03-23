@@ -9,13 +9,17 @@ namespace CrossStitch.Core.Modules.Master
     {
         private readonly string _nodeId;
         private readonly string _nodeName;
+        private readonly string _networkNodeId;
+        private readonly IEnumerable<string> _zones;
         private readonly IEnumerable<string> _addedModules;
         private readonly IEnumerable<StitchInstance> _stitchInstances;
 
-        public NodeStatusBuilder(string nodeId, string nodeName, IEnumerable<string> addedModules, IEnumerable<StitchInstance> stitchInstances)
+        public NodeStatusBuilder(string nodeId, string nodeName, string networkNodeId, IEnumerable<string> zones, IEnumerable<string> addedModules, IEnumerable<StitchInstance> stitchInstances)
         {
             _nodeId = nodeId;
             _nodeName = nodeName;
+            _networkNodeId = networkNodeId;
+            _zones = zones;
             _addedModules = addedModules;
             _stitchInstances = stitchInstances;
         }
@@ -30,6 +34,8 @@ namespace CrossStitch.Core.Modules.Master
             {
                 Id = _nodeId,
                 Name = _nodeName,
+                NetworkNodeId = _networkNodeId,
+                Zones = _zones.ToList(),
                 RunningModules = _addedModules.OrEmptyIfNull().ToList(),
                 StitchInstances = stitches
                     .Select(si => new Messages.Stitches.InstanceInformation
@@ -39,9 +45,6 @@ namespace CrossStitch.Core.Modules.Master
                         State = si.State
                     })
                     .ToList(),
-
-                // This gets enriched in the backplane, for now
-                Zones = null
             };
             return message;
         }

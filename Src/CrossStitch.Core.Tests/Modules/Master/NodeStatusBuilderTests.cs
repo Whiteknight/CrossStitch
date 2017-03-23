@@ -33,15 +33,18 @@ namespace CrossStitch.Core.Tests.Modules.Master
                     State = InstanceStateType.Stopped
                 }
             };
-            var target = new NodeStatusBuilder("NodeId", "NodeName", modules, stitches);
+            var zones = new[] { "_all", "some", "none" };
+            var target = new NodeStatusBuilder("NodeId", "NodeName", "NetworkNodeId", zones, modules, stitches);
             var result = target.Build();
 
             result.Id.Should().Be("NodeId");
             result.Name.Should().Be("NodeName");
+            result.NetworkNodeId.Should().Be("NetworkNodeId");
             result.RunningModules.Should().Contain(modules);
             // TODO: We should keep track of zones in the Master module and fill this in
-            result.Zones.Should().BeNull();
+            result.Zones.Count.Should().Be(3);
             result.StitchInstances.Count.Should().Be(2);
+
         }
     }
 }

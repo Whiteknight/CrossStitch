@@ -18,6 +18,9 @@ namespace CrossStitch.Core.Modules.Master
         private readonly MasterDataRepository _data;
         private readonly Dictionary<CommandType, ICommandHandler> _commandHandlers;
 
+        private string _networkNodeId;
+        private string[] _clusterZones;
+
         public MasterService(CrossStitchCore core, IModuleLog log, MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender clusterSender)
         {
             _core = core;
@@ -25,6 +28,7 @@ namespace CrossStitch.Core.Modules.Master
             _data = data;
             _stitches = stitches;
             _clusterSender = clusterSender;
+            _clusterZones = new string[0];
 
             _commandHandlers = new Dictionary<CommandType, ICommandHandler>
             {
@@ -40,7 +44,7 @@ namespace CrossStitch.Core.Modules.Master
         public NodeStatus GenerateCurrentNodeStatus()
         {
             var stitches = _data.GetAll<StitchInstance>();
-            return new NodeStatusBuilder(_core.NodeId, _core.Name, _core.Modules.AddedModules, stitches).Build();
+            return new NodeStatusBuilder(_core.NodeId, _core.Name, _networkNodeId, _clusterZones, _core.Modules.AddedModules, stitches).Build();
         }
 
         public NodeStatus GetExistingNodeStatus(string id)
@@ -64,7 +68,9 @@ namespace CrossStitch.Core.Modules.Master
 
         public void EnrichStitchDataMessageWithAddress(StitchDataMessage message)
         {
-            // TODO: Make sure FromNodeId and FromNetworkNodeId are filled in
+            message.FromNodeId = _core.NodeId;
+            message.FromNetworkId = _networkNodeId;
+
             var stitches = _data.GetAllStitchSummaries();
             var messages = new DataMessageAddresser(stitches).AddressMessage(message);
             foreach (var outMessage in messages)
@@ -114,6 +120,16 @@ namespace CrossStitch.Core.Modules.Master
                 return CommandResponse.Create(false);
 
             return handler.Handle(arg);
+        }
+
+        public void SetNetworkNodeId(string networkNodeId)
+        {
+            _networkNodeId = networkNodeId;
+        }
+
+        public void SetClusterZones(string[] zones)
+        {
+            _clusterZones = zones ?? new string[0];
         }
     }
 }

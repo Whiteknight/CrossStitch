@@ -1,6 +1,5 @@
 ﻿using CrossStitch.Core;
 using CrossStitch.Core.Messages.Backplane;
-using CrossStitch.Core.Modules.Master;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Core.Utility.Serialization;
 using CrossStitch.Stitch.Events;

@@ -150,6 +150,49 @@ Getting information about the current group of a Stitch comes from the commandli
     // All stitches of the same version as this application component
     groupName = _manager.VersionGroupName;
 
+## Protocol Details
+
+The `ProcessV1` protocol uses the `ToStitchMessage` and `FromStitchMessage` contracts, serialized to JSON, sent over the Standard Input and Standard Output streams respectively.
+ Each message is followed by the word `end`, appearing on its own line. Here is an example input:
+
+    {
+        Id:1,
+        ChannelName:'_heartbeat'
+    }
+    end
+
+And this is the sync response that the above message is expected to produce:
+
+    {
+        Id:1,
+        ChannelName:'_sync'
+    }
+    end
+
+The `end` bit is required and must be on its own line, or else the reader may hang in an infinite loop. The JSON may be formatted with or without as many lines or whitespace as required. For example, this is ok:
+
+    {Id:1,ChannelName:'_sync'}
+    end
+
+These are **not ok**:
+
+    {
+        Id:1,
+        ChannelName:'_sync'
+    }end
+
+    {Id:1,ChannelName:'_sync'}end
+
+    {
+        Id:1,
+        ChannelName:'_sync'
+    }
+    end{
+        ... new message here
+    }
+
+The basic algorithm is to read lines into a buffer until the received line, trimmed of whitespace, is `"end"`. Then join the buffered lines together with newlines in between and deserialize the JSON.
+
 ## Threading
 
 `StitchMessageManager` uses threads internally to allow communication operations to be non-blocking and to allow timeouts. It also allows thread safety, by doing stream reads and message parsing on a dedicated reader thread, so that multiple worker threads are not all fighting over the same stream and getting incomplete/torn messages.

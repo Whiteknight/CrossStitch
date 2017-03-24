@@ -125,11 +125,14 @@ namespace CrossStitch.Core.Modules.Master
         public void SetNetworkNodeId(string networkNodeId)
         {
             _networkNodeId = networkNodeId;
+            _log.LogDebug("Registered with cluster as NodeId={0}", _networkNodeId);
         }
 
         public void SetClusterZones(string[] zones)
         {
             _clusterZones = zones ?? new string[0];
+            if (_clusterZones.Length > 0)
+                _log.LogDebug("Member of cluster zones {0}", string.Join(",", _clusterZones));
         }
     }
 }

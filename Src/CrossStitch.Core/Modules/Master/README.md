@@ -1,12 +1,20 @@
 ﻿## Master Module
 
-The Master Module serves as a brain or router for a cluster, keeping track of nodes on the network, and allowing routing and dispatch of events and commands between nodes. The Master module serves several purposes, which seem distinct but have several shared requirements which prevent them from being cleanly separated (at this time).
+The Master Module serves as a brain or router for a cluster, keeping track of nodes on the network, and allowing routing and dispatch of events and commands between nodes. The Master module serves several purposes, which seem distinct at first glance but are all related to the same underlying requirement: Keeping track of cluster state.
 
-1. Keeping track of the state of nodes in the cluster
-2. Publishing the state of the current running node to the cluster
-3. Responding to requests for node state
+1. Publishing the state of the current running node to the cluster
+2. Receiving and storing state published by other nodes in the cluster
+3. Responding to requests for node state (from, for example, the HTTP API)
 4. Routing messages to individual stitches, by looking up what node the stitch lives on and sending the message to that node
 5. Breaking up complex commands to commands for individual nodes, and dispatching those individual commands to nodes in the cluster.
+
+### Messaging
+
+The Master Module subscribes to the following types of events:
+
+1. Cluster status updates from the Backplane
+2. Node status updates from the Backplane
+3. Stitch status updates from the Stitches module
 
 ### Command Behavior
 

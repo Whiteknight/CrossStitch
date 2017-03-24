@@ -1,5 +1,5 @@
-﻿using System;
-using CrossStitch.Stitch.Events;
+﻿using CrossStitch.Stitch.Events;
+using System;
 
 namespace CrossStitch.Stitch.ProcessV1.Core
 {
@@ -26,7 +26,7 @@ namespace CrossStitch.Stitch.ProcessV1.Core
             StitchStateChange.Raise(this, new StitchProcessEventArgs(StitchInstanceId, isRunning, wasRequested));
         }
 
-        public void ReceiveHeartbeat(long id)
+        public void ReceiveHeartbeatSync(long id)
         {
             if (id <= LastHeartbeatReceived)
                 return;

@@ -19,6 +19,7 @@ namespace StitchStart.Server
             {
                 var dataStorage = new InMemoryDataStorage();
 
+                // First stitch is a ProcessV1 stitch in a separate process
                 var result = dataStorage.Save(new StitchInstance
                 {
                     Name = "StitchStart.Client",
@@ -30,6 +31,23 @@ namespace StitchStart.Server
                         {
                             { Parameters.DirectoryPath, "." },
                             { Parameters.ExecutableName, "StitchStart.Client.exe" }
+                        }
+                    },
+                    State = InstanceStateType.Running,
+                    LastHeartbeatReceived = 0
+                }, true);
+
+                // Second stitch is a built-in class
+                result = dataStorage.Save(new StitchInstance
+                {
+                    Name = "StitchStart.BuiltIn",
+                    GroupName = new StitchGroupName("StitchStart", "BuiltIn", "1"),
+                    Adaptor = new InstanceAdaptorDetails
+                    {
+                        Type = AdaptorType.BuildInClassV1,
+                        Parameters = new Dictionary<string, string>
+                        {
+                            { CrossStitch.Stitch.BuiltInClassV1.Parameters.TypeName, typeof(StitchStartBuiltInStitch).AssemblyQualifiedName }
                         }
                     },
                     State = InstanceStateType.Running,

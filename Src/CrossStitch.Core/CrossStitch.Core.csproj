@@ -83,6 +83,8 @@
     <Compile Include="Modules\Master\MasterDataRepository.cs" />
     <Compile Include="Modules\Master\Models\StitchSummary.cs" />
     <Compile Include="Modules\Master\Models\StitchLocaleType.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuildInClassV1Parameters.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassStitchAdaptor.cs" />
     <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
     <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
     <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1Parameters.cs" />

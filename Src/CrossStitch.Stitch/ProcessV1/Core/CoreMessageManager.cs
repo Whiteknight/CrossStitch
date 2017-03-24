@@ -54,7 +54,7 @@ namespace CrossStitch.Stitch.ProcessV1.Core
             switch (message.Command)
             {
                 case FromStitchMessage.CommandSync:
-                    _stitchContext.ReceiveHeartbeat(message.Id);
+                    _stitchContext.ReceiveHeartbeatSync(message.Id);
                     break;
                 case FromStitchMessage.CommandAck:
                     _stitchContext.ReceiveResponse(message.Id, true);

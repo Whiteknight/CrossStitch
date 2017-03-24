@@ -44,13 +44,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuiltInClassV1\Handles.cs" />
+    <Compile Include="BuiltInClassV1\Parameters.cs" />
     <Compile Include="Events\EventHandlerExtensions.cs" />
     <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="ProcessV1\Parameters.cs" />
     <Compile Include="Utility\JsonUtility.cs" />
     <Compile Include="ProcessV1\Arguments.cs" />
     <Compile Include="ProcessV1\Core\CoreMessageManager.cs" />
-    <Compile Include="ProcessV1\Core\CoreStitchContext.cs" />
+    <Compile Include="CoreStitchContext.cs" />
     <Compile Include="ProcessV1\Core\FromStitchMessageReader.cs" />
     <Compile Include="ProcessV1\Core\FromStitchMessageReceivedEventArgs.cs" />
     <Compile Include="ProcessV1\Core\FromStitchReaderThread.cs" />

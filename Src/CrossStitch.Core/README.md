@@ -2,6 +2,8 @@
 
 This is the core library of the CrossStitch system. It implements all core behaviors, though most of those behaviors are pluggable and able to be overridden by custom implementations and extensions.
 
+The CrossSystem system is designed to be modular and flexible for an unforseeably large set of use-cases. Modules are loosely coupled and communicate with each other via a message-passing system. Some abilities, such as the ability to coordinate CrossStitch instances into a cluster, to host an HTTP API, to host Stitches, and others are completely optional and may be turned on or off depending on use-case.
+
 ## QuickStart
 
 For an extremely simple node, create a `CrossStitchCore` object  and call the `.Start()` method. 

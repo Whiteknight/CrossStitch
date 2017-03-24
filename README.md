@@ -4,8 +4,17 @@
 
 CrossStitch is an app fabric for the .NET ecosystem. Think about something like ElasticSearch minus the search, or Kubernetes without Docker. It's a lot like Apache Storm, without the dependency on Java or the focus on big data. CrossStitch can still do processing on data streams, especially if you combine it with a data source like RabbitMQ or Kafka, but it has a lot of other uses as well.
 
-CrossStitch is an application host with a specific focus on microservices, which are called "Stitches". A node can host many Stitches, including multiple instances of the same Stitch. It's sort of like a Windows Service with less ceremony, simpler administration, easier development and easier testability.
+CrossStitch is an application host with a specific focus on microservices, which are called "Stitches". A node can host many Stitches, including multiple instances of the same Stitch. It's sort of like a Windows Service with less ceremony, simpler administration, faster development and easier testability.
 
+## Design Goals
+
+Cross stitching is a traditional artform with colored thread and needle-work where individual stitches are made with colored thread, typically in a simple X pattern. The techniques are very simple and easy to learn. By combining these simple stitches with color and pattern, beautiful works of art can be created. In the same way, CrossStitch allows simple, easy-to-learn building blocks to be combined and repeated together to make large, complex applications.
+
+Creating, deploying, monitoring and managing stitches should be fast and easy. Developers shouldn't need special tooling, specific languages, and deep knowledge about the workings of CrossStitch to get things working. If you can write a console application, you can host applications on CrossStitch.
+
+The CrossStitch core should be modular and loosely-coupled, following modern best practices and modern idiomatic C#.
+
+CrossStitch should provide sane but simple defaults, while allowing users to write and substitute their own, more complex versions as required.
 
 ## Stitches
 
@@ -13,7 +22,7 @@ CrossStitch is an application host with a specific focus on microservices, which
 
  Because Stitches are Console applications, they are very easy to develop and test. There's no magic to it: Read messages from STDIN and write messages to STDOUT, and do whatever processing you need to do in between. 
 
- With the simplicity comes power. You can offload expensive background processing steps from an overloaded webserver to a cluster of CrossStitch nodes on commodity hardware, for example. 
+ With the simplicity comes power. You can offload expensive background processing steps from an overloaded webserver to a cluster of CrossStitch nodes. You can decompose a large, unweildy monolithic application into a suite of small and simple microservices. You can transform a collection of outdated commodity server machines into a powerful and flexible computation cluster
 
 ## Architecture 
 
@@ -24,6 +33,8 @@ With a backplane module installed, CrossStitch instances from across a network c
 With an HTTP module installed, CrossStitch instances will expose an HTTP API which can be used to query state and issue commands to the node
 
 A LoggingModule allows you to get and persist debug logs from both the core process and the running Stitches.
+
+An alerting module allows CrossStitch to push alerts to your IT team when things are going wrong or when Stitches are becoming unresponsive.
 
 ## Usage
 

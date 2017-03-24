@@ -1,5 +1,3 @@
-using System;
-
 namespace CrossStitch.Stitch.ProcessV1
 {
     public class ToStitchMessage
@@ -18,11 +16,12 @@ namespace CrossStitch.Stitch.ProcessV1
         // The data, as a string. The sender and recipient will decide on the format
         public string Data { get; set; }
 
-        public static ToStitchMessage Exit()
+        public static ToStitchMessage Exit(int exitCode = 0)
         {
             return new ToStitchMessage
             {
-                ChannelName = ChannelNameExit
+                ChannelName = ChannelNameExit,
+                Id = exitCode
             };
         }
 

@@ -1,5 +1,7 @@
 ﻿namespace CrossStitch.Stitch.ProcessV1
 {
+    // These parameters are required in the StitchInstance.Adaptor.Parameters map when the stitch
+    // is created
     public static class Parameters
     {
         public const string DirectoryPath = "DirectoryPath";

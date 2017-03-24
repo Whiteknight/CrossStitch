@@ -58,7 +58,6 @@
     <Compile Include="ProcessV1\Core\LogsReceivedEventArgs.cs" />
     <Compile Include="ProcessV1\Core\RequestResponseReceivedEventArgs.cs" />
     <Compile Include="ProcessV1\Core\StitchProcessEventArgs.cs" />
-    <Compile Include="ProcessV1\Stitch\HeartbeatReceivedEventArgs.cs" />
     <Compile Include="ProcessV1\Stitch\StitchMessageManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProcessV1\FromStitchMessage.cs" />
@@ -70,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

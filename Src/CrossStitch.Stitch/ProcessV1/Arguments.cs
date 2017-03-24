@@ -1,5 +1,6 @@
 ﻿namespace CrossStitch.Stitch.ProcessV1
 {
+    // These arguments are passed to the Stitch process on the commandline
     public static class Arguments
     {
         public const string CorePid = "corepid";

@@ -12,6 +12,7 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
         private const int CoreCheckIntervalMs = 5000;
         private const int ExitBecauseOfCoreDisappearance = 1;
         private const int MessageReadTimeoutMs = 10000;
+        private const int ExitCodeCoreMissing = 1;
 
         private readonly ToStitchMessageReader _reader;
         private readonly FromStitchMessageSender _sender;
@@ -91,6 +92,18 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
             bool ok = _incomingMessages.TryTake(out message, MessageReadTimeoutMs);
             if (!ok || message == null)
                 return null;
+
+            if (message.IsExitMessage() && !ReceiveExitMessage)
+            {
+                Environment.Exit((int)message.Id);
+            }
+
+            if (message.IsHeartbeatMessage() && !ReceiveHeartbeats)
+            {
+                _sender.SendSync(message.Id);
+                return null;
+            }
+
             return message;
         }
 
@@ -126,6 +139,36 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
             _sender.Dispose();
         }
 
+        public string ApplicationGroupName
+        {
+            get
+            {
+                var application = GetCrossStitchArgument(Arguments.Application);
+                return application;
+            }
+        }
+
+        public string ComponentGroupName
+        {
+            get
+            {
+                var application = GetCrossStitchArgument(Arguments.Application);
+                var component = GetCrossStitchArgument(Arguments.Component);
+                return $"{application}.{component}";
+            }
+        }
+
+        public string VersionGroupName
+        {
+            get
+            {
+                var application = GetCrossStitchArgument(Arguments.Application);
+                var component = GetCrossStitchArgument(Arguments.Component);
+                var version = GetCrossStitchArgument(Arguments.Version);
+                return $"{application}.{component}.{version}";
+            }
+        }
+
         private int GetIntegerArgument(string name, int defaultValue = 0)
         {
             if (CrossStitchArguments.ContainsKey(name))
@@ -141,16 +184,6 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
                 if (message == null)
                     continue;
 
-                if (message.IsHeartbeatMessage())
-                {
-                    if (ReceiveHeartbeats)
-                        _incomingMessages.Add(message);
-                    else
-                        _sender.SendSync(message.Id);
-
-                    continue;
-                }
-
                 _incomingMessages.Add(message);
             }
         }
@@ -165,19 +198,21 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
             {
                 if (coreProcess.HasExited)
                 {
-                    OnCoreDisappeared();
+                    _incomingMessages.Add(ToStitchMessage.Exit(ExitCodeCoreMissing));
+                    // After enqueueing the message, we can safely exit this thread. There is no
+                    // further need to check anything and a second Exit message will not be
+                    // generated.
                     return;
                 }
                 Thread.Sleep(CoreCheckIntervalMs);
             }
         }
 
-        private void OnCoreDisappeared()
+        private string GetCrossStitchArgument(string name)
         {
-            if (ReceiveExitMessage)
-                _incomingMessages.Add(ToStitchMessage.Exit());
-            else
-                Environment.Exit(ExitBecauseOfCoreDisappearance);
+            if (CrossStitchArguments.ContainsKey(name))
+                return CrossStitchArguments[name];
+            return string.Empty;
         }
     }
 }

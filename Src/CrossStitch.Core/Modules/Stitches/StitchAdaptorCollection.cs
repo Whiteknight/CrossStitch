@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CrossStitch.Core.Modules.Stitches.Adaptors;
+using System;
 using System.Collections.Concurrent;
-using CrossStitch.Core.Modules.Stitches.Adaptors;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -15,13 +15,15 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public IStitchAdaptor Get(string id)
         {
-            bool found = _adaptors.TryGetValue(id, out IStitchAdaptor adaptor);
+            IStitchAdaptor adaptor;
+            bool found = _adaptors.TryGetValue(id, out adaptor);
             return found ? adaptor : null;
         }
 
         public IStitchAdaptor Remove(string id)
         {
-            bool removed = _adaptors.TryRemove(id, out IStitchAdaptor adaptor);
+            IStitchAdaptor adaptor;
+            bool removed = _adaptors.TryRemove(id, out adaptor);
             return removed ? adaptor : null;
         }
 

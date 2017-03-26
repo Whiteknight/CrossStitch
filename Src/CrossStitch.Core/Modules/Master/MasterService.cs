@@ -3,9 +3,11 @@ using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Handlers;
+using CrossStitch.Core.Modules.Master.Models;
 using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -45,13 +47,6 @@ namespace CrossStitch.Core.Modules.Master
         {
             var stitches = _data.GetAll<StitchInstance>();
             return new NodeStatusBuilder(_core.NodeId, _core.Name, _networkNodeId, _clusterZones, _core.Modules.AddedModules, stitches).Build();
-        }
-
-        public NodeStatus GetExistingNodeStatus(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-                id = _core.NodeId;
-            return _data.Get<NodeStatus>(id);
         }
 
         public void SaveNodeStatus(NodeStatus status)
@@ -111,6 +106,22 @@ namespace CrossStitch.Core.Modules.Master
 
             _log.LogDebug("Received receipt Job={0} Task={1} from node {2}", receipt.ReplyToJobId, receipt.ReplyToTaskId, received.FromNodeId);
             _data.Update<CommandJob>(receipt.ReplyToJobId, j => j.MarkTaskComplete(receipt.ReplyToTaskId, receipt.Success));
+        }
+
+        public List<StitchSummary> GetStitchSummaries(StitchSummaryRequest request)
+        {
+            IEnumerable<StitchSummary> query = _data.GetAllStitchSummaries();
+            if (!string.IsNullOrEmpty(request.NodeId))
+                query = query.Where(ss => ss.NodeId == request.NodeId);
+            if (!string.IsNullOrEmpty(request.StitchGroupName))
+            {
+                var name = new StitchGroupName(request.StitchGroupName);
+                query = query.Where(ss => name.Contains(ss.GroupName));
+            }
+            if (!string.IsNullOrEmpty(request.StitchId))
+                query = query.Where(ss => ss.Id == request.StitchId);
+
+            return query.ToList();
         }
 
         public CommandResponse DispatchCommandRequest(CommandRequest arg)

@@ -6,6 +6,8 @@ using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Modules.Master.Models;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -85,11 +87,12 @@ namespace CrossStitch.Core.Modules.Master
                 .Invoke(t => GenerateAndPublishNodeStatus())
                 .OnWorkerThread());
 
-            // Respond to requests for node status
             // TODO: Publish NodeStatus to cluster when Modules or StitchInstances change
-            _subscriptions.Listen<NodeStatusRequest, NodeStatus>(b => b
+
+            _subscriptions.Listen<StitchSummaryRequest, List<StitchSummary>>(b => b
                 .OnDefaultChannel()
-                .Invoke(m => _service.GetExistingNodeStatus(m.NodeId)));
+                .Invoke(_service.GetStitchSummaries));
+
             _subscriptions.Subscribe<ClusterMemberEvent>(b => b
                 .WithChannelName(ClusterMemberEvent.EnteringEvent)
                 .Invoke(SendNodeStatusToNewClusterNode));

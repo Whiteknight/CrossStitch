@@ -16,6 +16,8 @@ The CrossStitch core should be modular and loosely-coupled, following modern bes
 
 CrossStitch should provide sane but simple defaults, while allowing users to write and substitute their own, more complex versions as required.
 
+The initial release is expected to run on .NET Framework 4.6, but portability to Mono and .NET Core are on the roadmap.
+
 ## Stitches
 
  Each Stitch is a simple console application which implements a simple readline-based interface. Stitches read JSON-formatted messages from STDIN and write messages to STDOUT. There's no special library or dependency, no platform-dependent communication channels, and there's no favoritism. You can write a Stitch in any language you choose, so long as the server where CrossStitch is running is able to execute it.

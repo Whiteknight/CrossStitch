@@ -13,6 +13,30 @@ namespace CrossStitch.Http.NancyFx.Handlers
         public StitchGroupNancyModule(IMessageBus messageBus)
             : base("/stitchgroups")
         {
+            Post["/{GroupName}/upload"] = x =>
+            {
+                var file = Request.Files.Single();
+                var request = new PackageFileUploadRequest
+                {
+                    GroupName = new StitchGroupName(x.GroupName.ToString()),
+                    FileName = file.Name,
+                    Contents = file.Value
+                };
+
+                return messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
+            };
+
+            Post["/{GroupName}/createinstance"] = x =>
+            {
+                var request = this.Bind<CreateInstanceRequest>();
+                request.GroupName = new StitchGroupName(x.GroupName.ToString());
+                return messageBus.Request<CreateInstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreate, request);
+            };
+
+            // TODO: The rest of these requests are local-only, so we need to tell the handler
+            // (MasterModule) that these requests are local and the similar-looking ones from the
+            // Cluster api are cluster-wide.
+
             Get["/{GroupName}"] = _ =>
             {
                 // TODO: Get all instances in the group, including status and home node
@@ -44,31 +68,9 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 return null;
             };
 
-            Post["/{GroupName}/rebalance"] = _ =>
-            {
-                // TODO: Rebalance all instances in the group across the cluster
-                return null;
-            };
 
-            Post["/{GroupName}/upload"] = x =>
-            {
-                var file = Request.Files.Single();
-                var request = new PackageFileUploadRequest
-                {
-                    GroupName = new StitchGroupName(x.GroupName.ToString()),
-                    FileName = file.Name,
-                    Contents = file.Value
-                };
 
-                return messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
-            };
 
-            Post["/{GroupName}/createinstance"] = x =>
-            {
-                var request = this.Bind<CreateInstanceRequest>();
-                request.GroupName = new StitchGroupName(x.GroupName.ToString());
-                return messageBus.Request<CreateInstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreate, request);
-            };
         }
     }
 }

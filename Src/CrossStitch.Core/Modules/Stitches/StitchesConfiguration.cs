@@ -1,4 +1,5 @@
 ﻿using CrossStitch.Core.Configuration;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -12,6 +13,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public string DataBasePath { get; set; }
         public string AppLibraryBasePath { get; set; }
         public string RunningAppBasePath { get; set; }
+        public Dictionary<string, string> ExtensionRunners { get; set; }
 
         public void ValidateAndSetDefaults()
         {
@@ -21,6 +23,9 @@ namespace CrossStitch.Core.Modules.Stitches
                 AppLibraryBasePath = ".\\StitchLibrary";
             if (string.IsNullOrEmpty(RunningAppBasePath))
                 RunningAppBasePath = ".\\RunningStitches";
+
+            if (ExtensionRunners == null)
+                ExtensionRunners = new Dictionary<string, string>();
         }
     }
 }

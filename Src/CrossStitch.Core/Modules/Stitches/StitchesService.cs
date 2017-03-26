@@ -159,7 +159,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 _notifier.StitchStarted(instance);
             }
             else
-                _log.LogError("Could not start stitch {0}", request.Id);
+                _log.LogError(result.Exception, "Could not start stitch {0}", request.Id);
 
             _data.Save(instance);
             return InstanceResponse.Create(request, result.Success, instance);

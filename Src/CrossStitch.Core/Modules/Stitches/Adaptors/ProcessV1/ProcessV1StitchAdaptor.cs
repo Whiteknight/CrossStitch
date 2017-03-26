@@ -1,11 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using CrossStitch.Core.Messages.Stitches;
+﻿using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Stitch.ProcessV1;
 using CrossStitch.Stitch.ProcessV1.Core;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 {
@@ -17,9 +17,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
         public CoreStitchContext StitchContext { get; }
         private Process _process;
         private CoreMessageManager _channel;
+        private readonly StitchesConfiguration _configuration;
 
-        public ProcessV1StitchAdaptor(StitchInstance stitchInstance, CoreStitchContext stitchContext)
+        public ProcessV1StitchAdaptor(StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext)
         {
+            if (configuration == null)
+                throw new ArgumentNullException(nameof(configuration));
             if (stitchInstance == null)
                 throw new ArgumentNullException(nameof(stitchInstance));
             if (stitchContext == null)
@@ -28,14 +31,23 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             _stitchInstance = stitchInstance;
             StitchContext = stitchContext;
             _parameters = new ProcessV1Parameters(stitchInstance.Adaptor.Parameters);
+            _configuration = configuration;
         }
 
         public AdaptorType Type => AdaptorType.ProcessV1;
 
         public bool Start()
         {
+            string initArgs = "";
             int parentPid = Process.GetCurrentProcess().Id;
             var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
+            string ext = Path.GetExtension(executableName).ToLower();
+            if (_configuration.ExtensionRunners.ContainsKey(ext))
+            {
+                initArgs = executableName;
+                executableName = _configuration.ExtensionRunners[ext];
+            }
+
             _process = new Process();
 
             _process.EnableRaisingEvents = true;
@@ -49,7 +61,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
             // TODO: What other values should we pass to the new process?
-            _process.StartInfo.Arguments = BuildArgumentsString(parentPid);
+            _process.StartInfo.Arguments = BuildArgumentsString(initArgs, parentPid);
             _process.Exited += ProcessOnExited;
 
             // TODO: We should pass some command-line args to the new program:
@@ -67,9 +79,15 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             return true;
         }
 
-        private string BuildArgumentsString(int parentPid)
+        private string BuildArgumentsString(string initArgs, int parentPid)
         {
             var sb = new StringBuilder();
+            if (!string.IsNullOrEmpty(initArgs))
+            {
+                sb.Append(initArgs);
+                sb.Append(" ");
+            }
+
             AddArgument(sb, Arguments.CorePid, parentPid.ToString());
             AddArgument(sb, Arguments.InstanceId, _stitchInstance.Id);
             AddArgument(sb, Arguments.Application, _stitchInstance.GroupName.Application);

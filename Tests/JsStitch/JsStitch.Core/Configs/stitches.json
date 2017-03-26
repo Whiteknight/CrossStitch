@@ -1,0 +1,8 @@
+﻿{
+  "DataBasePath": ".\\AppData",
+  "AppLibraryBasePath": ".\\AppLibrary",
+  "RunningAppBasePath": ".\\RunningApps",
+  "ExtensionRunners": {
+    ".js":  "C:\\Program Files\\nodejs\\node.exe"
+  }
+}

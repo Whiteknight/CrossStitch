@@ -19,7 +19,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
         private CoreMessageManager _channel;
         private readonly StitchesConfiguration _configuration;
 
-        public ProcessV1StitchAdaptor(StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext)
+        public ProcessV1StitchAdaptor(StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext, ProcessV1Parameters parameters)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -27,10 +27,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
                 throw new ArgumentNullException(nameof(stitchInstance));
             if (stitchContext == null)
                 throw new ArgumentNullException(nameof(stitchContext));
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
 
             _stitchInstance = stitchInstance;
             StitchContext = stitchContext;
-            _parameters = new ProcessV1Parameters(stitchInstance.Adaptor.Parameters);
+            _parameters = parameters;
             _configuration = configuration;
         }
 
@@ -38,22 +40,26 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 
         public bool Start()
         {
-            string initArgs = "";
-            int parentPid = Process.GetCurrentProcess().Id;
             var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
-            string ext = Path.GetExtension(executableName).ToLower();
-            if (_configuration.ExtensionRunners.ContainsKey(ext))
-            {
-                initArgs = executableName;
-                executableName = _configuration.ExtensionRunners[ext];
-            }
+            var executableFile = _parameters.ExecutableFormat
+                .Replace("{ExecutableName}", _parameters.ExecutableName)
+                .Replace("{DirectoryPath}", _parameters.DirectoryPath);
+
+            int parentPid = Process.GetCurrentProcess().Id;
+
+            var coreArgs = BuildCoreArgumentsString(parentPid);
+            var arguments = _parameters.ArgumentsFormat
+                .Replace("{ExecutableName}", _parameters.ExecutableName)
+                .Replace("{DirectoryPath}", _parameters.DirectoryPath)
+                .Replace("{CoreArgs}", coreArgs)
+                .Replace("{CustomArgs}", _parameters.ExecutableArguments);
 
             _process = new Process();
 
             _process.EnableRaisingEvents = true;
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.ErrorDialog = false;
-            _process.StartInfo.FileName = executableName;
+            _process.StartInfo.FileName = executableFile;
             _process.StartInfo.WorkingDirectory = _parameters.DirectoryPath;
             _process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             _process.StartInfo.UseShellExecute = false;
@@ -61,7 +67,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
             // TODO: What other values should we pass to the new process?
-            _process.StartInfo.Arguments = BuildArgumentsString(initArgs, parentPid);
+            _process.StartInfo.Arguments = arguments;
             _process.Exited += ProcessOnExited;
 
             // TODO: We should pass some command-line args to the new program:
@@ -79,14 +85,9 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             return true;
         }
 
-        private string BuildArgumentsString(string initArgs, int parentPid)
+        private string BuildCoreArgumentsString(int parentPid)
         {
             var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(initArgs))
-            {
-                sb.Append(initArgs);
-                sb.Append(" ");
-            }
 
             AddArgument(sb, Arguments.CorePid, parentPid.ToString());
             AddArgument(sb, Arguments.InstanceId, _stitchInstance.Id);
@@ -95,11 +96,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             AddArgument(sb, Arguments.Version, _stitchInstance.GroupName.Version);
             AddArgument(sb, Arguments.GroupName, _stitchInstance.GroupName.ToString());
             AddArgument(sb, Arguments.DataDirectory, StitchContext.DataDirectory);
-            if (!string.IsNullOrEmpty(_parameters.ExecutableArguments))
-            {
-                sb.Append("-- ");
-                sb.Append(_parameters.ExecutableArguments);
-            }
+
             return sb.ToString();
         }
 

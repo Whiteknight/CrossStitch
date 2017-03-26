@@ -140,7 +140,7 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Stop()
         {
-            _subscriptions.Dispose();
+            _subscriptions?.Dispose();
             _subscriptions = null;
         }
 

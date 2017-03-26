@@ -19,7 +19,7 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             _fileSystem = fileSystem;
             // TODO: We need a way to get the unique string name of the node at this point.
-            _adaptorFactory = new StitchAdaptorFactory(configuration);
+            _adaptorFactory = new StitchAdaptorFactory(configuration, _fileSystem);
             _adaptors = new StitchAdaptorCollection();
         }
 

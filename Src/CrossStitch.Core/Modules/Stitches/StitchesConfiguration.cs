@@ -13,7 +13,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public string DataBasePath { get; set; }
         public string AppLibraryBasePath { get; set; }
         public string RunningAppBasePath { get; set; }
-        public Dictionary<string, string> ExtensionRunners { get; set; }
+        public Dictionary<string, StitchesExtensionConfiguration> Extensions { get; set; }
 
         public void ValidateAndSetDefaults()
         {
@@ -24,8 +24,14 @@ namespace CrossStitch.Core.Modules.Stitches
             if (string.IsNullOrEmpty(RunningAppBasePath))
                 RunningAppBasePath = ".\\RunningStitches";
 
-            if (ExtensionRunners == null)
-                ExtensionRunners = new Dictionary<string, string>();
+            if (Extensions == null)
+                Extensions = new Dictionary<string, StitchesExtensionConfiguration>();
         }
+    }
+
+    public class StitchesExtensionConfiguration
+    {
+        public string ExecutableFormat { get; set; }
+        public string ArgumentsFormat { get; set; }
     }
 }

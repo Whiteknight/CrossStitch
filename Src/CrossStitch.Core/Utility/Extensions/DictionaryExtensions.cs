@@ -10,5 +10,13 @@ namespace CrossStitch.Core.Utility.Extensions
                 return dict[key];
             return defaultValue;
         }
+
+        public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue addValue)
+        {
+            if (dict.ContainsKey(key))
+                return dict[key];
+            dict.Add(key, addValue);
+            return addValue;
+        }
     }
 }

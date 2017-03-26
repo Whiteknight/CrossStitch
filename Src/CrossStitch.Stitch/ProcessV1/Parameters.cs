@@ -7,5 +7,7 @@
         public const string DirectoryPath = "DirectoryPath";
         public const string ExecutableName = "ExecutableName";
         public const string ExecutableArguments = "ExecutableArguments";
+        public const string ExecutableFormat = "ExecutableFormat";
+        public const string ArgumentsFormat = "ArgumentsFormat";
     }
 }

@@ -1,9 +1,9 @@
-﻿using CrossStitch.Core.Models;
+﻿using CrossStitch.Core.Messages.Stitches;
+using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -77,7 +77,7 @@ namespace CrossStitch.Core.Modules.Stitches
             return Path.Combine(_config.DataBasePath, instanceId);
         }
 
-        private string GetInstanceRunningDirectory(string instanceId)
+        public string GetInstanceRunningDirectory(string instanceId)
         {
             return Path.Combine(_config.RunningAppBasePath, instanceId);
         }

@@ -2,7 +2,10 @@
   "DataBasePath": ".\\AppData",
   "AppLibraryBasePath": ".\\AppLibrary",
   "RunningAppBasePath": ".\\RunningApps",
-  "ExtensionRunners": {
-    ".js":  "C:\\Program Files\\nodejs\\node.exe"
+  "Extensions": {
+    ".js": {
+      "ExecutableFormat": "C:\\Program Files\\nodejs\\node.exe",
+      "ArgumentsFormat": "{DirectoryPath}\\{ExecutableName} {CoreArgs} -- {CustomArgs}"
+    }
   }
 }

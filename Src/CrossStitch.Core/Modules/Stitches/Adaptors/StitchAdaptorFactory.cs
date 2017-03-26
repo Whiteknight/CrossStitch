@@ -9,10 +9,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
     public class StitchAdaptorFactory
     {
         private readonly StitchesConfiguration _configuration;
+        private readonly StitchFileSystem _fileSystem;
 
-        public StitchAdaptorFactory(StitchesConfiguration configuration)
+        public StitchAdaptorFactory(StitchesConfiguration configuration, StitchFileSystem fileSystem)
         {
             _configuration = configuration;
+            _fileSystem = fileSystem;
         }
 
         public IStitchAdaptor Create(StitchInstance stitchInstance)
@@ -23,7 +25,8 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
                 //case InstanceRunModeType.AppDomain:
                 //    return new AppDomainAppAdaptor(instance, _network);
                 case AdaptorType.ProcessV1:
-                    return new ProcessV1StitchAdaptor(_configuration, stitchInstance, context);
+                    var pv1args = new ProcessV1Parameters(_configuration, _fileSystem, stitchInstance, stitchInstance.Adaptor.Parameters);
+                    return new ProcessV1StitchAdaptor(_configuration, stitchInstance, context, pv1args);
                 case AdaptorType.BuildInClassV1:
                     return new BuiltInClassV1StitchAdaptor(stitchInstance, context);
             }

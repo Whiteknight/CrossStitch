@@ -76,6 +76,7 @@
     <Compile Include="Messages\ClusterMessageBuilderTests.cs" />
     <Compile Include="Messages\ClusterMessageTests.cs" />
     <Compile Include="Models\CommandJobTests.cs" />
+    <Compile Include="Models\StitchFullIdTests.cs" />
     <Compile Include="Models\StitchGroupNameTests.cs" />
     <Compile Include="Modules\Core\CoreModuleTests.cs" />
     <Compile Include="Modules\Data\DataServiceTests.cs" />

@@ -9,11 +9,13 @@ namespace CrossStitch.Core.Modules.Master
 {
     public class MasterDataRepository : IDataRepository
     {
+        private readonly string _nodeId;
         private readonly IDataRepository _data;
         public MasterStitchCache StitchCache { get; }
 
         public MasterDataRepository(string nodeId, IDataRepository data)
         {
+            _nodeId = nodeId;
             _data = data;
             StitchCache = new MasterStitchCache(nodeId, GetLocalStitchSummaries(), GetRemoteStitchSummaries());
         }
@@ -102,6 +104,14 @@ namespace CrossStitch.Core.Modules.Master
         public List<StitchSummary> GetAllStitchSummaries()
         {
             return StitchCache.GetStitchSummaries();
+        }
+
+        public StitchSummary GetStitchSummary(string id)
+        {
+            var fullId = new StitchFullId(id);
+            if (fullId.IsLocalOnly)
+                return GetAllStitchSummaries().FirstOrDefault(ss => ss.NodeId == _nodeId && ss.Id == fullId.StitchInstanceId);
+            return GetAllStitchSummaries().FirstOrDefault(ss => ss.NodeId == fullId.NodeId && ss.Id == fullId.StitchInstanceId);
         }
 
         private List<StitchSummary> GetLocalStitchSummaries()

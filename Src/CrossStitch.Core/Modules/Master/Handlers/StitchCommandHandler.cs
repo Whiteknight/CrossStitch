@@ -23,7 +23,7 @@ namespace CrossStitch.Core.Modules.Master.Handlers
 
         public CommandResponse Handle(CommandRequest request)
         {
-            var stitch = _data.GetAllStitchSummaries().FirstOrDefault(ss => ss.Id == request.Target);
+            var stitch = _data.GetStitchSummary(request.Target);
             if (stitch == null || stitch.Locale == StitchLocaleType.NotFound)
                 return CommandResponse.Create(false);
 

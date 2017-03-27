@@ -58,7 +58,9 @@ namespace CrossStitch.Core.Tests.Modules.Master
             var message = new StitchDataMessage
             {
                 ToStitchInstanceId = "1",
-                Data = "ABC"
+                Data = "ABC",
+                FromNodeId = "FromNode1",
+                FromStitchInstanceId = "FromStitch1"
             };
             var result = target.AddressMessage(message).ToList();
             result.Count.Should().Be(1);
@@ -74,7 +76,42 @@ namespace CrossStitch.Core.Tests.Modules.Master
             var message = new StitchDataMessage
             {
                 ToStitchInstanceId = "XXX",
-                Data = "ABC"
+                Data = "ABC",
+                FromNodeId = "FromNode1",
+                FromStitchInstanceId = "FromStitch1"
+            };
+            var result = target.AddressMessage(message).ToList();
+            result.Count.Should().Be(0);
+        }
+
+        [Test]
+        public void AddressMessage_Instance_FullToId()
+        {
+            var target = CreateTarget();
+            var message = new StitchDataMessage
+            {
+                ToStitchInstanceId = "1:1",
+                Data = "ABC",
+                FromNodeId = "FromNode1",
+                FromStitchInstanceId = "FromStitch1"
+            };
+            var result = target.AddressMessage(message).ToList();
+            result.Count.Should().Be(1);
+            result[0].ToNodeId.Should().Be("1");
+            result[0].ToNetworkId.Should().Be("1N");
+            result[0].Data.Should().Be("ABC");
+        }
+
+        [Test]
+        public void AddressMessage_Instance_FullToIdBadNode()
+        {
+            var target = CreateTarget();
+            var message = new StitchDataMessage
+            {
+                ToStitchInstanceId = "2:1",
+                Data = "ABC",
+                FromNodeId = "FromNode1",
+                FromStitchInstanceId = "FromStitch1"
             };
             var result = target.AddressMessage(message).ToList();
             result.Count.Should().Be(0);
@@ -87,7 +124,9 @@ namespace CrossStitch.Core.Tests.Modules.Master
             var message = new StitchDataMessage
             {
                 ToStitchGroup = "A.B.1",
-                Data = "ABC"
+                Data = "ABC",
+                FromNodeId = "FromNode1",
+                FromStitchInstanceId = "FromStitch1"
             };
             var result = target.AddressMessage(message).OrderBy(si => si.Id).ToList();
             result.Count.Should().Be(2);
@@ -106,7 +145,9 @@ namespace CrossStitch.Core.Tests.Modules.Master
             var message = new StitchDataMessage
             {
                 ToStitchGroup = "A.B.X",
-                Data = "ABC"
+                Data = "ABC",
+                FromNodeId = "FromNode1",
+                FromStitchInstanceId = "FromStitch1"
             };
             var result = target.AddressMessage(message).OrderBy(si => si.Id).ToList();
             result.Count.Should().Be(0);
@@ -118,7 +159,9 @@ namespace CrossStitch.Core.Tests.Modules.Master
             var target = CreateTarget();
             var message = new StitchDataMessage
             {
-                Data = "ABC"
+                Data = "ABC",
+                FromNodeId = "FromNode1",
+                FromStitchInstanceId = "FromStitch1"
             };
             var result = target.AddressMessage(message).OrderBy(si => si.Id).ToList();
             result.Count.Should().Be(0);

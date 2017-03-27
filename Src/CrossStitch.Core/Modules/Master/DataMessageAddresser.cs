@@ -17,7 +17,14 @@ namespace CrossStitch.Core.Modules.Master
 
         public IEnumerable<StitchDataMessage> AddressMessage(StitchDataMessage message)
         {
-            if (!string.IsNullOrEmpty(message.ToStitchInstanceId) && message.ToStitchInstanceId != message.FromStitchInstanceId)
+            var fullFromId = new StitchFullId(message.FromNodeId, message.FromStitchInstanceId);
+            return AddressMessageInternal(message)
+                .Where(s => new StitchFullId(s.ToNodeId, s.ToStitchInstanceId).FullId != fullFromId.FullId);
+        }
+
+        private IEnumerable<StitchDataMessage> AddressMessageInternal(StitchDataMessage message)
+        {
+            if (!string.IsNullOrEmpty(message.ToStitchInstanceId))
             {
                 message = AddressInstanceMessage(message);
                 return message == null ? Enumerable.Empty<StitchDataMessage>() : new[] { message };
@@ -35,6 +42,7 @@ namespace CrossStitch.Core.Modules.Master
                 .Where(si => groupName.Contains(si.GroupName))
                 .Where(si => si.Id != message.FromStitchInstanceId)
                 .ToList();
+
             foreach (var stitch in stitches)
             {
                 messages.Add(new StitchDataMessage
@@ -55,9 +63,19 @@ namespace CrossStitch.Core.Modules.Master
 
         private StitchDataMessage AddressInstanceMessage(StitchDataMessage message)
         {
-            var stitch = _stitches.FirstOrDefault(si => si.Id == message.ToStitchInstanceId);
+            var fullToId = new StitchFullId(message.ToNodeId, message.ToStitchInstanceId);
+
+            IEnumerable<StitchSummary> query = _stitches;
+            var toNodeId = message.ToNodeId;
+            if (string.IsNullOrEmpty(toNodeId) && !fullToId.IsLocalOnly)
+                toNodeId = fullToId.NodeId;
+            if (!string.IsNullOrEmpty(toNodeId))
+                query = query.Where(s => s.NodeId == toNodeId);
+
+            var stitch = query.FirstOrDefault(si => si.Id == fullToId.StitchInstanceId);
             if (stitch == null)
                 return null;
+
             message.ToNodeId = stitch.NodeId;
             message.ToNetworkId = stitch.NetworkNodeId;
             return message;

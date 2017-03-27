@@ -1,4 +1,4 @@
-namespace CrossStitch.Core.Modules.Master.Models
+namespace CrossStitch.Core.Models
 {
     public enum StitchLocaleType
     {

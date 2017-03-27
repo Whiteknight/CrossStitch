@@ -71,9 +71,6 @@ namespace CrossStitch.Core.Modules.Master
             foreach (var outMessage in messages)
             {
                 bool isRemote = !string.IsNullOrEmpty(outMessage.ToNodeId) && outMessage.ToNodeId != _core.NodeId;
-                // If it has a Node id, publish it. The filter will stop it from coming back
-                // and the Backplane will pick it up.
-                // Otherwise, publish it locally for a local stitch instance to grab it.
                 _stitches.SendStitchData(outMessage, isRemote);
                 if (isRemote)
                     _log.LogDebug("Routing StitchDataMessage to node Id={0}, StitchId={1}", outMessage.ToNodeId, outMessage.ToStitchInstanceId);

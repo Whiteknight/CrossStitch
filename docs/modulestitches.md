@@ -1,3 +1,8 @@
+---
+layout: default
+title: Stitches Module
+---
+
 # Stitches Module
 
 The Stitches module is resonsible for running and managing individual stitches. It is the heart of the CrossStitch system, though it is not a required module. You can run CrossStitch without the Stitches module, if you want the node to focus on other tasks such as routing, monitoring and coordination.

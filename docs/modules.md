@@ -1,3 +1,8 @@
+---
+layout: default
+title: CrossStitch Modules
+---
+
 # Modules
 
 Internally, CrossStitch is broken up into several separate modules, which are independent and loosely coupled. Modules do not interact with one another directly, but instead communicate indirectly over the message bus.

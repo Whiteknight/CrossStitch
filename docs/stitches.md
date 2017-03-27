@@ -1,3 +1,8 @@
+---
+layout: default
+title: Stitches
+---
+
 # Stitches
 
 A stitch is a user-defined chunk of code which usually runs as a separate process. CrossStitch executes and manages it, but with strict encapsulation boundaries. Neither the CrossStitch application (called the "Core") nor the Stitch process have a hard dependency on the other, and can be developed completely in isolation.

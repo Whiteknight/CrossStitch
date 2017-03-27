@@ -1,3 +1,8 @@
+---
+layout: default
+title: Contributing
+---
+
 # CrossStitch Development
 
 ## Design Goals

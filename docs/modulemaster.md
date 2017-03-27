@@ -1,3 +1,8 @@
+---
+layout: default
+title: Master Module
+---
+
 # Master Module
 
 The Master Module serves as a brain or router for a cluster, keeping track of nodes on the network, and allowing routing and dispatch of events and commands between nodes. The Master module serves several purposes, which seem distinct at first glance but are all related to the same underlying requirement: Keeping track of cluster state, and using that knowledge of state to route messages.

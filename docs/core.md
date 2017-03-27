@@ -1,3 +1,8 @@
+---
+layout: default
+title: CrossStitch Core
+---
+
 # CrossStitch Core
 
 The Core of CrossStitch is comprised of a few bits: The `CrossStitchCore` class which is the top-level and organizes everything else, the `CoreModule` which allows the core to communicate with the message bus, and the `CoreService` which implements some logic specific to the core.

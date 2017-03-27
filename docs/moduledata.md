@@ -1,3 +1,8 @@
+---
+layout: default
+title: Data Modules
+---
+
 # Data Module
 
 The data module is responsible for storing persistant state of the CrossStitch node. It holds information about entities such as the state of the node, Stitch Instances, and a few other things as required by the core and various modules.

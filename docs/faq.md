@@ -1,4 +1,9 @@
-# Commonly Asked Questions
+---
+layout: default
+title: Frequently Asked Questions
+---
+
+# Frequently Asked Questions
 
 ## Stitches
 

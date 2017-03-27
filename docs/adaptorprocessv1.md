@@ -1,3 +1,8 @@
+---
+layout: default
+title: ProcessV1 Stitch Adaptor
+---
+
 # ProcessV1 Stitch Protocol
 
 The preferred and most simple adaptor is called `ProcessV1`. This protocol is inspired by several bits of prior art, though the first drafts of the readline-based protocol is mostly based on the "multilanguage protocol" from Apache Storm. In fact, backwards-compatibility with Apache Storm was an initial design goal, although that restriction was lifted and the CrossStitch implementation did start to diverge. A future adaptor implementation may attempt compatibility again, at some point.

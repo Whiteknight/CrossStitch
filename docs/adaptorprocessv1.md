@@ -10,7 +10,8 @@ The preferred and most simple adaptor is called `ProcessV1`. This protocol is in
         private static StitchMessageManager _manager;
         static void Main(string[] args)
         {
-            // Create and start the manager, to begin receiving messages
+            // Create and start the manager, to begin 
+            // receiving messages
             _manager = new StitchMessageManager(args);
             _manager.Start();
 
@@ -25,7 +26,8 @@ The preferred and most simple adaptor is called `ProcessV1`. This protocol is in
 
                 // Do some kind of processing on the message here
 
-                // Acknowledge that the message was received and handled successfully
+                // Acknowledge that the message was received and 
+                // handled successfully
                 _manager.AckMessage(msg.Id);
             }
         }
@@ -35,7 +37,7 @@ The preferred and most simple adaptor is called `ProcessV1`. This protocol is in
 
 ## Messages
 
-The Core generates messages of type `CrossStitch.Stitch.ProcessV1.ToStitchMessage` to send to the Stitch, and the Stitch sends messages of type `CrossStitch.Stitch.ProcessV1.FromStitchMessage` back to the core. This messaging system is asynchronous and bi-directional. The Stitch does not need to wait for a message from the Core to respond, or vice-versa. 
+The Core generates messages of type `CrossStitch.Stitch.ProcessV1.ToStitchMessage` to send to the Stitch, and the Stitch sends messages of type `CrossStitch.Stitch.ProcessV1.FromStitchMessage` back to the core. This messaging system is asynchronous and bi-directional. The Stitch does not need to wait for a message from the Core to respond, or vice-versa. In fact, because of the asynchronous nature of CrossStitch, waiting for anything is strongly discouraged.
 
 `ToStitchMessage` contains a `ChannelName` property which tells the name of the channel. Channel names which start with an underscore (`'_'`) are typically reserved for special purpose in the CrossStitch protocol. `ToStitchMessage` also contains information about the message sender (StitchId, NodeId), and the `Data` of the message. `Data` is a string whose format is left to the discretion of the Stitch developer. Suggested formats are JSON (for structured data) and Base64-encoded binary (for binary or unreadable data). Despite these suggestions, CrossStitch does not inspect, validate or care about what you put in your `Data`. Leave it null for all we care. There is no enforced limit on the size of these messages, though very large messages may have performance and reliability impacts, which we will discuss below. 
 

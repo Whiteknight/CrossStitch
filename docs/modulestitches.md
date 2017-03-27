@@ -1,8 +1,8 @@
 # Stitches Module
 
-The Stitches module is resonsible for running and managing individual stitches. The Stitches module is the heart of CrossStitch though it is not a required module. It is possible to run a CrossStitch node without the Stitches module running. In this case the CrossStitch node can still perform other tasks depending on which modules are installed, such as responding to requests over an HTTP API, keeping track of cluster state, routing and coordination tasks between nodes, etc. However, most nodes in your cluster will probably want this module to be running.
+The Stitches module is resonsible for running and managing individual stitches. It is the heart of the CrossStitch system, though it is not a required module. You can run CrossStitch without the Stitches module, if you want the node to focus on other tasks such as routing, monitoring and coordination.
 
-The `StitchesModule` performs basic operations on stitches: Creating, starting, and stopping. The Master module is used to route these operation requests between nodes in the cluster. Most requests should be sent to the MasterModule first, for routing. The MasterModule will redirect requests to the Stitches module as required.
+The `StitchesModule` performs basic operations on stitches: Creating, starting, stopping and communications. The Master module is used to route these operation requests between nodes in the cluster. Most requests should be sent to the [Master module](modulemaster.md) first, for routing. The MasterModule will redirect requests to the Stitches module as required.
 
 ## Adaptors
 
@@ -10,7 +10,7 @@ See the [adaptors documentation](stitches.md) for more details about different a
 
 ## Configuration
 
-The "stitches.json" file holds configuration for the StitchesModule. It defines the following keys:
+The "stitches.json" file holds configuration for the Stitches module. It defines the following keys:
 
 * "DataBasePath" a folder where stitches can store data. Every stitch instance gets a subfolder here to use for storing data
 * "AppLibraryBasePath" A folder where .zip files are stored for each stitch type, so they can be quickly instantiated
@@ -31,4 +31,28 @@ If you are writing a Stitch in a language which is not compiled, the executable 
 
 This has four variables, `{DirectoryPath}`, `{ExecutableName}` are the same as above, `{CoreArgs}` are arguments setup by CrossStitch and `{CustomArgs}` are arguments for the application that the user specifies. The default value for this is `"{CoreArgs} -- {CustomArgs}"`. If you are using a language which is not compiled and you have the VM/interpreter spcified in ExecutableFormat, you can use something like this for ArgumentsFormat: "{DirectoryPath}\{ExecutableName} {CoreArgs} -- {CustomArgs}". Consult the documentation for your target runtime for more information about how to setup your arguments.
 
+### Example Configs
 
+These examples assume the [ProcessV1](adaptorprocessv1.md) protocol. If you are using a different adaptor protocol, you may have different requirements for how to setup your formatting values.
+
+Here is an example of the default config for EXE files. These values are provided by default and do not need to be specified in your files, but this is an example for you to see what it looks like:
+
+    {
+      "Extensions": {
+        ".exe": {
+            "ExecutableFormat": "{DirectoryPath}\\{ExecutableName}",
+            "ArgumentsFormat": "{CoreArgs} -- {CustomArgs}"
+      }
+    }
+    
+
+Here is an example config for running a `.js` file as a Stitch, using NodeJs:
+
+    {
+      "Extensions": {
+        ".js": {
+          "ExecutableFormat": "C:\\Program Files\\nodejs\\node.exe",
+          "ArgumentsFormat": "{DirectoryPath}\\{ExecutableName} {CoreArgs} -- {CustomArgs}"
+        }
+      }
+    }

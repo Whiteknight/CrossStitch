@@ -2,8 +2,6 @@
 
 ## Design Goals
 
-[Cross stitching](https://en.wikipedia.org/wiki/Cross-stitch) is a traditional artform with colored thread and needle-work where individual stitches are made with colored thread, typically in a simple X pattern. The techniques are very simple and easy to learn. By combining these simple stitches with color and pattern, beautiful works of art can be created. In the same way, CrossStitch allows simple, easy-to-learn building blocks to be combined and repeated together to make large, complex applications.
-
 CrossStitch follows some of the same basic guidelines: Complexity emerges from repeating and combining large numbers of very simple building blocks. Here are some of the design goals for CrossStitch:
 
 1. Creating, deploying, monitoring and managing stitches should be fast and easy. Developers shouldn't need special tooling, specific languages, and deep knowledge about the workings of CrossStitch to get things working. If you can write a console application in your language of choice, you can create applications for CrossStitch.
@@ -36,4 +34,4 @@ CrossStitch is looking for good developers, including C# developers and develope
 
 The easiest way to get involved is to create a Fork on Github, start making changes and additions, and then open a Pull Request.
 
-CrossStitch is available under the Apache 2.0 license, and all contributions should be made with that in mind.
+CrossStitch is available under the **Apache 2.0 license**, and all contributions should be made with that in mind.

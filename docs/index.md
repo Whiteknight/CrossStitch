@@ -11,9 +11,9 @@ With the simplicity comes power. You can offload expensive background processing
 * [Contributing](contributing.md)
 * [Stitches](stitches.md)
     * Adaptors
-        * [ProcessV1](adaptorprocessv1.md)s
+        * [ProcessV1](adaptorprocessv1.md)
 * [Core](core.md)
     * Modules
-        * Stitches
+        * [Stitches](modulestitches.md)
         * [Master](modulemaster.md)
         * [Data](moduledata.md)

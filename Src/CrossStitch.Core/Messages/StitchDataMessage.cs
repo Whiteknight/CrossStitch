@@ -19,6 +19,14 @@ namespace CrossStitch.Core.Messages
         public string FromNetworkId { get; set; }
         public string FromNodeId { get; set; }
 
-        public StitchFullId RecipientId => new StitchFullId(ToNodeId, ToStitchInstanceId);
+        public StitchFullId GetRecipientId()
+        {
+            return new StitchFullId(ToNodeId, ToStitchInstanceId);
+        }
+
+        public StitchFullId GetSenderId()
+        {
+            return new StitchFullId(FromNodeId, FromStitchInstanceId);
+        }
     }
 }

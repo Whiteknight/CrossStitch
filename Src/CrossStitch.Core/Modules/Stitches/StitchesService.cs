@@ -52,7 +52,8 @@ namespace CrossStitch.Core.Modules.Stitches
                 {
                     Id = instance.Id
                 };
-                var response = StartInstanceInternal(request, instance);
+                // Best effort. The StartInstanceInternal method logs errors
+                StartInstanceInternal(request, instance);
             }
             _log.LogDebug("Startup stitches started");
         }
@@ -132,7 +133,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
             // Report success
             _log.LogInformation("Instance {0} cloned to {1}", instanceId, instance.Id);
-            return InstanceResponse.Success(request, instance); ;
+            return InstanceResponse.Success(request, instance);
         }
 
         // Starts the instance. Must have been created with CreateNewInstance first
@@ -239,7 +240,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public void SendDataMessageToStitch(StitchDataMessage message)
         {
-            var fullStitchId = message.RecipientId;
+            var fullStitchId = message.GetRecipientId();
             if (!fullStitchId.IsLocalOnly && fullStitchId.NodeId != _core.NodeId)
                 _log.LogWarning("Received message for stitch on the wrong node NodeId={0}", fullStitchId.NodeId);
             var result = _stitchInstanceManager.SendDataMessage(fullStitchId, message);

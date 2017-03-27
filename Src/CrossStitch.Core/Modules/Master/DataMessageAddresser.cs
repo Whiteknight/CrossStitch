@@ -17,7 +17,8 @@ namespace CrossStitch.Core.Modules.Master
 
         public IEnumerable<StitchDataMessage> AddressMessage(StitchDataMessage message)
         {
-            var fullFromId = new StitchFullId(message.FromNodeId, message.FromStitchInstanceId);
+            // TODO: Some kind of validation that we have all the necessary fields.
+            var fullFromId = message.GetSenderId();
             return AddressMessageInternal(message)
                 .Where(s => new StitchFullId(s.ToNodeId, s.ToStitchInstanceId).FullId != fullFromId.FullId);
         }

@@ -148,14 +148,14 @@ namespace CrossStitch.Core.Modules.Stitches
             });
         }
 
-        public InstanceActionResult SendDataMessage(StitchDataMessage message)
+        public InstanceActionResult SendDataMessage(StitchFullId fullStitchId, StitchDataMessage message)
         {
-            var adaptor = _adaptors.Get(message.ToStitchInstanceId);
+            var adaptor = _adaptors.Get(fullStitchId.StitchInstanceId);
             if (adaptor == null)
-                return InstanceActionResult.NotFound(message.ToStitchInstanceId);
+                return InstanceActionResult.NotFound(fullStitchId.StitchInstanceId);
 
             adaptor.SendMessage(message.Id, message.DataChannelName, message.Data, message.FromNodeId, message.FromStitchInstanceId);
-            return InstanceActionResult.Result(message.ToStitchInstanceId, true);
+            return InstanceActionResult.Result(fullStitchId.StitchInstanceId, true);
         }
 
         public int GetNumberOfRunningStitches()

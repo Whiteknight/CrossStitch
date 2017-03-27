@@ -239,8 +239,14 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public void SendDataMessageToStitch(StitchDataMessage message)
         {
-            _stitchInstanceManager.SendDataMessage(message);
-            _log.LogDebug("Sending message Id={0} to StitchInstanceId={1}", message.Id, message.ToStitchInstanceId);
+            var fullStitchId = message.RecipientId;
+            if (!fullStitchId.IsLocalOnly && fullStitchId.NodeId != _core.NodeId)
+                _log.LogWarning("Received message for stitch on the wrong node NodeId={0}", fullStitchId.NodeId);
+            var result = _stitchInstanceManager.SendDataMessage(fullStitchId, message);
+            if (result.Success)
+                _log.LogDebug("Sent message Id={0} to StitchInstanceId={1}", message.Id, fullStitchId.StitchInstanceId);
+            else
+                _log.LogWarning("Could not deliver message Id={0} to StitchInstanceId={1}", message.Id, fullStitchId.StitchInstanceId);
         }
 
         public void StopAll()

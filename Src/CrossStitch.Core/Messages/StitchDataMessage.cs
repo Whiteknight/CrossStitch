@@ -1,4 +1,6 @@
-﻿namespace CrossStitch.Core.Messages
+﻿using CrossStitch.Core.Models;
+
+namespace CrossStitch.Core.Messages
 {
     public class StitchDataMessage
     {
@@ -16,5 +18,7 @@
         public string FromStitchInstanceId { get; set; }
         public string FromNetworkId { get; set; }
         public string FromNodeId { get; set; }
+
+        public StitchFullId RecipientId => new StitchFullId(ToNodeId, ToStitchInstanceId);
     }
 }

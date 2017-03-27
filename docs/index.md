@@ -24,12 +24,12 @@ With this simplicity comes power. You can offload expensive background processin
         * [Stitches](modulestitches.md)
         * [Master](modulemaster.md)
         * [Data](moduledata.md)
-        * Logging
-        * Alerts
-        * Timer
+        * [Logging](modulelogging.md)
+        * [Alerts](modulealerts.md)
+        * [Timer](moduletimer.md)
     * Plugin Modules
-      * HTTP API (With NancyFX)
-      * Backplane (With NetMQ Zyre)
+      * [HTTP API](modulenancyfxapi.md) (With NancyFX)
+      * [Backplane](modulezyrebackplane.md) (With NetMQ Zyre)
 * [Frequently Asked Questions](faq.md)
 
 ## Installation

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch", "Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj", "{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}"
 EndProject
@@ -69,6 +69,21 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsStitch.Core", "Tests\JsStitch\JsStitch.Core\JsStitch.Core.csproj", "{4228C563-0827-40BA-B530-D4A15D7882FA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JsStitch", "JsStitch", "{50D0AE07-F880-4CA7-8D62-F263F4274CB8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{185F6383-3BEF-4BFB-8BDA-68007A4DC580}"
+	ProjectSection(SolutionItems) = preProject
+		docs\_config.yml = docs\_config.yml
+		docs\adaptorprocessv1.md = docs\adaptorprocessv1.md
+		docs\contributing.md = docs\contributing.md
+		docs\core.md = docs\core.md
+		docs\faq.md = docs\faq.md
+		docs\index.md = docs\index.md
+		docs\moduledata.md = docs\moduledata.md
+		docs\modulemaster.md = docs\modulemaster.md
+		docs\modules.md = docs\modules.md
+		docs\modulestitches.md = docs\modulestitches.md
+		docs\stitches.md = docs\stitches.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

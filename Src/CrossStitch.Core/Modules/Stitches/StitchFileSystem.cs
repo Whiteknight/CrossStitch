@@ -18,7 +18,14 @@ namespace CrossStitch.Core.Modules.Stitches
             _versions = versions;
         }
 
-        public string SavePackageToLibrary(string appName, string componentName, Stream contents)
+        public class SavePackageResult
+        {
+            public string Version { get; set; }
+            public string FilePath { get; set; }
+        }
+
+        // Save the new package file, creating a new version name for it
+        public SavePackageResult SavePackageToLibrary(string appName, string componentName, Stream contents)
         {
             string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
             if (!Directory.Exists(libraryDirectoryPath))
@@ -33,7 +40,30 @@ namespace CrossStitch.Core.Modules.Stitches
             using (var fileStream = File.Open(libraryFilePath, FileMode.Create, FileAccess.Write))
                 contents.CopyTo(fileStream);
 
-            return nextVersion;
+            return new SavePackageResult
+            {
+                Version = nextVersion,
+                FilePath = libraryFilePath
+            };
+        }
+
+        // Save the package file with an existing version, usually send from a remote node
+        public SavePackageResult SavePackageToLibrary(string appName, string componentName, string versionName, Stream contents)
+        {
+            string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
+            if (!Directory.Exists(libraryDirectoryPath))
+                Directory.CreateDirectory(libraryDirectoryPath);
+
+            string libraryFilePath = Path.Combine(libraryDirectoryPath, versionName + ".zip");
+
+            using (var fileStream = File.Open(libraryFilePath, FileMode.Create, FileAccess.Write))
+                contents.CopyTo(fileStream);
+
+            return new SavePackageResult
+            {
+                Version = versionName,
+                FilePath = libraryFilePath
+            };
         }
 
         public class Result
@@ -55,7 +85,7 @@ namespace CrossStitch.Core.Modules.Stitches
             string libraryFilePath = Path.Combine(libraryDirectoryPath, groupName.Version + ".zip");
             var runningDirectory = GetInstanceRunningDirectory(instanceId);
             if (Directory.Exists(runningDirectory))
-                return Result.Failure();
+                Directory.Delete(runningDirectory, true);
             Directory.CreateDirectory(runningDirectory);
 
             using (FileStream fileStream = File.Open(libraryFilePath, FileMode.Open, FileAccess.Read))

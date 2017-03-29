@@ -8,6 +8,7 @@ using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -93,16 +94,25 @@ namespace CrossStitch.Core.Modules.Master
                 _clusterSender.SendReceipt(ok, received.FromNetworkId, request.ReplyToJobId, request.ReplyToTaskId);
         }
 
-        public void ReceiveReceiptFromRemote(ReceivedEvent received, CommandReceipt receipt)
+        public JobCompleteEvent ReceiveReceiptFromRemote(ReceivedEvent received, CommandReceipt receipt)
         {
             if (string.IsNullOrEmpty(receipt.ReplyToJobId) || string.IsNullOrEmpty(receipt.ReplyToTaskId))
             {
                 _log.LogWarning("Received job receipt from Node {0} without necessary job information", received.FromNodeId);
-                return;
+                return null;
             }
 
             _log.LogDebug("Received receipt Job={0} Task={1} from node {2}", receipt.ReplyToJobId, receipt.ReplyToTaskId, received.FromNodeId);
-            _data.Update<CommandJob>(receipt.ReplyToJobId, j => j.MarkTaskComplete(receipt.ReplyToTaskId, receipt.Success));
+            var job = _data.Update<CommandJob>(receipt.ReplyToJobId, j => j.MarkTaskComplete(receipt.ReplyToTaskId, receipt.Success));
+            if (job.IsComplete)
+            {
+                return new JobCompleteEvent
+                {
+                    JobId = job.Id,
+                    Status = job.Status
+                };
+            }
+            return null;
         }
 
         public List<StitchSummary> GetStitchSummaries(StitchSummaryRequest request)
@@ -130,6 +140,64 @@ namespace CrossStitch.Core.Modules.Master
             return handler.Handle(arg);
         }
 
+        public CreateInstanceResponse CreateNewInstances(CreateInstanceRequest arg)
+        {
+            // If we are creating the instances locally, redirect to the Stitches module
+            if (arg.LocalOnly)
+            {
+                var localResponse = _stitches.CreateInstances(arg, null, false);
+                return new CreateInstanceResponse(localResponse);
+            }
+
+            // Otherwise we're distributing. First, get the recipient nodes.
+            // TODO: A better algorithm for selecting nodes. Add instances to nodes with the lowest number of instances first.
+            var nodes = _data.GetAll<NodeStatus>()
+                .Where(ns => ns.RunningModules.Contains(ModuleNames.Stitches))
+                .ToList();
+            var selectedNodes = new List<NodeStatus>();
+            for (int i = 0; i < arg.NumberOfInstances; i++)
+            {
+                // Do some scoring, to select the nodes with the most capacity
+                var node = nodes[i % nodes.Count];
+                selectedNodes.Add(node);
+            }
+
+            // Create a job, and start dispatching commands
+            var job = new CommandJob();
+            _data.Insert(job);
+
+            foreach (var node in selectedNodes)
+            {
+                var task = job.CreateSubtask(CommandType.CreateStitchInstance, node.Id, node.Id);
+                var payload = new CreateInstanceRequest
+                {
+                    Adaptor = arg.Adaptor,
+                    GroupName = arg.GroupName,
+                    Name = arg.Name,
+                    NumberOfInstances = 1,
+                    JobId = job.Id,
+                    TaskId = task.Id
+                };
+                bool isRemote = node.Id != _core.NodeId;
+                var response = _stitches.CreateInstances(payload, node.NetworkNodeId, isRemote);
+                if (!isRemote && response != null)
+                    task.Status = response.IsSuccess ? JobStatusType.Success : JobStatusType.Failure;
+            }
+            _data.Save(job, true);
+            return new CreateInstanceResponse
+            {
+                JobId = job.Id,
+                IsSuccess = true
+            };
+        }
+
+        public void CreateNewInstanceFromRemote(ReceivedEvent received, CreateInstanceRequest request)
+        {
+            var response = _stitches.CreateInstances(request, null, false);
+            if (request.ReceiptRequested)
+                _clusterSender.SendReceipt(response.IsSuccess, received.FromNetworkId, request.JobId, request.TaskId);
+        }
+
         public void SetNetworkNodeId(string networkNodeId)
         {
             _networkNodeId = networkNodeId;
@@ -141,6 +209,29 @@ namespace CrossStitch.Core.Modules.Master
             _clusterZones = zones ?? new string[0];
             if (_clusterZones.Length > 0)
                 _log.LogDebug("Member of cluster zones {0}", string.Join(",", _clusterZones));
+        }
+
+        public PackageFileUploadResponse UploadStitchPackageFile(StitchGroupName groupName, string filePath, PackageFileUploadRequest arg)
+        {
+            // Send this to all nodes which are running the Stitches module
+            var nodes = _data.GetAll<NodeStatus>()
+                .Where(n => n.Id != _core.NodeId)
+                .Where(ns => ns.RunningModules.Contains(ModuleNames.Stitches))
+                .ToList();
+            if (nodes.Count == 0)
+                return new PackageFileUploadResponse(true, groupName, filePath);
+
+            var job = new CommandJob();
+            _data.Insert(job);
+
+            foreach (var node in nodes)
+            {
+                var task = job.CreateSubtask(CommandType.UploadPackageFile, node.Id, node.Id);
+                _clusterSender.SendPackageFile(node.NetworkNodeId, groupName, arg.FileName, filePath, job.Id, task.Id);
+            }
+
+            _data.Save(job, true);
+            return new PackageFileUploadResponse(true, groupName, filePath, job.Id);
         }
     }
 }

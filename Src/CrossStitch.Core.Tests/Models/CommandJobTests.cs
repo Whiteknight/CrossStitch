@@ -12,13 +12,13 @@ namespace CrossStitch.Core.Tests.Models
         public void Status_Test()
         {
             var target = new CommandJob();
-            target.Status.Should().Be(JobStatusType.Complete);
+            target.Status.Should().Be(JobStatusType.Success);
 
             target.Tasks.Add(new CommandJobTask
             {
-                Status = JobStatusType.Complete
+                Status = JobStatusType.Success
             });
-            target.Status.Should().Be(JobStatusType.Complete);
+            target.Status.Should().Be(JobStatusType.Success);
 
 
             target.Tasks.Add(new CommandJobTask
@@ -58,7 +58,7 @@ namespace CrossStitch.Core.Tests.Models
             task.Status.Should().Be(JobStatusType.Started);
 
             target.MarkTaskComplete(task.Id, true);
-            task.Status.Should().Be(JobStatusType.Complete);
+            task.Status.Should().Be(JobStatusType.Success);
 
             target.MarkTaskComplete(task.Id, false);
             task.Status.Should().Be(JobStatusType.Failure);

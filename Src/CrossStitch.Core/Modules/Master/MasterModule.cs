@@ -119,6 +119,18 @@ namespace CrossStitch.Core.Modules.Master
             // TODO: On Stitch Started/Stopped we should publish notification to the cluster so other Master nodes can update their
             // caches.
 
+            // Upload package files and distribute to all nodes
+            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
+                .OnDefaultChannel()
+                .Invoke(UploadPackageFile));
+            // Create new stitch instances 
+            _subscriptions.Listen<CreateInstanceRequest, CreateInstanceResponse>(l => l
+                .OnDefaultChannel()
+                .Invoke(_service.CreateNewInstances));
+            _subscriptions.Subscribe<ObjectReceivedEvent<CreateInstanceRequest>>(b => b
+                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .Invoke(m => _service.CreateNewInstanceFromRemote(m, m.Object)));
+
             // Handle incoming commands
             _subscriptions.Listen<CommandRequest, CommandResponse>(b => b
                 .OnDefaultChannel()
@@ -130,12 +142,22 @@ namespace CrossStitch.Core.Modules.Master
             // Handle incoming command receipt messages
             _subscriptions.Subscribe<ObjectReceivedEvent<CommandReceipt>>(b => b
                 .WithChannelName(ReceivedEvent.ChannelReceived)
-                .Invoke(ore => _service.ReceiveReceiptFromRemote(ore, ore.Object)));
+                .Invoke(ReceiveCommandJobReceipt));
 
             // Route StitchDataMessage to the correct node
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()
                 .Invoke(_service.EnrichStitchDataMessageWithAddress));
+        }
+
+        private void ReceiveCommandJobReceipt(ObjectReceivedEvent<CommandReceipt> ore)
+        {
+            var eventMessage = _service.ReceiveReceiptFromRemote(ore, ore.Object);
+            if (eventMessage == null)
+                return;
+
+            _log.LogDebug("Job Id={0} is complete: {1}", eventMessage.JobId, eventMessage.Status);
+            _messageBus.Publish(eventMessage.Status == JobStatusType.Success ? JobCompleteEvent.ChannelSuccess : JobCompleteEvent.ChannelFailure, eventMessage);
         }
 
         public void Stop()
@@ -144,9 +166,10 @@ namespace CrossStitch.Core.Modules.Master
             _subscriptions = null;
         }
 
-        public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
+        public IReadOnlyDictionary<string, string> GetStatusDetails()
         {
-            return new System.Collections.Generic.Dictionary<string, string>();
+            // TODO: Return stats about the number of known peer nodes? Known Stitches? Usage stats?
+            return new Dictionary<string, string>();
         }
 
         public void Dispose()
@@ -190,6 +213,20 @@ namespace CrossStitch.Core.Modules.Master
                 .Build();
             _messageBus.Publish(ClusterMessage.SendEventName, envelope);
             _log.LogDebug("Published node status to node Id={0}", obj.NodeId);
+        }
+
+        private PackageFileUploadResponse UploadPackageFile(PackageFileUploadRequest request)
+        {
+            var response = _messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelLocal, request);
+            if (!response.Success)
+            {
+                _log.LogError("Could not upload package file");
+                return response;
+            }
+            if (request.LocalOnly)
+                return response;
+
+            return _service.UploadStitchPackageFile(response.GroupName, response.FilePath, request);
         }
 
         private class StitchRequestHandler : IStitchRequestHandler
@@ -245,6 +282,22 @@ namespace CrossStitch.Core.Modules.Master
                 else
                     _messageBus.Publish(StitchDataMessage.ChannelSendLocal, message);
             }
+
+            public LocalCreateInstanceResponse CreateInstances(CreateInstanceRequest request, string networkNodeId, bool remote)
+            {
+                if (remote)
+                {
+                    var message = new ClusterMessageBuilder()
+                        .FromNode()
+                        .ToNode(networkNodeId)
+                        .WithObjectPayload(request)
+                        .Build();
+                    _messageBus.Publish(ClusterMessage.SendEventName, message);
+                    return null;
+                }
+                else
+                    return _messageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(request);
+            }
         }
 
         private class ClusterMessageSender : IClusterMessageSender
@@ -274,6 +327,32 @@ namespace CrossStitch.Core.Modules.Master
                     })
                     .Build();
                 _messageBus.Publish(ClusterMessage.SendEventName, message);
+            }
+
+            public void SendPackageFile(string networkNodeId, StitchGroupName groupName, string fileName, string filePath, string jobId, string taskId)
+            {
+                _messageBus.Publish(new FileTransferRequest
+                {
+                    FilePath = filePath,
+                    NetworkNodeId = networkNodeId,
+                    GroupName = groupName,
+                    JobId = jobId,
+                    TaskId = taskId,
+                    FileName = fileName
+                });
+                //var message = new ClusterMessageBuilder()
+                //    .FromNode()
+                //    .ToNode(networkNodeId)
+                //    .WithObjectPayload(new FileTransferRequest
+                //    {
+                //        FilePath = filePath,
+                //        GroupName = groupName,
+                //        JobId = jobId,
+                //        TaskId = taskId,
+                //        FileName = fileName
+                //    })
+                //    .Build();
+                //_messageBus.Publish(ClusterMessage.SendEventName, message);
             }
         }
     }

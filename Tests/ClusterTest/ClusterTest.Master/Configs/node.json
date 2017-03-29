@@ -1,3 +1,5 @@
 ﻿{
-    "Zones" : []
+  "HeartbeatIntervalMinutes": 1,
+  "StitchMonitorIntervalMinutes": 5,
+  "StatusBroadcastIntervalMinutes": 5
 }

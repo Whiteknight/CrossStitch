@@ -89,7 +89,7 @@ namespace CrossStitch.Core.Modules.Master.Handlers
             // TODO: Publish status async here and rely on the job to communicate status of the
             // request. We will need a new mechanism for this and new message types
             bool ok = _stitches.StopInstance(stitch.Id);
-            subtask.Status = ok ? JobStatusType.Complete : JobStatusType.Failure;
+            subtask.Status = ok ? JobStatusType.Success : JobStatusType.Failure;
         }
     }
 
@@ -106,7 +106,7 @@ namespace CrossStitch.Core.Modules.Master.Handlers
             // TODO: Publish status async here and rely on the job to communicate status of the
             // request. We will need a new mechanism for this and new message types
             bool ok = _stitches.StartInstance(stitch.Id);
-            subtask.Status = ok ? JobStatusType.Complete : JobStatusType.Failure;
+            subtask.Status = ok ? JobStatusType.Success : JobStatusType.Failure;
         }
     }
 }

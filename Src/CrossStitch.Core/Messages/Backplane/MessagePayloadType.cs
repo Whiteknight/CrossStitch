@@ -5,6 +5,7 @@
         None,
         CommandString,
         Object,
+        InternalObject,
         Raw,
         SuccessResponse,
         FailureResponse,

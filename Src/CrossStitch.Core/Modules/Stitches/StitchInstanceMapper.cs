@@ -14,7 +14,7 @@ namespace CrossStitch.Core.Modules.Stitches
             _nodeName = nodeName;
         }
 
-        public StitchInstance Map(CreateInstanceRequest request)
+        public StitchInstance Map(LocalCreateInstanceRequest request)
         {
             return new StitchInstance
             {

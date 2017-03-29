@@ -1,4 +1,5 @@
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -9,5 +10,6 @@ namespace CrossStitch.Core.Modules.Master
         bool RemoveInstance(string instanceId);
 
         void SendStitchData(StitchDataMessage message, bool remote);
+        LocalCreateInstanceResponse CreateInstances(CreateInstanceRequest request, string networkNodeId, bool remote);
     }
 }

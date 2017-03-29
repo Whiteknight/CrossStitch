@@ -22,7 +22,7 @@ namespace CrossStitch.Backplane.Zyre
             envelope.Header = _serializer.Deserialize<MessageHeader>(source.Pop().Buffer);
             if (envelope.Header.PayloadType == MessagePayloadType.Raw)
                 envelope.RawFrames = source.Select(f => f.ToByteArray()).ToList();
-            else if (envelope.Header.PayloadType == MessagePayloadType.Object)
+            else if (envelope.Header.PayloadType == MessagePayloadType.Object || envelope.Header.PayloadType == MessagePayloadType.InternalObject)
             {
                 var bytes = source.FirstOrDefault()?.ToByteArray();
                 if (bytes != null)
@@ -51,7 +51,7 @@ namespace CrossStitch.Backplane.Zyre
                     message.Append(bytes);
                 }
             }
-            if (envelope.Header.PayloadType == MessagePayloadType.Object)
+            if (envelope.Header.PayloadType == MessagePayloadType.Object || envelope.Header.PayloadType == MessagePayloadType.InternalObject)
             {
                 var bytes = _serializer.Serialize(envelope.PayloadObject);
                 message.Append(bytes);

@@ -59,6 +59,7 @@
     <Compile Include="Configuration\IModuleConfiguration.cs" />
     <Compile Include="Messages\Backplane\ClusterMessage.cs" />
     <Compile Include="Messages\Backplane\ClusterMessageBuilder.cs" />
+    <Compile Include="Messages\Backplane\FileTransferRequest.cs" />
     <Compile Include="Messages\Backplane\IRequiresNetworkNodeId.cs" />
     <Compile Include="Messages\Backplane\MessageHeader.cs" />
     <Compile Include="Messages\Backplane\MessagePayloadType.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Messages\Master\CommandResponse.cs" />
     <Compile Include="Messages\Master\CommandResultType.cs" />
     <Compile Include="Messages\Master\CommandType.cs" />
+    <Compile Include="Messages\Master\JobCompleteEvent.cs" />
     <Compile Include="Messages\Master\StitchSummaryRequest.cs" />
     <Compile Include="Models\AdaptorType.cs" />
     <Compile Include="Models\InstanceAdaptorDetails.cs" />

@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BCD0EBEB-A3D7-40F7-BF8A-4CE23F844397}</ProjectGuid>
+    <ProjectGuid>{6EEDE746-2ABE-4EC5-B445-60447A70180D}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClusterTest.Master</RootNamespace>
-    <AssemblyName>ClusterTest.Master</AssemblyName>
+    <RootNamespace>StitchIntegration.ServerB</RootNamespace>
+    <AssemblyName>StitchIntegration.ServerB</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -35,35 +35,20 @@
   <ItemGroup>
     <Reference Include="Acquaintance, Version=1.0.0.17705, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Acquaintance.1.0.0-rc3\lib\net46\Acquaintance.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\AsyncIO.0.1.26.0\lib\net40\AsyncIO.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Common.Logging, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Common.Logging.3.3.1\lib\net40\Common.Logging.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Common.Logging.Core, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Common.Logging.Core.3.3.1\lib\net40\Common.Logging.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NetMQ, Version=4.0.0.1, Culture=neutral, PublicKeyToken=a6decef4ddc58b3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NetMQ.4.0.0.1\lib\net40\NetMQ.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NetMQ.Zyre, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NetMQ.Zyre.1.0.0-rc1\lib\net40\NetMQ.Zyre.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -73,33 +58,25 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Configs\backplane.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Configs\node.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Configs\stitches.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Src\CrossStitch.Backplane.Zyre\CrossStitch.Backplane.Zyre.csproj">
-      <Project>{4fcbe339-b357-4f32-937d-4ab1d1196b67}</Project>
+      <Project>{4FCBE339-B357-4F32-937D-4AB1D1196B67}</Project>
       <Name>CrossStitch.Backplane.Zyre</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Src\CrossStitch.Core\CrossStitch.Core.csproj">
-      <Project>{a9a30edf-7047-4d0f-a756-816eb85d0384}</Project>
+      <Project>{A9A30EDF-7047-4D0F-A756-816EB85D0384}</Project>
       <Name>CrossStitch.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj">
-      <Project>{4BD40E13-2F9A-41C9-AED4-DC160B3D48A6}</Project>
-      <Name>CrossStitch.Stitch</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

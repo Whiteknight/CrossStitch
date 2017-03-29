@@ -14,7 +14,7 @@ namespace CrossStitch.Core.Modules.Stitches.Versions
             while (versionLookup.Contains(version))
             {
                 suffix++;
-                version = versionBase + "." + suffix;
+                version = versionBase + "_" + suffix;
             }
             return version;
         }

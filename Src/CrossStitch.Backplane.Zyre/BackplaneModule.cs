@@ -6,7 +6,12 @@ using CrossStitch.Core.Modules;
 using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.Events;
 using System;
+using System.IO;
+using CrossStitch.Backplane.Zyre.Models;
 using CrossStitch.Core.Messages;
+using CrossStitch.Core.Messages.Master;
+using CrossStitch.Core.Messages.Stitches;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Backplane.Zyre
 {
@@ -57,6 +62,9 @@ namespace CrossStitch.Backplane.Zyre
             _subscriptions.Subscribe<CoreEvent>(b => b
                 .WithChannelName(CoreEvent.ChannelInitialized)
                 .Invoke(BroadcastNetworkInformation));
+            _subscriptions.Subscribe<FileTransferRequest>(b => b
+                .OnDefaultChannel()
+                .Invoke(m => _backplane.TransferPackageFile(m.GroupName, m.NetworkNodeId, m.FilePath, m.FileName, m.JobId, m.TaskId)));
 
             // TODO: Listen to requests to get current network id, zones, etc.
             // TODO: Request to get info on known peers/zones?
@@ -111,12 +119,12 @@ namespace CrossStitch.Backplane.Zyre
         // more agnostic to the backplane implementation.
         private void ZoneMemberHandler(object sender, PayloadEventArgs<ZoneMemberEvent> e)
         {
-            _messageBus?.Publish(e);
-
             if (e.Command == ZoneMemberEvent.JoiningEvent)
                 _log.LogInformation("New member added to zone={0} NodeId={1}", e.Payload.Zone, e.Payload.NodeUuid);
             if (e.Command == ZoneMemberEvent.LeavingEvent)
                 _log.LogInformation("Member node has left zone={0} NodeId={1}", e.Payload.Zone, e.Payload.NodeUuid);
+
+            _messageBus?.Publish(e.Command, e.Payload);
         }
 
         private void ClusterMemberHandler(object sender, PayloadEventArgs<ClusterMemberEvent> e)
@@ -131,7 +139,7 @@ namespace CrossStitch.Backplane.Zyre
 
         private void MessageReceivedHandler(object sender, PayloadEventArgs<ClusterMessage> e)
         {
-            if (_messageBus == null || e == null || e.Payload == null)
+            if (_messageBus == null || e?.Payload == null)
                 return;
 
             string channel = e.Command;
@@ -139,6 +147,9 @@ namespace CrossStitch.Backplane.Zyre
             {
                 case MessagePayloadType.Object:
                     PublishPayloadObjects(channel, e.Payload);
+                    break;
+                case MessagePayloadType.InternalObject:
+                    HandleInternalPayloadObjects(e.Payload);
                     break;
                 default:
                     _log.LogWarning("Received message of unhandled type: " + e.Payload.Header.PayloadType);
@@ -161,6 +172,57 @@ namespace CrossStitch.Backplane.Zyre
             catch (Exception e)
             {
                 _log.LogError(e, "Error decoding PayloadObject of type {0}", envelope.PayloadObject.GetType().Name);
+            }
+        }
+
+        private void HandleInternalPayloadObjects(ClusterMessage envelope)
+        {
+            if (envelope.PayloadObject == null)
+                return;
+
+            try
+            {
+                var internalObject = envelope.PayloadObject;
+                var fileTransferRequest = internalObject as FileTransferEnvelope;
+                if (fileTransferRequest != null)
+                {
+                    _log.LogDebug("Received file transfer request from {0}", envelope.Header.FromNetworkId);
+                    ReceiveFileTransferRequest(envelope, fileTransferRequest);
+                    return;
+                }
+
+                _log.LogWarning("Received internal object of unhandled type {0} from {1}", internalObject.GetType().FullName, envelope.Header.FromNetworkId);
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Error decoding internal object of type {0}", envelope.PayloadObject.GetType().Name);
+            }
+        }
+
+        private void ReceiveFileTransferRequest(ClusterMessage envelope, FileTransferEnvelope request)
+        {
+            using (var stream = new MemoryStream(request.Contents))
+            {
+                // TODO: Get more sophisticated with chunking, restart/retry, checksums, etc
+                var response = _messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelFromRemote, new PackageFileUploadRequest
+                {
+                    Contents = stream,
+                    FileName = request.FileName,
+                    GroupName = new StitchGroupName(request.GroupName),
+                    LocalOnly = true
+                });
+
+                var outEnvelope = new ClusterMessageBuilder()
+                    .FromNode()
+                    .ToNode(envelope.Header.FromNetworkId)
+                    .WithObjectPayload(new CommandReceipt
+                    {
+                        Success = response.Success,
+                        ReplyToJobId = request.JobId,
+                        ReplyToTaskId = request.TaskId
+                    })
+                    .Build();
+                _backplane.Send(outEnvelope);
             }
         }
 

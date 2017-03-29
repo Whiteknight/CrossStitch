@@ -4,6 +4,9 @@
     {
         Ping,
 
+        UploadPackageFile,
+        CreateStitchInstance,
+
         StartStitchInstance,
         StartStitchGroup,
 

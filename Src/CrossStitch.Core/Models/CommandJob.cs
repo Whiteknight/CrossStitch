@@ -8,7 +8,7 @@ namespace CrossStitch.Core.Models
     public enum JobStatusType
     {
         Started,
-        Complete,
+        Success,
         Failure
     }
 
@@ -33,8 +33,13 @@ namespace CrossStitch.Core.Models
                     return JobStatusType.Failure;
                 if (Tasks.Any(t => t.Status == JobStatusType.Started))
                     return JobStatusType.Started;
-                return JobStatusType.Complete;
+                return JobStatusType.Success;
             }
+        }
+
+        public bool IsComplete
+        {
+            get { return Tasks.All(t => t.Status != JobStatusType.Started); }
         }
 
         public CommandJobTask CreateSubtask(CommandType command, string target, string handlingNodeId)
@@ -56,7 +61,7 @@ namespace CrossStitch.Core.Models
             var task = Tasks.FirstOrDefault(t => t.Id == taskId);
             if (task == null)
                 return;
-            task.Status = success ? JobStatusType.Complete : JobStatusType.Failure;
+            task.Status = success ? JobStatusType.Success : JobStatusType.Failure;
         }
     }
 

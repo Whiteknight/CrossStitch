@@ -20,7 +20,8 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 {
                     GroupName = new StitchGroupName(x.GroupName.ToString()),
                     FileName = file.Name,
-                    Contents = file.Value
+                    Contents = file.Value,
+                    LocalOnly = true
                 };
 
                 return messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
@@ -30,7 +31,8 @@ namespace CrossStitch.Http.NancyFx.Handlers
             {
                 var request = this.Bind<CreateInstanceRequest>();
                 request.GroupName = new StitchGroupName(x.GroupName.ToString());
-                return messageBus.Request<CreateInstanceRequest, InstanceResponse>(InstanceRequest.ChannelCreate, request);
+                request.LocalOnly = true;
+                return messageBus.Request<CreateInstanceRequest, CreateInstanceResponse>(request);
             };
 
             // TODO: The rest of these requests are local-only, so we need to tell the handler

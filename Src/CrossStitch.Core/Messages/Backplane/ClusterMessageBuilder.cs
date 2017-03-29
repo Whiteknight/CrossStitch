@@ -45,6 +45,13 @@ namespace CrossStitch.Core.Messages.Backplane
             return this;
         }
 
+        public ClusterMessageBuilder WithInternalObjectPayload(object payloadObject)
+        {
+            _envelope.Header.PayloadType = MessagePayloadType.InternalObject;
+            _envelope.PayloadObject = payloadObject;
+            return this;
+        }
+
         public ClusterMessageBuilder WithCommandStrings(IEnumerable<string> commandStrings)
         {
             _envelope.Header.PayloadType = MessagePayloadType.CommandString;

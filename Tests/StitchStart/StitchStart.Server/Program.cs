@@ -7,6 +7,9 @@ using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Stitch.ProcessV1;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using CrossStitch.Core.Messages.Stitches;
+using Acquaintance;
 
 namespace StitchStart.Server
 {
@@ -17,13 +20,20 @@ namespace StitchStart.Server
             var config = NodeConfiguration.GetDefault();
             using (var core = new CrossStitchCore(config))
             {
-                var dataStorage = new InMemoryDataStorage();
+                var stitchesConfiguration = StitchesConfiguration.GetDefault();
+                var stitches = new StitchesModule(core, stitchesConfiguration);
+                core.AddModule(stitches);
 
-                // First stitch is a ProcessV1 stitch in a separate process
-                var result = dataStorage.Save(new StitchInstance
+                var log = Common.Logging.LogManager.GetLogger("CrossStitch");
+                var logging = new LoggingModule(core, log);
+                core.AddModule(logging);
+
+                core.Start();
+
+                // First stitch is a p
+                var createResult1 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
                 {
                     Name = "StitchStart.Client",
-                    GroupName = new StitchGroupName("StitchStart", "Client", "1"),
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.ProcessV1,
@@ -31,14 +41,19 @@ namespace StitchStart.Server
                         {
                             { Parameters.DirectoryPath, "." },
                             { Parameters.ExecutableName, "StitchStart.Client.exe" }
-                        }
+                        },
+                        RequiresPackageUnzip = false
                     },
-                    State = InstanceStateType.Running,
-                    LastHeartbeatReceived = 0
-                }, true);
+                    GroupName = new StitchGroupName("StitchStart", "Client", "1"),
+                    NumberOfInstances = 1,
+                });
+                core.MessageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
+                {
+                    Id = createResult1.CreatedIds.FirstOrDefault()
+                });
 
                 // Second stitch is a built-in class
-                result = dataStorage.Save(new StitchInstance
+                var createResult2 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
                 {
                     Name = "StitchStart.BuiltIn",
                     GroupName = new StitchGroupName("StitchStart", "BuiltIn", "1"),
@@ -50,22 +65,13 @@ namespace StitchStart.Server
                             { CrossStitch.Stitch.BuiltInClassV1.Parameters.TypeName, typeof(StitchStartBuiltInStitch).AssemblyQualifiedName }
                         }
                     },
-                    State = InstanceStateType.Running,
-                    LastHeartbeatReceived = 0
-                }, true);
+                    NumberOfInstances = 1
+                });
+                core.MessageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
+                {
+                    Id = createResult2.CreatedIds.FirstOrDefault()
+                });
 
-                var data = new DataModule(core.MessageBus, dataStorage);
-                core.AddModule(data);
-
-                var stitchesConfiguration = StitchesConfiguration.GetDefault();
-                var stitches = new StitchesModule(core, stitchesConfiguration);
-                core.AddModule(stitches);
-
-                var log = Common.Logging.LogManager.GetLogger("CrossStitch");
-                var logging = new LoggingModule(core, log);
-                core.AddModule(logging);
-
-                core.Start();
                 Console.ReadKey();
                 core.Stop();
             }

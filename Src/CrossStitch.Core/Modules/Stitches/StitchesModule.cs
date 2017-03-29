@@ -41,12 +41,16 @@ namespace CrossStitch.Core.Modules.Stitches
                 .Invoke(m => _service.StartRunningStitchesOnStartup())
                 .OnWorkerThread());
 
+            // Upload package files
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
-                .OnDefaultChannel()
+                .WithChannelName(PackageFileUploadRequest.ChannelLocal)
                 .Invoke(_service.UploadStitchPackageFile));
+            _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
+                .WithChannelName(PackageFileUploadRequest.ChannelFromRemote)
+                .Invoke(_service.UploadStitchPackageFileFromRemote));
 
-            _subscriptions.Listen<CreateInstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelCreate)
+            _subscriptions.Listen<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(l => l
+                .OnDefaultChannel()
                 .Invoke(_service.CreateNewInstance));
 
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l

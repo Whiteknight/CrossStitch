@@ -10,7 +10,6 @@ namespace CrossStitch.Backplane.Zyre
             return ConfigurationLoader.GetConfiguration<BackplaneConfiguration>("backplane.json");
         }
 
-        public int ListenPort { get; set; }
         public List<string> Zones { get; set; }
 
         public void ValidateAndSetDefaults()

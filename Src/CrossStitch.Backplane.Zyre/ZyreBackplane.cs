@@ -5,7 +5,10 @@ using CrossStitch.Core.Utility.Serialization;
 using CrossStitch.Stitch.Events;
 using NetMQ.Zyre.ZyreEvents;
 using System;
+using System.IO;
 using System.Linq;
+using CrossStitch.Backplane.Zyre.Models;
+using CrossStitch.Core.Models;
 
 namespace CrossStitch.Backplane.Zyre
 {
@@ -104,6 +107,32 @@ namespace CrossStitch.Backplane.Zyre
                 _zyre.Shout(envelope.Header.ZoneName, message);
             else if (envelope.Header.ToType == TargetType.Node)
                 _zyre.Whisper(envelope.Header.GetToNetworkUuid(), message);
+        }
+
+        public void TransferPackageFile(StitchGroupName groupName, string toNodeId, string filePath, string fileName, string jobId, string taskId)
+        {
+            // TODO: More validation and error handling
+            // TODO: We need to get more sophisticated about this, such as doing the transfer in chunks and allowing restarts
+            if (!groupName.IsValid() || !groupName.IsVersionGroup())
+                throw new Exception("Must use a valid version name for a package upload file");
+
+            var bytes = File.ReadAllBytes(filePath);
+            var envelope = new FileTransferEnvelope
+            {
+                Contents = bytes,
+                GroupName = groupName.VersionString,
+                JobId = jobId,
+                TaskId = taskId,
+                PacketNumber = 1,
+                TotalNumberOfPackets = 1,
+                FileName = fileName
+            };
+            var message = new ClusterMessageBuilder()
+                .ToNode(toNodeId)
+                .FromNode()
+                .WithInternalObjectPayload(envelope)
+                .Build();
+            Send(message);
         }
 
         public void Dispose()

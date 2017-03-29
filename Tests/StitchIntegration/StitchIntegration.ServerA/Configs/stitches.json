@@ -1,0 +1,5 @@
+﻿{
+  "DataBasePath": ".\\AppData",
+  "AppLibraryBasePath": ".\\AppLibrary",
+  "RunningAppBasePath": ".\\RunningApps"
+}

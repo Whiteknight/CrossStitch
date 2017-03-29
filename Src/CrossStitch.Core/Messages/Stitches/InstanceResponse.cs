@@ -1,12 +1,18 @@
 ﻿using CrossStitch.Core.Models;
 using System;
+using System.Collections.Generic;
 
 namespace CrossStitch.Core.Messages.Stitches
 {
     public class InstanceResponse
     {
+        public InstanceResponse()
+        {
+            Instances = new List<StitchInstance>();
+        }
+
         public string Id { get; set; }
-        public StitchInstance Instance { get; set; }
+        public List<StitchInstance> Instances { get; set; }
         public bool IsSuccess { get; set; }
         public string Data { get; set; }
         public Exception Exception { get; set; }
@@ -38,24 +44,27 @@ namespace CrossStitch.Core.Messages.Stitches
 
         public static InstanceResponse Success(CreateInstanceRequest request, StitchInstance createdInstance, string data = null)
         {
-            return new InstanceResponse
+            var response = new InstanceResponse
             {
                 Id = createdInstance.Id,
-                Instance = createdInstance,
                 Data = data,
                 IsSuccess = true
             };
+            response.Instances.Add(createdInstance);
+            return response;
         }
 
         public static InstanceResponse Create(InstanceRequest request, bool success, StitchInstance instance = null, string data = null)
         {
-            return new InstanceResponse
+            var response = new InstanceResponse
             {
                 IsSuccess = success,
                 Id = request.Id,
                 Data = data,
-                Instance = instance
             };
+            if (instance != null)
+                response.Instances.Add(instance);
+            return response;
         }
     }
 }

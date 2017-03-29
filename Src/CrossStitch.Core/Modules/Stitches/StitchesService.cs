@@ -60,48 +60,79 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public PackageFileUploadResponse UploadStitchPackageFile(PackageFileUploadRequest request)
         {
-            if (!request.IsValid())
-                return new PackageFileUploadResponse(false, null);
+            if (!request.IsValidLocalRequest())
+                return new PackageFileUploadResponse(false, null, null);
 
-            // TODO: Validate the file. It should be a .zip
             // Save the file and generate a unique Version name
-            string version = _fileSystem.SavePackageToLibrary(request.GroupName.Application, request.GroupName.Component, request.Contents);
-            var groupName = new StitchGroupName(request.GroupName.Application, request.GroupName.Component, version);
+            var result = _fileSystem.SavePackageToLibrary(request.GroupName.Application, request.GroupName.Component, request.Contents);
+            var groupName = new StitchGroupName(request.GroupName.Application, request.GroupName.Component, result.Version);
 
             _log.LogDebug("Uploaded package file {0}", groupName);
-            return new PackageFileUploadResponse(true, groupName);
+            return new PackageFileUploadResponse(true, groupName, result.FilePath);
+        }
+
+        public PackageFileUploadResponse UploadStitchPackageFileFromRemote(PackageFileUploadRequest request)
+        {
+            if (!request.IsValidRemoteRequest())
+                return new PackageFileUploadResponse(false, null, null);
+
+            // Save the file and generate a unique Version name
+            var result = _fileSystem.SavePackageToLibrary(request.GroupName.Application, request.GroupName.Component, request.GroupName.Version, request.Contents);
+
+            _log.LogDebug("Uploaded package file {0}", request.GroupName);
+            return new PackageFileUploadResponse(true, request.GroupName, result.FilePath);
         }
 
         // Creates an unzipped copy of the executable for the Stitch, and any other resource
         // allocation. Call StartInstance to start the instance
-        public InstanceResponse CreateNewInstance(CreateInstanceRequest request)
+        public LocalCreateInstanceResponse CreateNewInstance(LocalCreateInstanceRequest request)
         {
-            if (request == null || !request.IsValid())
-                return InstanceResponse.Failure(request);
+            var response = new LocalCreateInstanceResponse();
+            if (request == null || !request.IsValid() || request.NumberOfInstances <= 0)
+            {
+                response.IsSuccess = false;
+                return response;
+            }
 
+            for (int i = 0; i < request.NumberOfInstances; i++)
+            {
+                var instance = CreateSingleNewInstanceInternal(request);
+                if (instance != null)
+                    response.CreatedIds.Add(instance.Id);
+            }
+            response.IsSuccess = response.CreatedIds.Count == request.NumberOfInstances;
+            return response;
+        }
+
+        private StitchInstance CreateSingleNewInstanceInternal(LocalCreateInstanceRequest request)
+        {
             // Insert the new instance to the data module
             var instance = new StitchInstanceMapper(_core.NodeId, _core.Name).Map(request);
             instance = _data.Insert(instance);
             if (instance == null)
             {
                 _log.LogError("Could not save new stitch instance");
-                return InstanceResponse.Failure(request);
+                return null;
             }
 
-            // Unzip a copy of the version from the library into the running base
-            var result = _fileSystem.UnzipLibraryPackageToRunningBase(instance.GroupName, instance.Id);
-            if (!result.Success)
+            if (request.Adaptor.RequiresPackageUnzip)
             {
-                _log.LogError("Could not unzip library package for new stitch {0}", instance.GroupName);
-                return InstanceResponse.Failure(request);
+                // Unzip a copy of the version from the library into the running base
+                var result = _fileSystem.UnzipLibraryPackageToRunningBase(instance.GroupName, instance.Id);
+                if (!result.Success)
+                {
+                    _log.LogError("Could not unzip library package for new stitch {0}", instance.GroupName);
+                    return null;
+                }
+                // TODO: We should move this into a class specific to ProcessV1 types.
+                instance.Adaptor.Parameters[Parameters.DirectoryPath] = result.Path;
             }
 
-            // TODO: We should move this into a class specific to ProcessV1 types.
-            instance.Adaptor.Parameters[Parameters.DirectoryPath] = result.Path;
-            instance = _data.Insert(instance);
+            _data.Save(instance);
+            _log.LogInformation("Created stitch instance Id={0} GroupName={1}", instance.Id, request.GroupName);
 
             // StitchInstanceManager auto-creates the necessary adaptor on Start. We don't need to do anything for it here.
-            return InstanceResponse.Success(request, instance);
+            return instance;
         }
 
         // TODO: Ability to CloneTo a local instance to a remote node

@@ -6,5 +6,18 @@ namespace CrossStitch.Core.Models
     {
         public AdaptorType Type { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
+
+        private bool? _requiresPackageUnzip;
+
+        public bool RequiresPackageUnzip
+        {
+            get
+            {
+                if (_requiresPackageUnzip.HasValue)
+                    return _requiresPackageUnzip.Value;
+                return Type == AdaptorType.ProcessV1;
+            }
+            set { _requiresPackageUnzip = value; }
+        }
     }
 }

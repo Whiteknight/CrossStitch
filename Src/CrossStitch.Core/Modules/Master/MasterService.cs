@@ -1,6 +1,7 @@
 ﻿using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
+using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Handlers;
 using CrossStitch.Core.Modules.Master.Models;
@@ -8,7 +9,6 @@ using CrossStitch.Core.Utility;
 using CrossStitch.Core.Utility.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Messages.Stitches;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -20,6 +20,7 @@ namespace CrossStitch.Core.Modules.Master
         private readonly IClusterMessageSender _clusterSender;
         private readonly MasterDataRepository _data;
         private readonly Dictionary<CommandType, ICommandHandler> _commandHandlers;
+        private readonly JobManager _jobManager;
 
         private string _networkNodeId;
         private string[] _clusterZones;
@@ -32,6 +33,7 @@ namespace CrossStitch.Core.Modules.Master
             _stitches = stitches;
             _clusterSender = clusterSender;
             _clusterZones = new string[0];
+            _jobManager = new JobManager(_core.MessageBus, _data, _log);
 
             _commandHandlers = new Dictionary<CommandType, ICommandHandler>
             {
@@ -94,25 +96,16 @@ namespace CrossStitch.Core.Modules.Master
                 _clusterSender.SendReceipt(ok, received.FromNetworkId, request.ReplyToJobId, request.ReplyToTaskId);
         }
 
-        public JobCompleteEvent ReceiveReceiptFromRemote(ReceivedEvent received, CommandReceipt receipt)
+        public void ReceiveReceiptFromRemote(ReceivedEvent received, CommandReceipt receipt)
         {
             if (string.IsNullOrEmpty(receipt.ReplyToJobId) || string.IsNullOrEmpty(receipt.ReplyToTaskId))
             {
                 _log.LogWarning("Received job receipt from Node {0} without necessary job information", received.FromNodeId);
-                return null;
+                return;
             }
 
             _log.LogDebug("Received receipt Job={0} Task={1} from node {2}", receipt.ReplyToJobId, receipt.ReplyToTaskId, received.FromNodeId);
-            var job = _data.Update<CommandJob>(receipt.ReplyToJobId, j => j.MarkTaskComplete(receipt.ReplyToTaskId, receipt.Success));
-            if (job.IsComplete)
-            {
-                return new JobCompleteEvent
-                {
-                    JobId = job.Id,
-                    Status = job.Status
-                };
-            }
-            return null;
+            _jobManager.MarkTaskComplete(receipt.ReplyToJobId, receipt.ReplyToTaskId, receipt.Success);
         }
 
         public List<StitchSummary> GetStitchSummaries(StitchSummaryRequest request)

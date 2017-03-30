@@ -285,8 +285,7 @@ namespace CrossStitch.Core.Modules.Master
                     _messageBus.Publish(ClusterMessage.SendEventName, message);
                     return null;
                 }
-                else
-                    return _messageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(request);
+                return _messageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(request);
             }
         }
 
@@ -343,6 +342,17 @@ namespace CrossStitch.Core.Modules.Master
                 //    })
                 //    .Build();
                 //_messageBus.Publish(ClusterMessage.SendEventName, message);
+            }
+
+            public void SendCommandRequest(string networkNodeId, CommandRequest request, CommandJob job, CommandJobTask task)
+            {
+                request.SetJobDetails(job.Id, task.Id);
+                var message = new ClusterMessageBuilder()
+                    .FromNode()
+                    .ToNode(networkNodeId)
+                    .WithObjectPayload(request)
+                    .Build();
+                Send(message);
             }
         }
     }

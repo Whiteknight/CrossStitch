@@ -9,13 +9,15 @@ namespace CrossStitch.Core.Modules.Master.Handlers
     {
         protected readonly IStitchRequestHandler _stitches;
         protected readonly MasterDataRepository _data;
+        private readonly JobManager _jobManager;
         protected readonly IClusterMessageSender _sender;
         protected readonly string _nodeId;
 
-        protected StitchGroupCommandHandler(string nodeId, MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender sender)
+        protected StitchGroupCommandHandler(string nodeId, MasterDataRepository data, JobManager jobManager, IStitchRequestHandler stitches, IClusterMessageSender sender)
         {
             _stitches = stitches;
             _data = data;
+            _jobManager = jobManager;
             _sender = sender;
             _nodeId = nodeId;
         }
@@ -34,7 +36,7 @@ namespace CrossStitch.Core.Modules.Master.Handlers
                 return CommandResponse.Create(false);
             var groupName = new StitchGroupName(request.Target);
 
-            var job = new CommandJob();
+            var job = _jobManager.CreateJob("Command=" + request.Command);
 
             var stitches = _data.GetStitchesInGroup(groupName);
             foreach (var stitch in stitches)
@@ -47,66 +49,26 @@ namespace CrossStitch.Core.Modules.Master.Handlers
             }
 
             // Save the job to get an Id
-            job = _data.Insert(job);
+            _jobManager.Save(job);
             return CommandResponse.Started(job.Id);
         }
 
         protected abstract CommandType CommandType { get; }
         protected abstract void SendLocal(CommandJob job, CommandJobTask subtask, StitchSummary stitch);
-        protected virtual CommandRequest CreateRemoteRequest(CommandJob job, CommandJobTask subtask, StitchSummary stitch)
+
+        protected virtual CommandRequest CreateRemoteRequest(StitchSummary stitch)
         {
-            var request = new CommandRequest();
-            request.Command = CommandType;
-            request.Target = stitch.Id;
-            request.ReplyToJobId = job.Id;
-            request.ReplyToTaskId = subtask.Id;
-            return request;
+            return new CommandRequest
+            {
+                Command = CommandType
+            };
         }
 
         private void SendRemote(CommandJob job, CommandJobTask subtask, StitchSummary stitch)
         {
-            var request = CreateRemoteRequest(job, subtask, stitch);
-            var message = new ClusterMessageBuilder()
-               .FromNode()
-               .ToNode(stitch.NetworkNodeId)
-               .WithObjectPayload(request)
-               .Build();
-            _sender.Send(message);
-            subtask.Status = JobStatusType.Started;
-        }
-    }
-
-    public class StopAllStitchGroupCommandHandler : StitchGroupCommandHandler
-    {
-        public StopAllStitchGroupCommandHandler(string nodeId, MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender sender) : base(nodeId, data, stitches, sender)
-        {
-        }
-
-        protected override CommandType CommandType => CommandType.StopStitchInstance;
-
-        protected override void SendLocal(CommandJob job, CommandJobTask subtask, StitchSummary stitch)
-        {
-            // TODO: Publish status async here and rely on the job to communicate status of the
-            // request. We will need a new mechanism for this and new message types
-            bool ok = _stitches.StopInstance(stitch.Id);
-            subtask.Status = ok ? JobStatusType.Success : JobStatusType.Failure;
-        }
-    }
-
-    public class StartAllStitchGroupCommandHandler : StitchGroupCommandHandler
-    {
-        public StartAllStitchGroupCommandHandler(string nodeId, MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender sender) : base(nodeId, data, stitches, sender)
-        {
-        }
-
-        protected override CommandType CommandType => CommandType.StartStitchInstance;
-
-        protected override void SendLocal(CommandJob job, CommandJobTask subtask, StitchSummary stitch)
-        {
-            // TODO: Publish status async here and rely on the job to communicate status of the
-            // request. We will need a new mechanism for this and new message types
-            bool ok = _stitches.StartInstance(stitch.Id);
-            subtask.Status = ok ? JobStatusType.Success : JobStatusType.Failure;
+            var request = CreateRemoteRequest(stitch);
+            request.Target = stitch.Id;
+            _sender.SendCommandRequest(stitch.NetworkNodeId, request, job, subtask);
         }
     }
 }

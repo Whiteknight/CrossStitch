@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using CrossStitch.Core.Messages.Backplane;
-using CrossStitch.Core.Messages.Master;
+﻿using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Models;
 
@@ -10,12 +8,14 @@ namespace CrossStitch.Core.Modules.Master.Handlers
     {
         protected readonly IStitchRequestHandler _stitches;
         protected readonly MasterDataRepository _data;
+        private readonly JobManager _jobManager;
         protected readonly IClusterMessageSender _sender;
 
-        protected StitchCommandHandler(MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender sender)
+        protected StitchCommandHandler(MasterDataRepository data, JobManager jobManager, IStitchRequestHandler stitches, IClusterMessageSender sender)
         {
             _stitches = stitches;
             _data = data;
+            _jobManager = jobManager;
             _sender = sender;
         }
 
@@ -35,32 +35,28 @@ namespace CrossStitch.Core.Modules.Master.Handlers
             }
 
             if (stitch.Locale == StitchLocaleType.Remote)
-            {
-                string nodeId = stitch.NodeId;
-                var node = _data.Get<NodeStatus>(nodeId);
-                if (node == null)
-                    return CommandResponse.Create(false);
-
-                // Create a job to track status
-                var job = new CommandJob();
-                var subtask = job.CreateSubtask(request.Command, request.Target, stitch.NodeId);
-                job = _data.Insert(job);
-
-                // Create the message and send it over the backplane
-                //request.ReplyToNodeId = ??
-                request.ReplyToJobId = job.Id;
-                request.ReplyToTaskId = subtask.Id;
-                var message = new ClusterMessageBuilder()
-                    .FromNode()
-                    .ToNode(node.NetworkNodeId)
-                    .WithObjectPayload(request)
-                    .Build();
-                _sender.Send(message);
-
-                return CommandResponse.Started(job.Id);
-            }
+                return HandleRemote(request, stitch);
 
             return CommandResponse.Create(false);
+        }
+
+        private CommandResponse HandleRemote(CommandRequest request, StitchSummary stitch)
+        {
+            string nodeId = stitch.NodeId;
+            var node = _data.Get<NodeStatus>(nodeId);
+            if (node == null)
+                return CommandResponse.Create(false);
+
+            // Create a job to track status
+            var job = _jobManager.CreateJob("Command=" + request.Command);
+            var subtask = job.CreateSubtask(request.Command, request.Target, stitch.NodeId);
+
+            // Create the message and send it over the backplane
+            _sender.SendCommandRequest(node.NetworkNodeId, request, job, subtask);
+
+            _jobManager.Save(job);
+
+            return CommandResponse.Started(job.Id);
         }
     }
 }

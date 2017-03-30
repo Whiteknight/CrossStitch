@@ -4,7 +4,8 @@ namespace CrossStitch.Core.Modules.Master.Handlers
 {
     public class StopStitchCommandHandler : StitchCommandHandler
     {
-        public StopStitchCommandHandler(MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender sender) : base(data, stitches, sender)
+        public StopStitchCommandHandler(MasterDataRepository data, JobManager jobManager, IStitchRequestHandler stitches, IClusterMessageSender sender)
+            : base(data, jobManager, stitches, sender)
         {
         }
 

@@ -37,12 +37,12 @@ namespace CrossStitch.Core.Modules.Master
 
             _commandHandlers = new Dictionary<CommandType, ICommandHandler>
             {
-                { CommandType.Ping, new PingCommandHandler(data, _clusterSender) },
-                { CommandType.StartStitchInstance, new StartStitchCommandHandler(data, stitches, _clusterSender) },
-                { CommandType.StopStitchInstance, new StopStitchCommandHandler(data, stitches, _clusterSender) },
-                { CommandType.RemoveStitchInstance, new RemoveStitchCommandHandler(data, stitches, _clusterSender) },
-                { CommandType.StartStitchGroup, new StartAllStitchGroupCommandHandler(core.NodeId, data, stitches, _clusterSender) },
-                { CommandType.StopStitchGroup, new StopAllStitchGroupCommandHandler(core.NodeId, data, stitches, _clusterSender) }
+                { CommandType.Ping, new PingCommandHandler(_core.NodeId, data, _jobManager, _clusterSender) },
+                { CommandType.StartStitchInstance, new StartStitchCommandHandler(data, _jobManager, stitches, _clusterSender) },
+                { CommandType.StopStitchInstance, new StopStitchCommandHandler(data, _jobManager, stitches, _clusterSender) },
+                { CommandType.RemoveStitchInstance, new RemoveStitchCommandHandler(data, _jobManager, stitches, _clusterSender) },
+                { CommandType.StartStitchGroup, new StartAllStitchGroupCommandHandler(core.NodeId, data, _jobManager, stitches, _clusterSender) },
+                { CommandType.StopStitchGroup, new StopAllStitchGroupCommandHandler(core.NodeId, data, _jobManager, stitches, _clusterSender) }
             };
         }
 
@@ -156,8 +156,7 @@ namespace CrossStitch.Core.Modules.Master
             }
 
             // Create a job, and start dispatching commands
-            var job = new CommandJob();
-            _data.Insert(job);
+            var job = _jobManager.CreateJob("Command=CreateStitchInstance");
 
             foreach (var node in selectedNodes)
             {
@@ -174,9 +173,9 @@ namespace CrossStitch.Core.Modules.Master
                 bool isRemote = node.Id != _core.NodeId;
                 var response = _stitches.CreateInstances(payload, node.NetworkNodeId, isRemote);
                 if (!isRemote && response != null)
-                    task.Status = response.IsSuccess ? JobStatusType.Success : JobStatusType.Failure;
+                    job.MarkTaskComplete(task.Id, response.IsSuccess);
             }
-            _data.Save(job, true);
+            _jobManager.Save(job);
             return new CreateInstanceResponse
             {
                 JobId = job.Id,
@@ -214,8 +213,7 @@ namespace CrossStitch.Core.Modules.Master
             if (nodes.Count == 0)
                 return new PackageFileUploadResponse(true, groupName, filePath);
 
-            var job = new CommandJob();
-            _data.Insert(job);
+            var job = _jobManager.CreateJob("Command=PackageFileUpload");
 
             foreach (var node in nodes)
             {
@@ -223,7 +221,7 @@ namespace CrossStitch.Core.Modules.Master
                 _clusterSender.SendPackageFile(node.NetworkNodeId, groupName, arg.FileName, filePath, job.Id, task.Id);
             }
 
-            _data.Save(job, true);
+            _jobManager.Save(job);
             return new PackageFileUploadResponse(true, groupName, filePath, job.Id);
         }
     }

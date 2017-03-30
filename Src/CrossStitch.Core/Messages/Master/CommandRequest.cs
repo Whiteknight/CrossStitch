@@ -11,5 +11,11 @@
         {
             return !string.IsNullOrEmpty(ReplyToJobId) && !string.IsNullOrEmpty(ReplyToTaskId);
         }
+
+        public void SetJobDetails(string jobId, string taskId)
+        {
+            ReplyToJobId = jobId;
+            ReplyToTaskId = taskId;
+        }
     }
 }

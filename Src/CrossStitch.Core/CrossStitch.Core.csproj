@@ -75,7 +75,9 @@
     <Compile Include="Models\InstanceAdaptorDetails.cs" />
     <Compile Include="Models\InstanceStateType.cs" />
     <Compile Include="Models\StitchFullId.cs" />
+    <Compile Include="Modules\Master\Handlers\StartAllStitchGroupCommandHandler.cs" />
     <Compile Include="Modules\Master\Handlers\StitchGroupCommandHandler.cs" />
+    <Compile Include="Modules\Master\Handlers\StopAllStitchGroupCommandHandler.cs" />
     <Compile Include="Modules\Master\IClusterMessageSender.cs" />
     <Compile Include="Messages\Stitches\CreateInstanceRequest.cs" />
     <Compile Include="Models\CommandJob.cs" />

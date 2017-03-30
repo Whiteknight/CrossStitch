@@ -4,7 +4,8 @@ namespace CrossStitch.Core.Modules.Master.Handlers
 {
     public class RemoveStitchCommandHandler : StitchCommandHandler
     {
-        public RemoveStitchCommandHandler(MasterDataRepository data, IStitchRequestHandler stitches, IClusterMessageSender sender) : base(data, stitches, sender)
+        public RemoveStitchCommandHandler(MasterDataRepository data, JobManager jobManager, IStitchRequestHandler stitches, IClusterMessageSender sender)
+            : base(data, jobManager, stitches, sender)
         {
         }
 

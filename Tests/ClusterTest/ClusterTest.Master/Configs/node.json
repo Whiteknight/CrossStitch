@@ -1,5 +1,5 @@
 ﻿{
   "HeartbeatIntervalMinutes": 1,
-  "StitchMonitorIntervalMinutes": 5,
-  "StatusBroadcastIntervalMinutes": 5
+  "StitchMonitorIntervalMinutes": 1,
+  "StatusBroadcastIntervalMinutes": 1
 }

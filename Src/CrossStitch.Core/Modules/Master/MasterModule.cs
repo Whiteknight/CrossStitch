@@ -142,22 +142,12 @@ namespace CrossStitch.Core.Modules.Master
             // Handle incoming command receipt messages
             _subscriptions.Subscribe<ObjectReceivedEvent<CommandReceipt>>(b => b
                 .WithChannelName(ReceivedEvent.ChannelReceived)
-                .Invoke(ReceiveCommandJobReceipt));
+                .Invoke(m => ReceiveCommandJobReceipt(m, m.Object)));
 
             // Route StitchDataMessage to the correct node
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .OnDefaultChannel()
                 .Invoke(_service.EnrichStitchDataMessageWithAddress));
-        }
-
-        private void ReceiveCommandJobReceipt(ObjectReceivedEvent<CommandReceipt> ore)
-        {
-            var eventMessage = _service.ReceiveReceiptFromRemote(ore, ore.Object);
-            if (eventMessage == null)
-                return;
-
-            _log.LogDebug("Job Id={0} is complete: {1}", eventMessage.JobId, eventMessage.Status);
-            _messageBus.Publish(eventMessage.Status == JobStatusType.Success ? JobCompleteEvent.ChannelSuccess : JobCompleteEvent.ChannelFailure, eventMessage);
         }
 
         public void Stop()
@@ -227,6 +217,16 @@ namespace CrossStitch.Core.Modules.Master
                 return response;
 
             return _service.UploadStitchPackageFile(response.GroupName, response.FilePath, request);
+        }
+
+        private void ReceiveCommandJobReceipt(ReceivedEvent received, CommandReceipt receipt)
+        {
+            var eventMessage = _service.ReceiveReceiptFromRemote(received, receipt);
+            if (eventMessage == null)
+                return;
+
+            _log.LogDebug("Job Id={0} is complete: {1}", eventMessage.JobId, eventMessage.Status);
+            _messageBus.Publish(eventMessage.Status == JobStatusType.Success ? JobCompleteEvent.ChannelSuccess : JobCompleteEvent.ChannelFailure, eventMessage);
         }
 
         private class StitchRequestHandler : IStitchRequestHandler

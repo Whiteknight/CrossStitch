@@ -74,7 +74,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 .Invoke(m => _service.GetInstanceResources(m.StitchInstanceId)));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
-                .OnDefaultChannel()
+                .WithChannelName(StitchDataMessage.ChannelSendLocal)
                 .Invoke(_service.SendDataMessageToStitch)
                 .OnWorkerThread()
                 .WithFilter(m => !string.IsNullOrEmpty(m.ToStitchInstanceId)));

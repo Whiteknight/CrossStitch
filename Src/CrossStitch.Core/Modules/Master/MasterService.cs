@@ -204,7 +204,7 @@ namespace CrossStitch.Core.Modules.Master
             _data.StitchCache.AddLocalStitch(instanceEvent.InstanceId, instanceEvent.GroupName);
             _clusterSender.Send(new ClusterMessageBuilder()
                 .FromNode()
-                .ToCluster()
+                .ToZone(Zones.DesignatedMaster)
                 .WithEventName(StitchInstanceEvent.ChannelCreated)
                 .WithObjectPayload(instanceEvent)
                 .Build());
@@ -216,7 +216,7 @@ namespace CrossStitch.Core.Modules.Master
             _data.StitchCache.RemoveLocalStitch(instanceEvent.InstanceId);
             _clusterSender.Send(new ClusterMessageBuilder()
                 .FromNode()
-                .ToCluster()
+                .ToZone(Zones.DesignatedMaster)
                 .WithEventName(StitchInstanceEvent.ChannelDeleted)
                 .WithObjectPayload(instanceEvent)
                 .Build());

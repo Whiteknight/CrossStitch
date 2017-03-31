@@ -195,6 +195,7 @@
     <Compile Include="Utility\NullModuleLog.cs" />
     <Compile Include="Utility\Serialization\IByteSerializer.cs" />
     <Compile Include="Utility\Serialization\JsonByteSerializer.cs" />
+    <Compile Include="Zones.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CrossStitch.Core.nuspec">

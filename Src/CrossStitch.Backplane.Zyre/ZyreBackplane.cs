@@ -54,8 +54,10 @@ namespace CrossStitch.Backplane.Zyre
 
             _zyre.Start();
             _uuid = _zyre.Uuid();
-            _zyre.Join(Zones.ZoneAll);
-            foreach (string zone in _config.Zones.OrEmptyIfNull().Where(z => z != Zones.ZoneAll))
+            _zyre.Join(Zones.All);
+            // TODO: can exit the DesignatedMaster by config flag
+            _zyre.Join(Zones.DesignatedMaster);
+            foreach (string zone in _config.Zones.OrEmptyIfNull().Where(z => z != Zones.All))
                 _zyre.Join(zone);
 
             _mapper = new NetMqMessageMapper(_byteSerializer);
@@ -102,7 +104,7 @@ namespace CrossStitch.Backplane.Zyre
                     _zyre.Whisper(uuid, message);
             }
             else if (envelope.Header.ToType == TargetType.Cluster)
-                _zyre.Shout(Zones.ZoneAll, message);
+                _zyre.Shout(Zones.All, message);
             else if (envelope.Header.ToType == TargetType.Zone)
                 _zyre.Shout(envelope.Header.ZoneName, message);
             else if (envelope.Header.ToType == TargetType.Node)

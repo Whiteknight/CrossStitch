@@ -80,7 +80,6 @@
     <Compile Include="NetMqMessageMapper.cs" />
     <Compile Include="PayloadObjectDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Zones.cs" />
     <Compile Include="ZyreBackplane.cs" />
   </ItemGroup>
   <ItemGroup>

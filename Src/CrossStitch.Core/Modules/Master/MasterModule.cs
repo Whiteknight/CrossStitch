@@ -190,7 +190,7 @@ namespace CrossStitch.Core.Modules.Master
 
             // Send it over the backplane, so all other nodes can be aware of it.
             var envelope = new ClusterMessageBuilder()
-                .ToCluster()
+                .ToZone(Zones.DesignatedMaster)
                 .FromNode()
                 .WithObjectPayload(message)
                 .Build();

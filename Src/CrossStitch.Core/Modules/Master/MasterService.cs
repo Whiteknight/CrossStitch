@@ -203,6 +203,42 @@ namespace CrossStitch.Core.Modules.Master
                 _log.LogDebug("Member of cluster zones {0}", string.Join(",", _clusterZones));
         }
 
+        public void HandleLocalStitchCreated(StitchInstanceEvent instanceEvent)
+        {
+            _data.StitchCache.AddLocalStitch(instanceEvent.InstanceId, instanceEvent.GroupName);
+            _clusterSender.Send(new ClusterMessageBuilder()
+                .FromNode()
+                .ToCluster()
+                .WithEventName(StitchInstanceEvent.ChannelCreated)
+                .WithObjectPayload(instanceEvent)
+                .Build());
+            _log.LogDebug("Adding new local stitch Id={0} to lookup cache", instanceEvent.InstanceId);
+        }
+
+        public void HandleLocalStitchDeleted(StitchInstanceEvent instanceEvent)
+        {
+            _data.StitchCache.RemoveLocalStitch(instanceEvent.InstanceId);
+            _clusterSender.Send(new ClusterMessageBuilder()
+                .FromNode()
+                .ToCluster()
+                .WithEventName(StitchInstanceEvent.ChannelDeleted)
+                .WithObjectPayload(instanceEvent)
+                .Build());
+            _log.LogDebug("Removing local stitch Id={0} from lookup cache", instanceEvent.InstanceId);
+        }
+
+        public void HandleRemoteStitchCreated(ReceivedEvent received, StitchInstanceEvent instanceEvent)
+        {
+            _data.StitchCache.AddRemoteStitch(received.FromNodeId, received.FromNetworkId, instanceEvent.InstanceId, instanceEvent.GroupName);
+            _log.LogDebug("Adding new remote stitch Id={0} NodeId={1} to lookup cache", instanceEvent.InstanceId, received.FromNodeId);
+        }
+
+        public void HandleRemoteStitchDeleted(ReceivedEvent received, StitchInstanceEvent instanceEvent)
+        {
+            _data.StitchCache.RemoveRemoteStitch(received.FromNodeId, instanceEvent.InstanceId);
+            _log.LogDebug("Removing remote stitch Id={0} NodeId={1} from lookup cache", instanceEvent.InstanceId, received.FromNodeId);
+        }
+
         public PackageFileUploadResponse UploadStitchPackageFile(StitchGroupName groupName, string filePath, PackageFileUploadRequest arg)
         {
             // Send this to all nodes which are running the Stitches module

@@ -87,21 +87,29 @@ namespace CrossStitch.Core.Modules.Stitches
         // allocation. Call StartInstance to start the instance
         public LocalCreateInstanceResponse CreateNewInstance(LocalCreateInstanceRequest request)
         {
-            var response = new LocalCreateInstanceResponse();
-            if (request == null || !request.IsValid() || request.NumberOfInstances <= 0)
+            try
             {
-                response.IsSuccess = false;
+                var response = new LocalCreateInstanceResponse();
+                if (request == null || !request.IsValid() || request.NumberOfInstances <= 0)
+                {
+                    response.IsSuccess = false;
+                    return response;
+                }
+
+                for (int i = 0; i < request.NumberOfInstances; i++)
+                {
+                    var instance = CreateSingleNewInstanceInternal(request);
+                    if (instance != null)
+                        response.CreatedIds.Add(instance.Id);
+                }
+                response.IsSuccess = response.CreatedIds.Count == request.NumberOfInstances;
                 return response;
             }
-
-            for (int i = 0; i < request.NumberOfInstances; i++)
+            catch (Exception e)
             {
-                var instance = CreateSingleNewInstanceInternal(request);
-                if (instance != null)
-                    response.CreatedIds.Add(instance.Id);
+                _log.LogError(e, "Could not create new stitch instance");
+                return null;
             }
-            response.IsSuccess = response.CreatedIds.Count == request.NumberOfInstances;
-            return response;
         }
 
         private StitchInstance CreateSingleNewInstanceInternal(LocalCreateInstanceRequest request)
@@ -130,6 +138,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
             _data.Save(instance);
             _log.LogInformation("Created stitch instance Id={0} GroupName={1}", instance.Id, request.GroupName);
+            _notifier.StitchCreated(instance);
 
             // StitchInstanceManager auto-creates the necessary adaptor on Start. We don't need to do anything for it here.
             return instance;
@@ -164,6 +173,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
             // Report success
             _log.LogInformation("Instance {0} cloned to {1}", instanceId, instance.Id);
+            _notifier.StitchCreated(instance);
             return InstanceResponse.Success(request, instance);
         }
 
@@ -185,15 +195,15 @@ namespace CrossStitch.Core.Modules.Stitches
                 return InstanceResponse.Failure(request);
 
             var result = _stitchInstanceManager.Start(instance);
-            if (result.Success)
-            {
-                _log.LogInformation("Started stitch {0} Id={1}", result.StitchInstance.GroupName, result.StitchInstance.Id);
-                _notifier.StitchStarted(instance);
-            }
-            else
-                _log.LogError(result.Exception, "Could not start stitch {0}", request.Id);
-
             _data.Save(instance);
+            if (!result.Success)
+            {
+                _log.LogError(result.Exception, "Could not start stitch {0}", request.Id);
+                return InstanceResponse.Create(request, result.Success, instance);
+            }
+
+            _log.LogInformation("Started stitch {0} Id={1}", result.StitchInstance.GroupName, result.StitchInstance.Id);
+            _notifier.StitchStarted(instance);
             return InstanceResponse.Create(request, result.Success, instance);
         }
 
@@ -211,21 +221,19 @@ namespace CrossStitch.Core.Modules.Stitches
                 return InstanceResponse.Failure(request);
             }
 
-            bool success = true;
             var stopResult = _stitchInstanceManager.Stop(instance);
-            if (stopResult.Success && stopResult.StitchInstance.State == InstanceStateType.Stopped)
-            {
-                _log.LogDebug("Stitch instance {0} Id={3} stopped", instance.GroupName, instance.Id);
-                _notifier.StitchStopped(instance);
-            }
-            else
+            _data.Save(stopResult.StitchInstance);
+
+            if (!stopResult.Success || stopResult.StitchInstance.State != InstanceStateType.Stopped)
             {
                 _log.LogError("Could not stop stitch {0}", request.Id);
-                success = false;
+                return InstanceResponse.Create(request, false);
             }
 
-            _data.Save(stopResult.StitchInstance);
-            return InstanceResponse.Create(request, success);
+            _log.LogDebug("Stitch instance {0} Id={3} stopped", instance.GroupName, instance.Id);
+            _notifier.StitchStopped(instance);
+
+            return InstanceResponse.Create(request, true);
         }
 
         public InstanceResponse DeleteStitchInstance(InstanceRequest request)
@@ -260,6 +268,8 @@ namespace CrossStitch.Core.Modules.Stitches
                 success = false;
             }
 
+            _notifier.StitchDeleted(instanceId, instance.GroupName);
+
             _log.LogInformation("Instance {0} stopped and deleted successfully", instanceId);
             return InstanceResponse.Create(request, success, instance);
         }
@@ -281,8 +291,10 @@ namespace CrossStitch.Core.Modules.Stitches
                 _log.LogWarning("Could not deliver message Id={0} to StitchInstanceId={1}", message.Id, fullStitchId.StitchInstanceId);
         }
 
-        public void StopAll()
+        public void StopAllOnShutdown()
         {
+            // Stop all instances, we don't need to send out logs and notifications because the application is terminating
+            // and subscribers will probably be gone.
             _stitchInstanceManager.StopAll();
             _log.LogDebug("Stopped");
         }

@@ -89,7 +89,7 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public void Stop()
         {
-            _service.StopAll();
+            _service.StopAllOnShutdown();
             _subscriptions?.Dispose();
             _subscriptions = null;
         }
@@ -117,6 +117,15 @@ namespace CrossStitch.Core.Modules.Stitches
                 _messageBus = messageBus;
             }
 
+            public void StitchCreated(StitchInstance instance)
+            {
+                _messageBus.Publish(StitchInstanceEvent.ChannelCreated, new StitchInstanceEvent
+                {
+                    InstanceId = instance.Id,
+                    GroupName = instance.GroupName
+                });
+            }
+
             public void StitchStarted(StitchInstance instance)
             {
                 _messageBus.Publish(StitchInstanceEvent.ChannelStarted, new StitchInstanceEvent
@@ -132,6 +141,15 @@ namespace CrossStitch.Core.Modules.Stitches
                 {
                     InstanceId = instance.Id,
                     GroupName = instance.GroupName
+                });
+            }
+
+            public void StitchDeleted(string id, StitchGroupName groupName)
+            {
+                _messageBus.Publish(StitchInstanceEvent.ChannelCreated, new StitchInstanceEvent
+                {
+                    InstanceId = id,
+                    GroupName = groupName
                 });
             }
         }

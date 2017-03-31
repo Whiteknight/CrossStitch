@@ -1,5 +1,4 @@
-﻿using CrossStitch.Core.Messages.Backplane;
-using CrossStitch.Core.Messages.Master;
+﻿using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Models;
 

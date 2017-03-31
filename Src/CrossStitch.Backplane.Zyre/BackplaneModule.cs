@@ -57,8 +57,7 @@ namespace CrossStitch.Backplane.Zyre
             _subscriptions.Subscribe<ClusterMessage>(s => s
                 .WithChannelName(ClusterMessage.SendEventName)
                 .Invoke(e => _backplane.Send(e))
-                .OnThread(_workerThreadId)
-                .WithFilter(IsMessageSendable));
+                .OnThread(_workerThreadId));
             _subscriptions.Subscribe<CoreEvent>(b => b
                 .WithChannelName(CoreEvent.ChannelInitialized)
                 .Invoke(BroadcastNetworkInformation));
@@ -217,20 +216,13 @@ namespace CrossStitch.Backplane.Zyre
                     .ToNode(envelope.Header.FromNetworkId)
                     .WithObjectPayload(new CommandReceipt
                     {
-                        Success = response.Success,
+                        Success = response.IsSuccess,
                         ReplyToJobId = request.JobId,
                         ReplyToTaskId = request.TaskId
                     })
                     .Build();
                 _backplane.Send(outEnvelope);
             }
-        }
-
-        private static bool IsMessageSendable(ClusterMessage envelope)
-        {
-            return envelope.Header.ToType == TargetType.Node ||
-                   envelope.Header.ToType == TargetType.Zone ||
-                   !string.IsNullOrEmpty(envelope.Header.ProxyNodeNetworkId);
         }
     }
 }

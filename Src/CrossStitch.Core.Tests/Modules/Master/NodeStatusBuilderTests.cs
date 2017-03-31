@@ -43,7 +43,7 @@ namespace CrossStitch.Core.Tests.Modules.Master
             result.RunningModules.Should().Contain(modules);
             // TODO: We should keep track of zones in the Master module and fill this in
             result.Zones.Count.Should().Be(3);
-            result.StitchInstances.Count.Should().Be(2);
+            result.StitchInstances.Count.Should().Be(3);
 
         }
     }

@@ -66,13 +66,9 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             _process.StartInfo.RedirectStandardError = true;
             _process.StartInfo.RedirectStandardInput = true;
             _process.StartInfo.RedirectStandardOutput = true;
-            // TODO: What other values should we pass to the new process?
             _process.StartInfo.Arguments = arguments;
             _process.Exited += ProcessOnExited;
 
-            // TODO: We should pass some command-line args to the new program:
-            // node name/id, instance id, some information about the application topology, 
-            // the data directory, etc
             bool ok = _process.Start();
 
             var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
@@ -148,6 +144,8 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 
         private void Cleanup(bool requested)
         {
+            // TODO: Read and log messages written to STDERR, for cases where, for example, the VM exits with errors before the stitch script is executed
+            //var contents = _process.StandardError.ReadToEnd();
             if (_process != null && !_process.HasExited)
             {
                 _process.CancelErrorRead();

@@ -15,10 +15,12 @@ namespace StitchIntegration.ServerB
             nodeConfig.NodeName = "StitchIntegration.ServerB";
             using (var core = new CrossStitchCore(nodeConfig))
             {
+                Console.Title = core.Name;
                 core.AddModule(new BackplaneModule(core));
                 core.AddModule(new StitchesModule(core));
                 core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
 
+                // This Node just runs. ServerA will generate and send commands to this node to produce changes
                 core.Start();
 
                 Console.ReadKey();

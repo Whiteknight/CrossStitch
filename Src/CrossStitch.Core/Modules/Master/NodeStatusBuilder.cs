@@ -27,7 +27,7 @@ namespace CrossStitch.Core.Modules.Master
         public NodeStatus Build()
         {
             var stitches = _stitchInstances
-                .Where(si => si.State == InstanceStateType.Running || si.State == InstanceStateType.Started)
+                .Where(si => si.State != InstanceStateType.Error && si.State != InstanceStateType.Missing)
                 .ToList();
 
             var message = new NodeStatus

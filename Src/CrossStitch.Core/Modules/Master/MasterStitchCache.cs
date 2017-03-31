@@ -49,6 +49,38 @@ namespace CrossStitch.Core.Modules.Master
             _allStitches = null;
         }
 
+        public void AddRemoteStitch(string nodeId, string networkNodeId, string id, StitchGroupName groupName)
+        {
+            var summary = new StitchSummary
+            {
+                GroupName = groupName,
+                Id = id,
+                Locale = StitchLocaleType.Remote,
+                NodeId = nodeId,
+                NetworkNodeId = networkNodeId
+            };
+            if (!_remoteStitches.ContainsKey(nodeId))
+            {
+                _remoteStitches.Add(nodeId, new List<StitchSummary>
+                {
+                    summary
+                });
+                return;
+            }
+            var summaries = _remoteStitches[nodeId].Where(ss => ss.Id != id).Concat(new[] { summary }).ToList();
+            _remoteStitches[nodeId] = summaries;
+            _allStitches = null;
+        }
+
+        public void RemoveRemoteStitch(string nodeId, string id)
+        {
+            if (!_remoteStitches.ContainsKey(nodeId))
+                return;
+            var summaries = _remoteStitches[nodeId].Where(ss => ss.Id != id).ToList();
+            _remoteStitches[nodeId] = summaries;
+            _allStitches = null;
+        }
+
         public void AddLocalStitch(string id, StitchGroupName groupName)
         {
             var locals = _localStitches
@@ -76,6 +108,8 @@ namespace CrossStitch.Core.Modules.Master
             _localStitches = locals;
             _allStitches = null;
         }
+
+
 
         public List<StitchSummary> GetStitchSummaries()
         {

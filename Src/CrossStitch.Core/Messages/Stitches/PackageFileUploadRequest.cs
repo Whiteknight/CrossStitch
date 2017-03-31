@@ -35,14 +35,14 @@ namespace CrossStitch.Core.Messages.Stitches
 
     public class PackageFileUploadResponse
     {
-        public PackageFileUploadResponse(bool success, StitchGroupName groupName, string filePath, string jobId = null)
+        public PackageFileUploadResponse(bool isSuccess, StitchGroupName groupName, string filePath, string jobId = null)
         {
-            Success = success;
+            IsSuccess = isSuccess;
             GroupName = groupName;
             FilePath = filePath;
         }
 
-        public bool Success { get; }
+        public bool IsSuccess { get; }
         public StitchGroupName GroupName { get; }
         public string FilePath { get; }
         public string JobId { get; set; }

@@ -108,12 +108,20 @@ namespace CrossStitch.Core.Modules.Master
                 .Invoke(m => _data.StitchCache.AddNodeStatus(m, m.Object))
                 .OnThread(_cacheThreadId));
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
-                .WithChannelName(StitchInstanceEvent.ChannelStarted)
-                .Invoke(m => _data.StitchCache.AddLocalStitch(m.InstanceId, m.GroupName))
+                .WithChannelName(StitchInstanceEvent.ChannelCreated)
+                .Invoke(_service.HandleLocalStitchCreated)
+                .OnThread(_cacheThreadId));
+            _subscriptions.Subscribe<ObjectReceivedEvent<StitchInstanceEvent>>(b => b
+                .WithChannelName(ReceivedEvent.ReceivedEventName(StitchInstanceEvent.ChannelCreated))
+                .Invoke(m => _service.HandleRemoteStitchCreated(m, m.Object))
                 .OnThread(_cacheThreadId));
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
-                .WithChannelName(StitchInstanceEvent.ChannelStopped)
-                .Invoke(m => _data.StitchCache.RemoveLocalStitch(m.InstanceId))
+                .WithChannelName(StitchInstanceEvent.ChannelDeleted)
+                .Invoke(_service.HandleLocalStitchDeleted)
+                .OnThread(_cacheThreadId));
+            _subscriptions.Subscribe<ObjectReceivedEvent<StitchInstanceEvent>>(b => b
+                .WithChannelName(ReceivedEvent.ReceivedEventName(StitchInstanceEvent.ChannelDeleted))
+                .Invoke(m => _service.HandleRemoteStitchDeleted(m, m.Object))
                 .OnThread(_cacheThreadId));
 
             // TODO: On Stitch Started/Stopped we should publish notification to the cluster so other Master nodes can update their
@@ -208,7 +216,7 @@ namespace CrossStitch.Core.Modules.Master
         private PackageFileUploadResponse UploadPackageFile(PackageFileUploadRequest request)
         {
             var response = _messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelLocal, request);
-            if (!response.Success)
+            if (!response.IsSuccess)
             {
                 _log.LogError("Could not upload package file");
                 return response;

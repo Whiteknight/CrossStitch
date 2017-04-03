@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props" Condition="Exists('..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +13,8 @@
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -186,7 +189,9 @@
     <Compile Include="Utility\Serialization\JsonSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CrossStitch.Core.nuspec" />
+    <None Include="CrossStitch.Core.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Modules\Alerts\README.md" />
     <None Include="Modules\Core\README.md" />
     <None Include="Modules\Data\README.md" />
@@ -220,6 +225,12 @@
     <RemoveDir Directories="NuGet" />
     <MakeDir Directories="NuGet" />
     <!-- Package the project -->
-    <Exec WorkingDirectory="$(BuildDir)" Command="NuGet.exe pack CrossStitch.Core.nuspec -Verbosity detailed -OutputDir &quot;NuGet&quot; -Properties &quot;Configuration=$(Configuration)&quot;" />
+    <Exec WorkingDirectory="$(BuildDir)" Command="NuGet.exe pack CrossStitch.Core.csproj -Verbosity detailed -OutputDir &quot;NuGet&quot; -Properties &quot;Configuration=$(Configuration)&quot;" />
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props'))" />
   </Target>
 </Project>

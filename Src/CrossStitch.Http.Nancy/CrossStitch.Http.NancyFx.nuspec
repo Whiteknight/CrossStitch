@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CrossStitch.Http.NancyFx</id>
-    <version>0.1.0</version>
+    <version>0.1.0-alpha</version>
     <title>$title$</title>
     <authors>Andrew F. Whitworth</authors>
     <owners>$author$</owners>
@@ -14,15 +14,15 @@
     <tags>AppFabric Microservices Clustering</tags>
     <dependencies>
       <dependency id="CrossStitch.Stitch" version="0.1.0"/>
-      <dependency id="CrossStitch.Core" version="0.1.0"/>
+      <dependency id="CrossStitch.Core" version="0.1.0-alpha"/>
       <dependency id="Acquaintance" version="1.0.0-rc3" />
       <dependency id="Nancy" version="1.4.3"/>
       <dependency id="Nancy.Hosting.Self" version="1.4.1"/>
     </dependencies>
   </metadata>
   <files>
-        <file src="bin\Release\net45\CrossStitch.Http.NancyFx.dll" target="lib\net45\CrossStitch.Http.NancyFx.dll" />
-        <file src="bin\Release\net45\CrossStitch.Http.NancyFx.pdb" target="lib\net45\CrossStitch.Http.NancyFx.pdb" />
+        <!-- <file src="bin\Release\net45\CrossStitch.Http.NancyFx.dll" target="lib\net45\CrossStitch.Http.NancyFx.dll" /> -->
+        <!-- <file src="bin\Release\net45\CrossStitch.Http.NancyFx.pdb" target="lib\net45\CrossStitch.Http.NancyFx.pdb" /> -->
         <file src="bin\Release\net46\CrossStitch.Http.NancyFx.dll" target="lib\net46\CrossStitch.Http.NancyFx.dll" />
         <file src="bin\Release\net46\CrossStitch.Http.NancyFx.pdb" target="lib\net46\CrossStitch.Http.NancyFx.pdb" />
     </files>

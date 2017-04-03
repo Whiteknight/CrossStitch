@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>CrossStitch.Core</id>
+    <version>0.1.0</version>
+    <title>$title$</title>
+    <authors>Andrew F. Whitworth</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/Whiteknight/CrossStitch/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://whiteknight.github.io/CrossStitch/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A light-weight, low-ceremony app fabric for .NET</description>
+    <copyright>Copyright 2017</copyright>
+    <tags>AppFabric Microservices Clustering</tags>
+    <dependencies>
+      <dependency id="CrossStitch.Stitch" version="0.1.0"/>
+      <dependency id="Acquaintance" version="1.0.0-rc3" />
+      <dependency id="Common.Logging.Core" version="3.0.0" />
+      <dependency id="Microsoft.CSharp" version="4.0.1"/>
+    </dependencies>
+  </metadata>
+  <files>
+        <file src="bin\Release\net45\CrossStitch.Core.dll" target="lib\net45\CrossStitch.Core.dll" />
+        <file src="bin\Release\net45\CrossStitch.Core.pdb" target="lib\net45\CrossStitch.Core.pdb" />
+        <file src="bin\Release\net46\CrossStitch.Core.dll" target="lib\net46\CrossStitch.Core.dll" />
+        <file src="bin\Release\net46\CrossStitch.Core.pdb" target="lib\net46\CrossStitch.Core.pdb" />
+    </files>
+</package>

@@ -25,18 +25,23 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Release\net46</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release 4.5|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\net45\</OutputPath>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Acquaintance, Version=1.0.0.17705, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Acquaintance.1.0.0-rc3\lib\net46\Acquaintance.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\AsyncIO.0.1.26.0\lib\net40\AsyncIO.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Common.Logging.Core, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
@@ -181,6 +186,7 @@
     <Compile Include="Utility\Serialization\JsonSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CrossStitch.Core.nuspec" />
     <None Include="Modules\Alerts\README.md" />
     <None Include="Modules\Core\README.md" />
     <None Include="Modules\Data\README.md" />
@@ -189,6 +195,8 @@
     <None Include="Modules\Stitches\README.md" />
     <None Include="Modules\StitchMonitor\README.md" />
     <None Include="Modules\Timer\README.md" />
+    <None Include="nupkg-build.bat" />
+    <None Include="nupkg-publish.bat" />
     <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
@@ -207,4 +215,11 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="Package">
+    <!-- Ensure the Package directory exists for this project -->
+    <RemoveDir Directories="NuGet" />
+    <MakeDir Directories="NuGet" />
+    <!-- Package the project -->
+    <Exec WorkingDirectory="$(BuildDir)" Command="NuGet.exe pack CrossStitch.Core.nuspec -Verbosity detailed -OutputDir &quot;NuGet&quot; -Properties &quot;Configuration=$(Configuration)&quot;" />
+  </Target>
 </Project>

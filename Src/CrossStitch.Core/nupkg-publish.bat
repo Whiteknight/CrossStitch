@@ -1,0 +1,1 @@
+﻿nuget push Nuget\CrossStitch.Core.%1.nupkg -Source https://www.nuget.org/api/v2/package

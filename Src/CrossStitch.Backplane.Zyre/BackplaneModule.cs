@@ -63,7 +63,7 @@ namespace CrossStitch.Backplane.Zyre
                 .Invoke(BroadcastNetworkInformation));
             _subscriptions.Subscribe<FileTransferRequest>(b => b
                 .OnDefaultChannel()
-                .Invoke(m => _backplane.TransferPackageFile(m.GroupName, m.NetworkNodeId, m.FilePath, m.FileName, m.JobId, m.TaskId)));
+                .Invoke(m => _backplane.TransferPackageFile(m.GroupName, m.NetworkNodeId, m.FilePath, m.FileName, m.Adaptor, m.JobId, m.TaskId)));
 
             // TODO: Listen to requests to get current network id, zones, etc.
             // TODO: Request to get info on known peers/zones?
@@ -208,7 +208,8 @@ namespace CrossStitch.Backplane.Zyre
                     Contents = stream,
                     FileName = request.FileName,
                     GroupName = new StitchGroupName(request.GroupName),
-                    LocalOnly = true
+                    LocalOnly = true,
+                    Adaptor = request.Adaptor
                 });
 
                 var outEnvelope = new ClusterMessageBuilder()

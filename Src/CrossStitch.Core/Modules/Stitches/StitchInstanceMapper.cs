@@ -20,7 +20,6 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 Id = null,
                 StoreVersion = 0,
-                Adaptor = request.Adaptor,
                 GroupName = request.GroupName,
                 LastHeartbeatReceived = 0,
                 Name = request.Name,

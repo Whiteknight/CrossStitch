@@ -12,6 +12,7 @@ namespace CrossStitch.Core.Messages.Stitches
         public string FileName { get; set; }
         public Stream Contents { get; set; }
         public bool LocalOnly { get; set; }
+        public InstanceAdaptorDetails Adaptor { get; set; }
 
 
         public bool IsValidLocalRequest()
@@ -19,6 +20,7 @@ namespace CrossStitch.Core.Messages.Stitches
             return GroupName != null
                 && GroupName.IsComponentGroup()
                 && Contents != null
+                && Adaptor != null
                 && !string.IsNullOrEmpty(FileName)
                 && Path.GetExtension(FileName).ToLowerInvariant() == ".zip";
         }
@@ -28,6 +30,7 @@ namespace CrossStitch.Core.Messages.Stitches
             return GroupName != null
                 && GroupName.IsVersionGroup()
                 && Contents != null
+                && Adaptor != null
                 && !string.IsNullOrEmpty(FileName)
                 && Path.GetExtension(FileName).ToLowerInvariant() == ".zip";
         }

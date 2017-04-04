@@ -18,10 +18,11 @@ namespace PingPong.Server
             {
                 var dataStorage = new InMemoryDataStorage();
 
-                var ping = new StitchInstance
+                var pingGroup = new StitchGroupName("PingPong", "Ping", "1");
+                var pingPackage = new PackageFile
                 {
-                    Name = "PingPong.Ping",
-                    GroupName = new StitchGroupName("PingPong", "Ping", "1"),
+                    Id = pingGroup.ToString(),
+                    GroupName = pingGroup,
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.ProcessV1,
@@ -31,13 +32,20 @@ namespace PingPong.Server
                             { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "PingPong.Ping.exe" }
                         }
                     },
+                };
+                var ping = new StitchInstance
+                {
+                    Name = "PingPong.Ping",
+                    GroupName = pingGroup,
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
                 };
-                var pong = new StitchInstance
+
+                var pongGroup = new StitchGroupName("PingPong", "Pong", "1");
+                var pongPackage = new PackageFile
                 {
-                    Name = "PingPong.Pong",
-                    GroupName = new StitchGroupName("PingPong", "Pong", "1"),
+                    Id = pongGroup.ToString(),
+                    GroupName = pongGroup,
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.ProcessV1,
@@ -47,11 +55,18 @@ namespace PingPong.Server
                             { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "PingPong.Pong.exe" }
                         }
                     },
+                };
+                var pong = new StitchInstance
+                {
+                    Name = "PingPong.Pong",
+                    GroupName = pongGroup,
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
                 };
 
+                dataStorage.Save(pingPackage, true);
                 dataStorage.Save(ping, true);
+                dataStorage.Save(pongPackage, true);
                 dataStorage.Save(pong, true);
 
                 var data = new DataModule(core.MessageBus, dataStorage);

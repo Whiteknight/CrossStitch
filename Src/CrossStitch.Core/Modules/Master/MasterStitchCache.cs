@@ -10,13 +10,19 @@ namespace CrossStitch.Core.Modules.Master
     {
         private readonly string _nodeId;
 
-        private readonly Dictionary<string, List<StitchSummary>> _remoteStitches;
+        private Dictionary<string, List<StitchSummary>> _remoteStitches;
         private List<StitchSummary> _localStitches;
         private List<StitchSummary> _allStitches;
 
-        public MasterStitchCache(string nodeId, List<StitchSummary> initialLocals, Dictionary<string, List<StitchSummary>> initialRemotes)
+        public MasterStitchCache(string nodeId)
         {
             _nodeId = nodeId;
+            _localStitches = new List<StitchSummary>();
+            _remoteStitches = new Dictionary<string, List<StitchSummary>>();
+        }
+
+        public void Initialize(List<StitchSummary> initialLocals, Dictionary<string, List<StitchSummary>> initialRemotes)
+        {
             _localStitches = initialLocals ?? new List<StitchSummary>();
             _remoteStitches = initialRemotes ?? new Dictionary<string, List<StitchSummary>>();
         }

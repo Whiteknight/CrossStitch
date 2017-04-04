@@ -9,8 +9,6 @@ namespace CrossStitch.Core.Messages.Stitches
 
         public StitchGroupName GroupName { get; set; }
 
-        public InstanceAdaptorDetails Adaptor { get; set; }
-
         public int NumberOfInstances { get; set; }
 
         public bool IsValid()
@@ -19,7 +17,6 @@ namespace CrossStitch.Core.Messages.Stitches
                 && GroupName != null
                 && GroupName.IsValid()
                 && GroupName.IsVersionGroup()
-                && Adaptor != null
                 && !string.IsNullOrEmpty(Name);
         }
     }

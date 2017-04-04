@@ -12,11 +12,11 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
         private readonly BuiltInClassV1Parameters _parameters;
         private object _stitchObject;
 
-        public BuiltInClassV1StitchAdaptor(StitchInstance stitchInstance, CoreStitchContext stitchContext)
+        public BuiltInClassV1StitchAdaptor(PackageFile packageFile, StitchInstance stitchInstance, CoreStitchContext stitchContext)
         {
             StitchContext = stitchContext;
             _stitchInstance = stitchInstance;
-            _parameters = new BuiltInClassV1Parameters(stitchInstance.Adaptor.Parameters);
+            _parameters = new BuiltInClassV1Parameters(packageFile.Adaptor.Parameters);
         }
 
         public CoreStitchContext StitchContext { get; }

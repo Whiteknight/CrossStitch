@@ -29,7 +29,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public event EventHandler<LogsReceivedEventArgs> LogsReceived;
         public event EventHandler<DataMessageReceivedEventArgs> DataMessageReceived;
 
-        public InstanceActionResult Start(StitchInstance stitchInstance)
+        public InstanceActionResult Start(PackageFile packageFile, StitchInstance stitchInstance)
         {
             if (string.IsNullOrEmpty(stitchInstance?.Id))
                 return InstanceActionResult.BadRequest();
@@ -40,7 +40,7 @@ namespace CrossStitch.Core.Modules.Stitches
             try
             {
                 stitchInstance.State = InstanceStateType.Stopped;
-                adaptor = GetOrCreateStitchAdaptor(stitchInstance);
+                adaptor = GetOrCreateStitchAdaptor(packageFile, stitchInstance);
                 if (adaptor == null)
                 {
                     stitchInstance.State = InstanceStateType.Missing;
@@ -169,13 +169,13 @@ namespace CrossStitch.Core.Modules.Stitches
             _adaptors.Clear();
         }
 
-        private IStitchAdaptor GetOrCreateStitchAdaptor(StitchInstance stitchInstance)
+        private IStitchAdaptor GetOrCreateStitchAdaptor(PackageFile packageFile, StitchInstance stitchInstance)
         {
             var adaptor = _adaptors.Get(stitchInstance.Id);
             if (adaptor != null)
                 return adaptor;
 
-            adaptor = _adaptorFactory.Create(stitchInstance);
+            adaptor = _adaptorFactory.Create(packageFile, stitchInstance);
             adaptor.StitchContext.DataDirectory = _fileSystem.GetInstanceDataDirectoryPath(stitchInstance.Id);
             adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
             adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;

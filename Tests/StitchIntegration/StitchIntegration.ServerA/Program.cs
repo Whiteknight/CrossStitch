@@ -87,7 +87,18 @@ namespace StitchIntegration.ServerA
                 Contents = stream,
                 FileName = "Stitch.zip",
                 GroupName = new StitchGroupName("StitchIntegration.Stitch"),
-                LocalOnly = false
+                LocalOnly = false,
+                Adaptor = new InstanceAdaptorDetails
+                {
+                    RequiresPackageUnzip = true,
+                    Type = AdaptorType.ProcessV1,
+                    Parameters = new Dictionary<string, string>
+                    {
+                        { Parameters.ArgumentsFormat, "{ExecutableName} {CoreArgs} -- {CustomArgs}" },
+                        { Parameters.ExecutableFormat, "C:\\Program Files\\nodejs\\node.exe" },
+                        { Parameters.ExecutableName, "Stitch.js" }
+                    }
+                },
             });
             _groupName = response.GroupName;
             _testLog.LogInformation("Uploaded version {0}", _groupName);
@@ -110,17 +121,6 @@ namespace StitchIntegration.ServerA
             // Command ServerB to create a new stitch instance
             var response = messageBus.Request<CreateInstanceRequest, CreateInstanceResponse>(new CreateInstanceRequest
             {
-                Adaptor = new InstanceAdaptorDetails
-                {
-                    RequiresPackageUnzip = true,
-                    Type = AdaptorType.ProcessV1,
-                    Parameters = new Dictionary<string, string>
-                    {
-                        { Parameters.ArgumentsFormat, "{ExecutableName} {CoreArgs} -- {CustomArgs}" },
-                        { Parameters.ExecutableFormat, "C:\\Program Files\\nodejs\\node.exe" },
-                        { Parameters.ExecutableName, "Stitch.js" }
-                    }
-                },
                 GroupName = _groupName,
                 LocalOnly = false,
                 Name = "Stitch",

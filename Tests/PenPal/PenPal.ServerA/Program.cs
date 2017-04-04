@@ -33,9 +33,11 @@ namespace PenPal.ServerA
                 core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
 
                 // Create a stitch instance to run on startup
-                var stitch = new StitchInstance
+                var groupName = new StitchGroupName("PenPal.StitchA.1");
+                var packageFile = new PackageFile
                 {
-                    Name = "StitchA",
+                    Id = groupName.ToString(),
+                    GroupName = groupName,
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.ProcessV1,
@@ -46,7 +48,12 @@ namespace PenPal.ServerA
                             { Parameters.ExecutableName, "PenPal.StitchA.exe" }
                         }
                     },
-                    GroupName = new StitchGroupName("PenPal.StitchA.1"),
+                };
+                store.Save(packageFile, true);
+                var stitch = new StitchInstance
+                {
+                    Name = "StitchA",
+                    GroupName = groupName,
                     OwnerNodeName = core.Name,
                     OwnerNodeId = core.NodeId,
                     State = InstanceStateType.Running

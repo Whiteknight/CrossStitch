@@ -19,6 +19,6 @@ namespace CrossStitch.Backplane.Zyre
         //TResponse Send<TRequest, TResponse>(NodeCommunicationInformation recipient, TRequest request);
         //Task<TResponse> SendAsync<TRequest, TResponse>(NodeCommunicationInformation recipient, TRequest request, CancellationToken cancellation);
 
-        void TransferPackageFile(StitchGroupName groupName, string toNodeId, string filePath, string fileName, string jobId, string taskId);
+        void TransferPackageFile(StitchGroupName groupName, string toNodeId, string filePath, string fileName, InstanceAdaptorDetails adaptor, string jobId, string taskId);
     }
 }

@@ -17,7 +17,12 @@ namespace CrossStitch.Core.Modules.Master
         {
             _nodeId = nodeId;
             _data = data;
-            StitchCache = new MasterStitchCache(nodeId, GetLocalStitchSummaries(), GetRemoteStitchSummaries());
+            StitchCache = new MasterStitchCache(nodeId);
+        }
+
+        public void Initialize()
+        {
+            StitchCache.Initialize(GetLocalStitchSummaries(), GetRemoteStitchSummaries());
         }
 
         // TODO: Method to re-sync the stitch cache with the data module contents?

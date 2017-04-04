@@ -11,8 +11,6 @@
 
         public StitchGroupName GroupName { get; set; }
 
-        public InstanceAdaptorDetails Adaptor { get; set; }
-
         public InstanceStateType State { get; set; }
         public long LastHeartbeatReceived { get; set; }
 

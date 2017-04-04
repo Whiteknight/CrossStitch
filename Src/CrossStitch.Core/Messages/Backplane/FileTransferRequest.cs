@@ -10,5 +10,6 @@ namespace CrossStitch.Core.Messages.Backplane
         public string TaskId { get; set; }
         public string FilePath { get; set; }
         public string FileName { get; set; }
+        public InstanceAdaptorDetails Adaptor { get; set; }
     }
 }

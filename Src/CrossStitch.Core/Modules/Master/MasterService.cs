@@ -163,7 +163,6 @@ namespace CrossStitch.Core.Modules.Master
                 var task = job.CreateSubtask(CommandType.CreateStitchInstance, node.Id, node.Id);
                 var payload = new CreateInstanceRequest
                 {
-                    Adaptor = arg.Adaptor,
                     GroupName = arg.GroupName,
                     Name = arg.Name,
                     NumberOfInstances = 1,
@@ -239,7 +238,7 @@ namespace CrossStitch.Core.Modules.Master
             _log.LogDebug("Removing remote stitch Id={0} NodeId={1} from lookup cache", instanceEvent.InstanceId, received.FromNodeId);
         }
 
-        public PackageFileUploadResponse UploadStitchPackageFile(StitchGroupName groupName, string filePath, PackageFileUploadRequest arg)
+        public PackageFileUploadResponse UploadStitchPackageFile(StitchGroupName groupName, string filePath, PackageFileUploadRequest request)
         {
             // Send this to all nodes which are running the Stitches module
             var nodes = _data.GetAll<NodeStatus>()
@@ -254,7 +253,7 @@ namespace CrossStitch.Core.Modules.Master
             foreach (var node in nodes)
             {
                 var task = job.CreateSubtask(CommandType.UploadPackageFile, node.Id, node.Id);
-                _clusterSender.SendPackageFile(node.NetworkNodeId, groupName, arg.FileName, filePath, job.Id, task.Id);
+                _clusterSender.SendPackageFile(node.NetworkNodeId, groupName, request.FileName, filePath, request.Adaptor, job.Id, task.Id);
             }
 
             _jobManager.Save(job);

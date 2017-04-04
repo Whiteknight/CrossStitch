@@ -41,6 +41,10 @@ namespace CrossStitch.Core.Modules.Data
                 .OnDefaultChannel()
                 .Invoke(_service.HandleRequest)
                 .OnThread(_workerThreadId));
+            _subscriptions.Listen<DataRequest<PackageFile>, DataResponse<PackageFile>>(l => l
+                .OnDefaultChannel()
+                .Invoke(_service.HandleRequest)
+                .OnThread(_workerThreadId));
         }
 
         public void Stop()

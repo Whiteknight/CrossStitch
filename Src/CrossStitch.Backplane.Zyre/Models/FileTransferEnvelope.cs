@@ -1,4 +1,6 @@
-﻿namespace CrossStitch.Backplane.Zyre.Models
+﻿using CrossStitch.Core.Models;
+
+namespace CrossStitch.Backplane.Zyre.Models
 {
     public class FileTransferEnvelope
     {
@@ -8,6 +10,7 @@
         public string FileName { get; set; }
         public int TotalNumberOfPackets { get; set; }
         public int PacketNumber { get; set; }
+        public InstanceAdaptorDetails Adaptor { get; set; }
         public byte[] Contents { get; set; }
     }
 }

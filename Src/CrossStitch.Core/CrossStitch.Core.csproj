@@ -82,6 +82,7 @@
     <Compile Include="Models\AdaptorType.cs" />
     <Compile Include="Models\InstanceAdaptorDetails.cs" />
     <Compile Include="Models\InstanceStateType.cs" />
+    <Compile Include="Models\PackageFile.cs" />
     <Compile Include="Models\StitchFullId.cs" />
     <Compile Include="Modules\Master\Handlers\StartAllStitchGroupCommandHandler.cs" />
     <Compile Include="Modules\Master\Handlers\StitchGroupCommandHandler.cs" />

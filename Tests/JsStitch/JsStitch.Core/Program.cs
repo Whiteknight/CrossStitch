@@ -18,11 +18,11 @@ namespace JsStitch.Core
             using (var core = new CrossStitchCore(config))
             {
                 var dataStorage = new InMemoryDataStorage();
-
-                var result = dataStorage.Save(new StitchInstance
+                var groupName = new StitchGroupName("JsStitch", "Stitch", "1");
+                dataStorage.Save(new PackageFile
                 {
-                    Name = "JsStitch.Stitch",
-                    GroupName = new StitchGroupName("JsStitch", "Stitch", "1"),
+                    Id = groupName.ToString(),
+                    GroupName = groupName,
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.ProcessV1,
@@ -32,6 +32,11 @@ namespace JsStitch.Core
                             { Parameters.ExecutableName, "JsStitch.Stitch.js" }
                         }
                     },
+                }, true);
+                dataStorage.Save(new StitchInstance
+                {
+                    Name = "JsStitch.Stitch",
+                    GroupName = groupName,
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
                 }, true);

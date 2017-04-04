@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.Core.Messages.Stitches;
 using Acquaintance;
+using CrossStitch.Core.Messages.Data;
 
 namespace StitchStart.Server
 {
@@ -30,10 +31,12 @@ namespace StitchStart.Server
 
                 core.Start();
 
-                // First stitch is a p
-                var createResult1 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
+                // First stitch is a processV1
+                var group1 = new StitchGroupName("StitchStart", "Client", "1");
+                var packageResult1 = core.MessageBus.Request<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
                 {
-                    Name = "StitchStart.Client",
+                    Id = group1.ToString(),
+                    GroupName = group1,
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.ProcessV1,
@@ -43,8 +46,12 @@ namespace StitchStart.Server
                             { Parameters.ExecutableName, "StitchStart.Client.exe" }
                         },
                         RequiresPackageUnzip = false
-                    },
-                    GroupName = new StitchGroupName("StitchStart", "Client", "1"),
+                    }
+                }, true));
+                var createResult1 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
+                {
+                    Name = "StitchStart.Client",
+                    GroupName = group1,
                     NumberOfInstances = 1,
                 });
                 core.MessageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
@@ -53,10 +60,11 @@ namespace StitchStart.Server
                 });
 
                 // Second stitch is a built-in class
-                var createResult2 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
+                var group2 = new StitchGroupName("StitchStart", "BuiltIn", "1");
+                var packageResult2 = core.MessageBus.Request<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
                 {
-                    Name = "StitchStart.BuiltIn",
-                    GroupName = new StitchGroupName("StitchStart", "BuiltIn", "1"),
+                    Id = group2.ToString(),
+                    GroupName = group2,
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.BuildInClassV1,
@@ -65,6 +73,11 @@ namespace StitchStart.Server
                             { CrossStitch.Stitch.BuiltInClassV1.Parameters.TypeName, typeof(StitchStartBuiltInStitch).AssemblyQualifiedName }
                         }
                     },
+                }, true));
+                var createResult2 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
+                {
+                    Name = "StitchStart.BuiltIn",
+                    GroupName = group2,
                     NumberOfInstances = 1
                 });
                 core.MessageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest

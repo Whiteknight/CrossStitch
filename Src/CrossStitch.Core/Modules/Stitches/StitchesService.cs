@@ -52,8 +52,9 @@ namespace CrossStitch.Core.Modules.Stitches
                 {
                     Id = instance.Id
                 };
+                var packageFile = _data.Get<PackageFile>(instance.GroupName.ToString());
                 // Best effort. The StartInstanceInternal method logs errors
-                StartInstanceInternal(request, instance);
+                StartInstanceInternal(request, packageFile, instance);
             }
             _log.LogDebug("Startup stitches started");
         }
@@ -67,6 +68,15 @@ namespace CrossStitch.Core.Modules.Stitches
             var result = _fileSystem.SavePackageToLibrary(request.GroupName.Application, request.GroupName.Component, request.Contents);
             var groupName = new StitchGroupName(request.GroupName.Application, request.GroupName.Component, result.Version);
 
+            var packageFile = new PackageFile
+            {
+                Id = groupName.ToString(),
+                Adaptor = request.Adaptor,
+                FileName = request.FileName,
+                GroupName = groupName
+            };
+            bool ok = _data.Save(packageFile, true);
+
             _log.LogDebug("Uploaded package file {0}", groupName);
             return new PackageFileUploadResponse(true, groupName, result.FilePath);
         }
@@ -78,6 +88,15 @@ namespace CrossStitch.Core.Modules.Stitches
 
             // Save the file and generate a unique Version name
             var result = _fileSystem.SavePackageToLibrary(request.GroupName.Application, request.GroupName.Component, request.GroupName.Version, request.Contents);
+
+            var packageFile = new PackageFile
+            {
+                Id = request.GroupName.ToString(),
+                Adaptor = request.Adaptor,
+                FileName = request.FileName,
+                GroupName = request.GroupName
+            };
+            bool ok = _data.Save(packageFile, true);
 
             _log.LogDebug("Uploaded package file {0}", request.GroupName);
             return new PackageFileUploadResponse(true, request.GroupName, result.FilePath);
@@ -96,9 +115,16 @@ namespace CrossStitch.Core.Modules.Stitches
                     return response;
                 }
 
+                var packageFile = _data.Get<PackageFile>(request.GroupName.ToString());
+                if (packageFile == null)
+                {
+                    response.IsSuccess = false;
+                    return response;
+                }
+
                 for (int i = 0; i < request.NumberOfInstances; i++)
                 {
-                    var instance = CreateSingleNewInstanceInternal(request);
+                    var instance = CreateSingleNewInstanceInternal(packageFile, request);
                     if (instance != null)
                         response.CreatedIds.Add(instance.Id);
                 }
@@ -112,7 +138,7 @@ namespace CrossStitch.Core.Modules.Stitches
             }
         }
 
-        private StitchInstance CreateSingleNewInstanceInternal(LocalCreateInstanceRequest request)
+        private StitchInstance CreateSingleNewInstanceInternal(PackageFile packageFile, LocalCreateInstanceRequest request)
         {
             // Insert the new instance to the data module
             var instance = new StitchInstanceMapper(_core.NodeId, _core.Name).Map(request);
@@ -123,7 +149,7 @@ namespace CrossStitch.Core.Modules.Stitches
                 return null;
             }
 
-            if (request.Adaptor.RequiresPackageUnzip)
+            if (packageFile.Adaptor.RequiresPackageUnzip)
             {
                 // Unzip a copy of the version from the library into the running base
                 var result = _fileSystem.UnzipLibraryPackageToRunningBase(instance.GroupName, instance.Id);
@@ -133,7 +159,7 @@ namespace CrossStitch.Core.Modules.Stitches
                     return null;
                 }
                 // TODO: We should move this into a class specific to ProcessV1 types.
-                instance.Adaptor.Parameters[Parameters.DirectoryPath] = result.Path;
+                _data.Update<PackageFile>(packageFile.Id, pf => pf.Adaptor.Parameters[Parameters.DirectoryPath] = result.Path);
             }
 
             _data.Save(instance);
@@ -181,7 +207,8 @@ namespace CrossStitch.Core.Modules.Stitches
         public InstanceResponse StartInstance(InstanceRequest request)
         {
             var instance = _data.Get<StitchInstance>(request.Id);
-            return StartInstanceInternal(request, instance);
+            var packageFile = _data.Get<PackageFile>(instance.GroupName.ToString());
+            return StartInstanceInternal(request, packageFile, instance);
         }
 
         public StitchResourceUsage GetInstanceResources(string instanceId)
@@ -189,12 +216,12 @@ namespace CrossStitch.Core.Modules.Stitches
             return _stitchInstanceManager.GetInstanceResources(instanceId);
         }
 
-        private InstanceResponse StartInstanceInternal(InstanceRequest request, StitchInstance instance)
+        private InstanceResponse StartInstanceInternal(InstanceRequest request, PackageFile packageFile, StitchInstance instance)
         {
             if (instance == null)
                 return InstanceResponse.Failure(request);
 
-            var result = _stitchInstanceManager.Start(instance);
+            var result = _stitchInstanceManager.Start(packageFile, instance);
             _data.Save(instance);
             if (!result.Success)
             {

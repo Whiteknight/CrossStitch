@@ -29,10 +29,12 @@ namespace HttpTest
                 var stitches = new StitchesModule(core, stitchesConfiguration);
                 core.AddModule(stitches);
 
-                var stitch = new StitchInstance
+                var groupName = new StitchGroupName("HttpTest", "Stitch", "1");
+
+                var packageFile = new PackageFile
                 {
-                    Name = "HttpTest.Stitch",
-                    GroupName = new StitchGroupName("HttpTest", "Stitch", "1"),
+                    Id = groupName.ToString(),
+                    GroupName = groupName,
                     Adaptor = new InstanceAdaptorDetails
                     {
                         Type = AdaptorType.ProcessV1,
@@ -42,6 +44,13 @@ namespace HttpTest
                             { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "HttpTest.Stitch.exe" }
                         }
                     },
+                };
+                dataStorage.Save(packageFile, true);
+                var stitch = new StitchInstance
+                {
+                    Name = "HttpTest.Stitch",
+                    GroupName = groupName,
+
                     State = InstanceStateType.Running,
                     LastHeartbeatReceived = 0
                 };

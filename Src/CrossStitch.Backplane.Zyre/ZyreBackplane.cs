@@ -109,12 +109,14 @@ namespace CrossStitch.Backplane.Zyre
                 _zyre.Whisper(envelope.Header.GetToNetworkUuid(), message);
         }
 
-        public void TransferPackageFile(StitchGroupName groupName, string toNodeId, string filePath, string fileName, string jobId, string taskId)
+        public void TransferPackageFile(StitchGroupName groupName, string toNodeId, string filePath, string fileName, InstanceAdaptorDetails adaptor, string jobId, string taskId)
         {
             // TODO: More validation and error handling
             // TODO: We need to get more sophisticated about this, such as doing the transfer in chunks and allowing restarts
             if (!groupName.IsValid() || !groupName.IsVersionGroup())
                 throw new Exception("Must use a valid version name for a package upload file");
+            if (adaptor == null)
+                throw new Exception("Adaptor details must be provided");
 
             var bytes = File.ReadAllBytes(filePath);
             var envelope = new FileTransferEnvelope
@@ -125,7 +127,8 @@ namespace CrossStitch.Backplane.Zyre
                 TaskId = taskId,
                 PacketNumber = 1,
                 TotalNumberOfPackets = 1,
-                FileName = fileName
+                FileName = fileName,
+                Adaptor = adaptor
             };
             var message = new ClusterMessageBuilder()
                 .ToNode(toNodeId)

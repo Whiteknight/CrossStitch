@@ -15,7 +15,7 @@ namespace CrossStitch.Core.Tests.Modules.Master
         [Test]
         public void GetStitchSummaries_Empty()
         {
-            var target = new MasterStitchCache("1", null, null);
+            var target = new MasterStitchCache("1");
             var result = target.GetStitchSummaries();
             result.Count.Should().Be(0);
 
@@ -27,7 +27,7 @@ namespace CrossStitch.Core.Tests.Modules.Master
         [Test]
         public void AddLocalStitch_Test()
         {
-            var target = new MasterStitchCache("1", null, null);
+            var target = new MasterStitchCache("1");
             target.AddLocalStitch("ABC", new StitchGroupName("A.B.C"));
             var result = target.GetStitchSummaries();
             result.Count.Should().Be(1);
@@ -37,7 +37,7 @@ namespace CrossStitch.Core.Tests.Modules.Master
         [Test]
         public void AddLocalStitch_Replace()
         {
-            var target = new MasterStitchCache("1", null, null);
+            var target = new MasterStitchCache("1");
             target.AddLocalStitch("ABC", new StitchGroupName("A.B.C"));
             var result = target.GetStitchSummaries();
             result.Count.Should().Be(1);
@@ -53,7 +53,7 @@ namespace CrossStitch.Core.Tests.Modules.Master
         [Test]
         public void RemoveLocalStitch_Test()
         {
-            var target = new MasterStitchCache("1", null, null);
+            var target = new MasterStitchCache("1");
             target.AddLocalStitch("ABC", new StitchGroupName("A.B.C"));
             target.RemoveLocalStitch("ABC");
             var result = target.GetStitchSummaries();
@@ -63,7 +63,7 @@ namespace CrossStitch.Core.Tests.Modules.Master
         [Test]
         public void AddNodeStatus_Test()
         {
-            var target = new MasterStitchCache("1", null, null);
+            var target = new MasterStitchCache("1");
             var received = new ObjectReceivedEvent<NodeStatus>
             {
                 FromNetworkId = "RemoteNetworkId",
@@ -111,7 +111,7 @@ namespace CrossStitch.Core.Tests.Modules.Master
         [Test]
         public void AddNodeStatus_ReceivedAgain()
         {
-            var target = new MasterStitchCache("1", null, null);
+            var target = new MasterStitchCache("1");
             var received = new ObjectReceivedEvent<NodeStatus>
             {
                 FromNetworkId = "RemoteNetworkId",

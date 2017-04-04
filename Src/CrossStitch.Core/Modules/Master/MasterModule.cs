@@ -67,6 +67,7 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Start()
         {
+            _data.Initialize();
             _subscriptions = new SubscriptionCollection(_messageBus);
             _cacheThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
@@ -326,7 +327,7 @@ namespace CrossStitch.Core.Modules.Master
                 _messageBus.Publish(ClusterMessage.SendEventName, message);
             }
 
-            public void SendPackageFile(string networkNodeId, StitchGroupName groupName, string fileName, string filePath, string jobId, string taskId)
+            public void SendPackageFile(string networkNodeId, StitchGroupName groupName, string fileName, string filePath, InstanceAdaptorDetails adaptor, string jobId, string taskId)
             {
                 _messageBus.Publish(new FileTransferRequest
                 {
@@ -335,7 +336,8 @@ namespace CrossStitch.Core.Modules.Master
                     GroupName = groupName,
                     JobId = jobId,
                     TaskId = taskId,
-                    FileName = fileName
+                    FileName = fileName,
+                    Adaptor = adaptor
                 });
                 //var message = new ClusterMessageBuilder()
                 //    .FromNode()

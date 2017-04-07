@@ -80,6 +80,7 @@
     <Compile Include="Messages\Master\JobCompleteEvent.cs" />
     <Compile Include="Messages\Master\StitchSummaryRequest.cs" />
     <Compile Include="Messages\StitchMonitor\StitchHealthEvent.cs" />
+    <Compile Include="Messages\Security\SecurityRequest.cs" />
     <Compile Include="Models\AdaptorType.cs" />
     <Compile Include="Models\InstanceAdaptorDetails.cs" />
     <Compile Include="Models\InstanceStateType.cs" />
@@ -102,7 +103,8 @@
     <Compile Include="Modules\Master\MasterDataRepository.cs" />
     <Compile Include="Modules\Master\Models\StitchSummary.cs" />
     <Compile Include="Models\StitchLocaleType.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassV1Parameters.cs" />
+    <Compile Include="Modules\Security\SecurityModule.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuildInClassV1Parameters.cs" />
     <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassStitchAdaptor.cs" />
     <Compile Include="Modules\Stitches\Adaptors\Process\CoreMessageChannelFactory.cs" />
     <Compile Include="Modules\Stitches\Adaptors\Process\ProcessAdaptorData.cs" />

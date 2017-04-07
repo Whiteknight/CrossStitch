@@ -6,8 +6,12 @@ using CrossStitch.Core.Modules.Master.Models;
 using Nancy;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using CrossStitch.Core.Messages.Security;
 using CrossStitch.Core.Messages.Stitches;
 using Nancy.ModelBinding;
+using Nancy.Responses;
+using Nancy.Security;
 
 namespace CrossStitch.Http.NancyFx.Handlers
 {
@@ -17,6 +21,8 @@ namespace CrossStitch.Http.NancyFx.Handlers
             : base("/cluster")
         {
             var data = new DataHelperClient(messageBus);
+
+            Before.AddItemToEndOfPipeline(ctx => AuthenticateUser(messageBus, ctx));
 
             Get["/"] = _ => data.GetAll<NodeStatus>();
 
@@ -86,6 +92,37 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 // TODO: Rebalance all instances in the group across the cluster
                 return null;
             };
+        }
+
+        private Response AuthenticateUser(IMessageBus messageBus, NancyContext context)
+        {
+            if (context.CurrentUser != null)
+                return null;
+
+            // TODO: Map method to SecurityRequestType
+            var method = context.Request.Method;
+            var type = SecurityRequestType.Read;
+            var response = messageBus.Request<SecurityRequest, SecurityResponse>(new SecurityRequest
+            {
+                Type = type
+            });
+
+            if (response != null && response.Allowed)
+            {
+                context.CurrentUser = new CrossStitchHttpUserIdentity
+                {
+                    UserName = response.UserName,
+                    Claims = new List<string>()
+                };
+            }
+
+            return new HtmlResponse(HttpStatusCode.Unauthorized);
+        }
+
+        private class CrossStitchHttpUserIdentity : IUserIdentity
+        {
+            public string UserName { get; set; }
+            public IEnumerable<string> Claims { get; set; }
         }
     }
 }

@@ -4,8 +4,6 @@ using CrossStitch.Stitch.ProcessV1;
 using CrossStitch.Stitch.ProcessV1.Core;
 using System;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 {
@@ -40,14 +38,14 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 
         public bool Start()
         {
-            var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
+            //var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
             var executableFile = _parameters.ExecutableFormat
                 .Replace("{ExecutableName}", _parameters.ExecutableName)
                 .Replace("{DirectoryPath}", _parameters.DirectoryPath);
 
             int parentPid = Process.GetCurrentProcess().Id;
 
-            var coreArgs = BuildCoreArgumentsString(parentPid);
+            var coreArgs = new ProcessV1ArgsBuilder(StitchContext).BuildCoreArgumentsString(_stitchInstance, parentPid);
             var arguments = _parameters.ArgumentsFormat
                 .Replace("{ExecutableName}", _parameters.ExecutableName)
                 .Replace("{DirectoryPath}", _parameters.DirectoryPath)
@@ -81,29 +79,18 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             return true;
         }
 
-        private string BuildCoreArgumentsString(int parentPid)
+        public bool StartExisting(int pid)
         {
-            var sb = new StringBuilder();
-
-            AddArgument(sb, Arguments.CorePid, parentPid.ToString());
-            AddArgument(sb, Arguments.InstanceId, _stitchInstance.Id);
-            AddArgument(sb, Arguments.Application, _stitchInstance.GroupName.Application);
-            AddArgument(sb, Arguments.Component, _stitchInstance.GroupName.Component);
-            AddArgument(sb, Arguments.Version, _stitchInstance.GroupName.Version);
-            AddArgument(sb, Arguments.GroupName, _stitchInstance.GroupName.ToString());
-            AddArgument(sb, Arguments.DataDirectory, StitchContext.DataDirectory);
-
-            return sb.ToString();
-        }
-
-        private void AddArgument(StringBuilder sb, string name, string value)
-        {
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
-                return;
-            sb.Append(name);
-            sb.Append("=");
-            sb.Append(value);
-            sb.Append(" ");
+            var process = Process.GetProcessById(pid);
+            _process = process;
+            _process.EnableRaisingEvents = true;
+            _process.Exited += ProcessOnExited;
+            var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
+            var toStitchSender = new ToStitchMessageSender(_process.StandardInput);
+            _channel = new CoreMessageManager(StitchContext, fromStitchReader, toStitchSender);
+            _channel.Start();
+            StitchContext.RaiseProcessEvent(true, true);
+            return true;
         }
 
         public void SendHeartbeat(long id)

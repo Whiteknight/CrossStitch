@@ -103,6 +103,7 @@
     <Compile Include="Models\StitchLocaleType.cs" />
     <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuildInClassV1Parameters.cs" />
     <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassStitchAdaptor.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1ArgsBuilder.cs" />
     <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
     <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
     <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1Parameters.cs" />

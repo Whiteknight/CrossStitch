@@ -16,6 +16,7 @@ namespace CrossStitch.Core.Modules.Core
             var module = _core.Modules.Get(name);
             if (module == null)
                 return null;
+
             var status = module.GetStatusDetails() ?? new Dictionary<string, string>();
             return status;
         }

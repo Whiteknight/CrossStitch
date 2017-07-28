@@ -1,4 +1,5 @@
 ﻿using System;
+using CrossStitch.Stitch.Utility;
 
 namespace CrossStitch.Stitch.ProcessV1.Core
 {
@@ -13,8 +14,7 @@ namespace CrossStitch.Stitch.ProcessV1.Core
 
         public CoreMessageManager(CoreStitchContext stitchContext, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
         {
-            if (stitchContext == null)
-                throw new ArgumentNullException(nameof(stitchContext));
+            Assert.ArgNotNull(stitchContext, nameof(stitchContext));
 
             _stitchContext = stitchContext;
             _reader = reader ?? new FromStitchMessageReader(Console.OpenStandardInput());
@@ -34,8 +34,7 @@ namespace CrossStitch.Stitch.ProcessV1.Core
 
         public void SendMessage(ToStitchMessage message)
         {
-            if (message == null)
-                throw new ArgumentNullException(nameof(message));
+            Assert.ArgNotNull(message, nameof(message));
             _sender.SendMessage(message);
         }
 

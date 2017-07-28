@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Stitch.ProcessV1.Stitch
 {
@@ -210,9 +211,7 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
 
         private string GetCrossStitchArgument(string name)
         {
-            if (CrossStitchArguments.ContainsKey(name))
-                return CrossStitchArguments[name];
-            return string.Empty;
+            return CrossStitchArguments.GetOrDefault(name, string.Empty);
         }
     }
 }

@@ -3,7 +3,6 @@ using CrossStitch.Core;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Modules;
-using CrossStitch.Core.Utility.Extensions;
 using CrossStitch.Stitch.Events;
 using System;
 using System.IO;
@@ -12,6 +11,7 @@ using CrossStitch.Core.Messages;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Backplane.Zyre
 {

@@ -62,6 +62,9 @@
     <Compile Include="Events\EventHandlerExtensions.cs" />
     <Compile Include="Events\PayloadEventArgs.cs" />
     <Compile Include="ProcessV1\Parameters.cs" />
+    <Compile Include="Utility\Assert.cs" />
+    <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
+    <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Utility\JsonUtility.cs" />
     <Compile Include="ProcessV1\Arguments.cs" />
     <Compile Include="ProcessV1\Core\CoreMessageManager.cs" />

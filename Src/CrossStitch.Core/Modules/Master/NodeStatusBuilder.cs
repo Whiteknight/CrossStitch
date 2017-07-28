@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CrossStitch.Core.Models;
 using System.Linq;
-using CrossStitch.Core.Utility.Extensions;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Core.Modules.Master
 {

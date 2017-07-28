@@ -15,15 +15,13 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public IStitchAdaptor Get(string id)
         {
-            IStitchAdaptor adaptor;
-            bool found = _adaptors.TryGetValue(id, out adaptor);
+            bool found = _adaptors.TryGetValue(id, out IStitchAdaptor adaptor);
             return found ? adaptor : null;
         }
 
         public IStitchAdaptor Remove(string id)
         {
-            IStitchAdaptor adaptor;
-            bool removed = _adaptors.TryRemove(id, out adaptor);
+            bool removed = _adaptors.TryRemove(id, out IStitchAdaptor adaptor);
             return removed ? adaptor : null;
         }
 

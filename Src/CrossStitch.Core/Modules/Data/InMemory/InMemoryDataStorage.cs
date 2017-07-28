@@ -24,12 +24,10 @@ namespace CrossStitch.Core.Modules.Data.InMemory
             where TEntity : class, IDataEntity
         {
             string key = GetKey<TEntity>(id);
-            if (_allData.ContainsKey(key))
-            {
-                _allData.Remove(key);
-                return true;
-            }
-            return false;
+            if (!_allData.ContainsKey(key))
+                return false;
+            _allData.Remove(key);
+            return true;
         }
 
         public TEntity Get<TEntity>(string id)
@@ -47,12 +45,10 @@ namespace CrossStitch.Core.Modules.Data.InMemory
             where TEntity : class, IDataEntity
         {
             string prefix = typeof(TEntity).Name + ":";
-            var entities = new List<string>();
-            foreach (var kvp in _allData)
-            {
-                if (kvp.Key.StartsWith(prefix))
-                    entities.Add(kvp.Value);
-            }
+            var entities = _allData
+                .Where(kvp => kvp.Key.StartsWith(prefix))
+                .Select(kvp => kvp.Value)
+                .ToList();
             var deserialized = entities.Select(JsonUtility.Deserialize<TEntity>);
             return deserialized;
         }

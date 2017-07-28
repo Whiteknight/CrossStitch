@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CrossStitch.Core.Models;
+using CrossStitch.Stitch.Utility;
 
 namespace CrossStitch.Core.Modules.Data
 {
@@ -12,9 +13,7 @@ namespace CrossStitch.Core.Modules.Data
 
         public DataCache(IDataStorage inner)
         {
-            if (inner == null)
-                throw new ArgumentNullException(nameof(inner));
-
+            Assert.ArgNotNull(inner, nameof(inner));
             _allData = new Dictionary<string, string>();
             _inner = inner;
         }
@@ -34,25 +33,25 @@ namespace CrossStitch.Core.Modules.Data
             string key = GetKey<TEntity>(id);
             if (_allData.ContainsKey(key))
                 _allData.Remove(key);
-            return ok;
+            return true;
         }
 
         public TEntity Get<TEntity>(string id)
             where TEntity : class, IDataEntity
         {
-            string json;
             string key = GetKey<TEntity>(id);
             if (_allData.ContainsKey(key))
             {
-                json = _allData[key];
-                return Stitch.Utility.JsonUtility.Deserialize<TEntity>(json);
+                var json1 = _allData[key];
+                return Stitch.Utility.JsonUtility.Deserialize<TEntity>(json1);
             }
 
             var entity = _inner.Get<TEntity>(id);
             if (entity == null)
                 return null;
-            json = Stitch.Utility.JsonUtility.Serialize(entity);
-            _allData.Add(key, json);
+
+            var json2 = Stitch.Utility.JsonUtility.Serialize(entity);
+            _allData.Add(key, json2);
             return entity;
         }
 

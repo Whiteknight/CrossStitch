@@ -2,6 +2,7 @@
 using System;
 using CrossStitch.Core.Messages.Logging;
 using CrossStitch.Core.Utility;
+using CrossStitch.Stitch.Utility;
 
 namespace CrossStitch.Core.MessageBus
 {
@@ -12,11 +13,8 @@ namespace CrossStitch.Core.MessageBus
 
         public ModuleLog(IMessageBus messageBus, string moduleName)
         {
-            if (messageBus == null)
-                throw new ArgumentNullException(nameof(messageBus));
-
-            if (moduleName == null)
-                throw new ArgumentNullException(nameof(moduleName));
+            Assert.ArgNotNull(messageBus, nameof(messageBus));
+            Assert.ArgNotNull(moduleName, nameof(moduleName));
 
             _moduleName = moduleName;
             MessageBus = messageBus;

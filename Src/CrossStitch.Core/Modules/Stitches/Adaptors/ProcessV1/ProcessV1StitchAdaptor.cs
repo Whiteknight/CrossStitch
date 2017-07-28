@@ -4,6 +4,7 @@ using CrossStitch.Stitch.ProcessV1;
 using CrossStitch.Stitch.ProcessV1.Core;
 using System;
 using System.Diagnostics;
+using CrossStitch.Stitch.Utility;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 {
@@ -19,14 +20,10 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 
         public ProcessV1StitchAdaptor(StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext, ProcessV1Parameters parameters)
         {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            if (stitchInstance == null)
-                throw new ArgumentNullException(nameof(stitchInstance));
-            if (stitchContext == null)
-                throw new ArgumentNullException(nameof(stitchContext));
-            if (parameters == null)
-                throw new ArgumentNullException(nameof(parameters));
+            Assert.ArgNotNull(configuration, nameof(configuration));
+            Assert.ArgNotNull(stitchInstance, nameof(stitchInstance));
+            Assert.ArgNotNull(stitchContext, nameof(stitchContext));
+            Assert.ArgNotNull(parameters, nameof(parameters));
 
             _stitchInstance = stitchInstance;
             StitchContext = stitchContext;
@@ -38,58 +35,20 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 
         public bool Start()
         {
-            //var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
-            var executableFile = _parameters.ExecutableFormat
-                .Replace("{ExecutableName}", _parameters.ExecutableName)
-                .Replace("{DirectoryPath}", _parameters.DirectoryPath);
+            var data = _stitchInstance.GetAdaptorDataObject<ProcessV1AdaptorData>();
+            if (data != null && data.Pid > 0)
+                _process = AttachExistingProcess(data.Pid);
+            if (_process == null)
+                _process = CreateNewProcess(); ;
+            if (_process == null)
+                return false;
 
-            int parentPid = Process.GetCurrentProcess().Id;
+            PersistProcessData();
 
-            var coreArgs = new ProcessV1ArgsBuilder(StitchContext).BuildCoreArgumentsString(_stitchInstance, parentPid);
-            var arguments = _parameters.ArgumentsFormat
-                .Replace("{ExecutableName}", _parameters.ExecutableName)
-                .Replace("{DirectoryPath}", _parameters.DirectoryPath)
-                .Replace("{CoreArgs}", coreArgs)
-                .Replace("{CustomArgs}", _parameters.ExecutableArguments);
-
-            _process = new Process();
-
-            _process.EnableRaisingEvents = true;
-            _process.StartInfo.CreateNoWindow = true;
-            _process.StartInfo.ErrorDialog = false;
-            _process.StartInfo.FileName = executableFile;
-            _process.StartInfo.WorkingDirectory = _parameters.DirectoryPath;
-            _process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            _process.StartInfo.UseShellExecute = false;
-            _process.StartInfo.RedirectStandardError = true;
-            _process.StartInfo.RedirectStandardInput = true;
-            _process.StartInfo.RedirectStandardOutput = true;
-            _process.StartInfo.Arguments = arguments;
-            _process.Exited += ProcessOnExited;
-
-            bool ok = _process.Start();
-
-            var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
-            var toStitchSender = new ToStitchMessageSender(_process.StandardInput);
-            _channel = new CoreMessageManager(StitchContext, fromStitchReader, toStitchSender);
-            _channel.Start();
+            SetupChannel();
 
             StitchContext.RaiseProcessEvent(true, true);
 
-            return true;
-        }
-
-        public bool StartExisting(int pid)
-        {
-            var process = Process.GetProcessById(pid);
-            _process = process;
-            _process.EnableRaisingEvents = true;
-            _process.Exited += ProcessOnExited;
-            var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
-            var toStitchSender = new ToStitchMessageSender(_process.StandardInput);
-            _channel = new CoreMessageManager(StitchContext, fromStitchReader, toStitchSender);
-            _channel.Start();
-            StitchContext.RaiseProcessEvent(true, true);
             return true;
         }
 
@@ -118,15 +77,113 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             });
         }
 
+        public void Stop()
+        {
+            Cleanup(true);
+        }
+
+        public StitchResourceUsage GetResources()
+        {
+            return new StitchResourceUsage
+            {
+                ProcessId = _process.Id,
+                ProcessorTime = _process.TotalProcessorTime,
+                TotalAllocatedMemory = _process.VirtualMemorySize64,
+                UsedMemory = _process.PagedMemorySize64
+            };
+        }
+
+        public void Dispose()
+        {
+            Stop();
+        }
+
+        private void SetupChannel()
+        {
+            var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
+            var toStitchSender = new ToStitchMessageSender(_process.StandardInput);
+            _channel = new CoreMessageManager(StitchContext, fromStitchReader, toStitchSender);
+            _channel.Start();
+        }
+
+        private void PersistProcessData()
+        {
+            _stitchInstance.SetAdaptorDataObject(new ProcessV1AdaptorData
+            {
+                Pid = _process.Id,
+                Name = _process.ProcessName
+            });
+        }
+
+        private Process CreateNewProcess()
+        {
+            try
+            {
+                //var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
+                var executableFile = _parameters.ExecutableFormat
+                    .Replace("{ExecutableName}", _parameters.ExecutableName)
+                    .Replace("{DirectoryPath}", _parameters.DirectoryPath);
+
+                int parentPid = Process.GetCurrentProcess().Id;
+
+                var coreArgs = new ProcessV1ArgsBuilder(StitchContext).BuildCoreArgumentsString(_stitchInstance, parentPid);
+                var arguments = _parameters.ArgumentsFormat
+                    .Replace("{ExecutableName}", _parameters.ExecutableName)
+                    .Replace("{DirectoryPath}", _parameters.DirectoryPath)
+                    .Replace("{CoreArgs}", coreArgs)
+                    .Replace("{CustomArgs}", _parameters.ExecutableArguments);
+
+                var process = new Process
+                {
+                    EnableRaisingEvents = true,
+                    StartInfo =
+                    {
+                        CreateNoWindow = true,
+                        ErrorDialog = false,
+                        FileName = executableFile,
+                        WorkingDirectory = _parameters.DirectoryPath,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        Arguments = arguments
+                    }
+                };
+
+                process.Exited += ProcessOnExited;
+
+                if (_process.Start())
+                    return process;
+
+                process.Dispose();
+                return null;
+            }
+            catch (Exception e)
+            {
+                // TODO: Logging
+                return null;
+            }
+        }
+
+        private Process AttachExistingProcess(int pid)
+        {
+            var process = Process.GetProcessById(pid);
+            _process = process;
+            _process.EnableRaisingEvents = true;
+            _process.Exited += ProcessOnExited;
+            var fromStitchReader = new FromStitchMessageReader(_process.StandardOutput);
+            var toStitchSender = new ToStitchMessageSender(_process.StandardInput);
+            _channel = new CoreMessageManager(StitchContext, fromStitchReader, toStitchSender);
+            _channel.Start();
+            StitchContext.RaiseProcessEvent(true, true);
+            return process;
+        }
+
         private void ProcessOnExited(object sender, EventArgs e)
         {
             // TODO: Can we get any information about why/how the process exited?
             Cleanup(false);
-        }
-
-        public void Stop()
-        {
-            Cleanup(true);
         }
 
         private void Cleanup(bool requested)
@@ -146,22 +203,6 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
                 _channel = null;
             }
             StitchContext.RaiseProcessEvent(false, requested);
-        }
-
-        public StitchResourceUsage GetResources()
-        {
-            return new StitchResourceUsage
-            {
-                ProcessId = _process.Id,
-                ProcessorTime = _process.TotalProcessorTime,
-                TotalAllocatedMemory = _process.VirtualMemorySize64,
-                UsedMemory = _process.PagedMemorySize64
-            };
-        }
-
-        public void Dispose()
-        {
-            Stop();
         }
     }
 }

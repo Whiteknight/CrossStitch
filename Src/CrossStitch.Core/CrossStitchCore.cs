@@ -40,13 +40,13 @@ namespace CrossStitch.Core
             if (module.Name == ModuleNames.Core)
                 throw new Exception("Cannot create a module with reserved name 'Core'");
             Modules.Add(module);
-            if (_started)
-            {
-                Modules.Add(module);
-                module.Start();
-                MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(module.Name));
-                Log.LogInformation("New module added: {0}", module.Name);
-            }
+            if (!_started)
+                return;
+
+            Modules.Add(module);
+            module.Start();
+            MessageBus.Publish(CoreEvent.ChannelModuleAdded, new CoreEvent(module.Name));
+            Log.LogInformation("New module added: {0}", module.Name);
         }
 
         public void Start()

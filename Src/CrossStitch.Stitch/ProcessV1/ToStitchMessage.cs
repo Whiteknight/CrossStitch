@@ -34,7 +34,5 @@ namespace CrossStitch.Stitch.ProcessV1
         {
             return ChannelName == ChannelNameExit;
         }
-
-
     }
 }

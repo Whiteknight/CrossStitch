@@ -69,10 +69,7 @@ namespace CrossStitch.Core.MessageBus
         {
             var response = Bus
                 .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.GetAll());
-            if (response == null)
-                return Enumerable.Empty<TEntity>();
-
-            return response.Entities;
+            return response == null ? Enumerable.Empty<TEntity>() : response.Entities;
         }
     }
 }

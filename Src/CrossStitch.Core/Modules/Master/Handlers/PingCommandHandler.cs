@@ -23,6 +23,7 @@ namespace CrossStitch.Core.Modules.Master.Handlers
             string nodeId = request.Target;
             if (nodeId == _nodeId)
                 return CommandResponse.Create(true);
+
             var node = _data.Get<NodeStatus>(nodeId);
             if (node == null)
                 return CommandResponse.Create(false);

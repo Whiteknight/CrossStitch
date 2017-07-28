@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Utility.Extensions;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Core.Messages.Backplane
 {

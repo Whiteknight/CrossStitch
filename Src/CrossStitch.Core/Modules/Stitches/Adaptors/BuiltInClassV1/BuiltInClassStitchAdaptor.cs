@@ -60,22 +60,19 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
         {
             _stitchObject = Activator.CreateInstance(_parameters.StitchType);
             var handlesStart = _stitchObject as IHandlesStart;
-            if (handlesStart != null)
-                return handlesStart.Start(StitchContext);
-            return true;
+            return handlesStart == null || handlesStart.Start(StitchContext);
         }
 
         public void Stop()
         {
             if (_stitchObject == null)
                 return;
+
             var handlesStop = _stitchObject as IHandlesStop;
-            if (handlesStop != null)
-                handlesStop.Stop();
+            handlesStop?.Stop();
 
             var disposable = _stitchObject as IDisposable;
-            if (disposable != null)
-                disposable.Dispose();
+            disposable?.Dispose();
 
             _stitchObject = null;
         }

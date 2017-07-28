@@ -6,9 +6,9 @@ using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Handlers;
 using CrossStitch.Core.Modules.Master.Models;
 using CrossStitch.Core.Utility;
-using CrossStitch.Core.Utility.Extensions;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -127,10 +127,7 @@ namespace CrossStitch.Core.Modules.Master
         public CommandResponse DispatchCommandRequest(CommandRequest arg)
         {
             var handler = _commandHandlers.GetOrDefault(arg.Command);
-            if (handler == null)
-                return CommandResponse.Create(false);
-
-            return handler.Handle(arg);
+            return handler == null ? CommandResponse.Create(false) : handler.Handle(arg);
         }
 
         public CreateInstanceResponse CreateNewInstances(CreateInstanceRequest arg)

@@ -24,12 +24,11 @@ namespace CrossStitch.Core.Modules.Data.Folders
             where TEntity : class, IDataEntity
         {
             string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, id);
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-                return true;
-            }
-            return false;
+            if (!File.Exists(filePath))
+                return false;
+
+            File.Delete(filePath);
+            return true;
         }
 
         public TEntity Get<TEntity>(string id)

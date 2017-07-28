@@ -3,6 +3,7 @@ using System.Linq;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Master.Models;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Core.Modules.Master
 {
@@ -48,10 +49,7 @@ namespace CrossStitch.Core.Modules.Master
                     NodeId = received.FromNodeId
                 })
                 .ToList();
-            if (!_remoteStitches.ContainsKey(received.FromNodeId))
-                _remoteStitches.Add(received.FromNodeId, summaries);
-            else
-                _remoteStitches[received.FromNodeId] = summaries;
+            _remoteStitches.AddOrUpdate(received.FromNodeId, summaries);
             _allStitches = null;
         }
 
@@ -73,7 +71,10 @@ namespace CrossStitch.Core.Modules.Master
                 });
                 return;
             }
-            var summaries = _remoteStitches[nodeId].Where(ss => ss.Id != id).Concat(new[] { summary }).ToList();
+            var summaries = _remoteStitches[nodeId]
+                .Where(ss => ss.Id != id)
+                .Concat(new[] { summary })
+                .ToList();
             _remoteStitches[nodeId] = summaries;
             _allStitches = null;
         }
@@ -82,7 +83,9 @@ namespace CrossStitch.Core.Modules.Master
         {
             if (!_remoteStitches.ContainsKey(nodeId))
                 return;
-            var summaries = _remoteStitches[nodeId].Where(ss => ss.Id != id).ToList();
+            var summaries = _remoteStitches[nodeId]
+                .Where(ss => ss.Id != id)
+                .ToList();
             _remoteStitches[nodeId] = summaries;
             _allStitches = null;
         }
@@ -126,7 +129,10 @@ namespace CrossStitch.Core.Modules.Master
             var remotes = _remoteStitches.Values.ToList();
             var locals = _localStitches;
 
-            all = remotes.SelectMany(s => s).Concat(locals).ToList();
+            all = remotes
+                .SelectMany(s => s)
+                .Concat(locals)
+                .ToList();
             _allStitches = all;
             return all;
         }

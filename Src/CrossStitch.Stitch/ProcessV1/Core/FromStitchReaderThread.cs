@@ -26,11 +26,10 @@ namespace CrossStitch.Stitch.ProcessV1.Core
 
         public void Stop()
         {
-            if (_readerThread.ThreadState == ThreadState.Running)
-            {
-                _readerThread.Abort();
-                _readerThread.Join();
-            }
+            if (_readerThread.ThreadState != ThreadState.Running)
+                return;
+            _readerThread.Abort();
+            _readerThread.Join();
         }
 
         public void Dispose()

@@ -2,7 +2,7 @@
 {
     public static class JsonUtility
     {
-        private static Newtonsoft.Json.JsonSerializerSettings _settings = new Newtonsoft.Json.JsonSerializerSettings
+        private static readonly Newtonsoft.Json.JsonSerializerSettings _settings = new Newtonsoft.Json.JsonSerializerSettings
         {
             TypeNameHandling = Newtonsoft.Json.TypeNameHandling.All,
             ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,

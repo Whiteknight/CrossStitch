@@ -1,7 +1,7 @@
-﻿using CrossStitch.Core.Utility.Extensions;
-using CrossStitch.Stitch.BuiltInClassV1;
+﻿using CrossStitch.Stitch.BuiltInClassV1;
 using System;
 using System.Collections.Generic;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
 {

@@ -101,8 +101,9 @@
     <Compile Include="Modules\Master\MasterDataRepository.cs" />
     <Compile Include="Modules\Master\Models\StitchSummary.cs" />
     <Compile Include="Models\StitchLocaleType.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuildInClassV1Parameters.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassV1Parameters.cs" />
     <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassStitchAdaptor.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1AdaptorData.cs" />
     <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1ArgsBuilder.cs" />
     <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
     <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
@@ -113,7 +114,6 @@
     <Compile Include="Modules\Stitches\StitchInstanceMapper.cs" />
     <Compile Include="Modules\StitchMonitor\IHeartbeatSender.cs" />
     <Compile Include="Modules\StitchMonitor\StitchHeartbeatService.cs" />
-    <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />
     <Compile Include="Utility\IDataRepository.cs" />
     <Compile Include="Messages\Alerts\AlertEvent.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />
@@ -182,7 +182,6 @@
     <Compile Include="CrossStitchCore.cs" />
     <Compile Include="Modules\Master\MasterModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utility\Extensions\EnumerableExtensions.cs" />
     <Compile Include="Utility\IFactory.cs" />
     <Compile Include="Utility\IMapper.cs" />
     <Compile Include="Utility\IModuleLog.cs" />

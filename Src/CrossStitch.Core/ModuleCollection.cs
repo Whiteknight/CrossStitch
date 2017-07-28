@@ -8,7 +8,7 @@ using CrossStitch.Core.Modules.Timer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CrossStitch.Core.Utility.Extensions;
+using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Core
 {
@@ -42,9 +42,7 @@ namespace CrossStitch.Core
 
         public IModule Get(string name)
         {
-            if (!_modules.ContainsKey(name))
-                return null;
-            return _modules[name];
+            return _modules.GetOrDefault(name);
         }
 
         private void AddWithWarning(IModule module)
@@ -96,4 +94,4 @@ namespace CrossStitch.Core
 
         public IEnumerable<string> AddedModules => _modules.Keys;
     }
-}
+}w

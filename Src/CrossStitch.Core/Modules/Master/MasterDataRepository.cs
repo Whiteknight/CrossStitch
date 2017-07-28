@@ -114,27 +114,23 @@ namespace CrossStitch.Core.Modules.Master
         public StitchSummary GetStitchSummary(string id)
         {
             var fullId = new StitchFullId(id);
-            if (fullId.IsLocalOnly)
-                return GetAllStitchSummaries().FirstOrDefault(ss => ss.NodeId == _nodeId && ss.Id == fullId.StitchInstanceId);
-            return GetAllStitchSummaries().FirstOrDefault(ss => ss.NodeId == fullId.NodeId && ss.Id == fullId.StitchInstanceId);
+            var nodeId = fullId.IsLocalOnly ? _nodeId : fullId.NodeId;
+            return GetAllStitchSummaries().FirstOrDefault(ss => ss.NodeId == nodeId && ss.Id == fullId.StitchInstanceId);
         }
 
         private List<StitchSummary> GetLocalStitchSummaries()
         {
-            var summaries = new List<StitchSummary>();
-            var instances = _data.GetAll<StitchInstance>().ToList();
-            foreach (var instance in instances)
-            {
-                summaries.Add(new StitchSummary
+            return _data
+                .GetAll<StitchInstance>()
+                .Select(instance => new StitchSummary
                 {
                     Id = instance.Id,
                     NodeId = null, // TODO
                     NetworkNodeId = null, // TODO
                     GroupName = instance.GroupName,
                     Locale = StitchLocaleType.Local
-                });
-            }
-            return summaries;
+                })
+                .ToList();
         }
 
         private Dictionary<string, List<StitchSummary>> GetRemoteStitchSummaries()
@@ -143,18 +139,16 @@ namespace CrossStitch.Core.Modules.Master
             var nodes = _data.GetAll<NodeStatus>();
             foreach (var node in nodes)
             {
-                var summaries = new List<StitchSummary>();
-                foreach (var instance in node.StitchInstances)
-                {
-                    summaries.Add(new StitchSummary
+                var summaries = node.StitchInstances
+                    .Select(instance => new StitchSummary
                     {
                         Id = instance.Id,
                         NodeId = node.Id,
                         NetworkNodeId = node.NetworkNodeId,
                         GroupName = new StitchGroupName(instance.GroupName),
                         Locale = StitchLocaleType.Remote
-                    });
-                }
+                    })
+                    .ToList();
                 allSummaries.Add(node.Id, summaries);
             }
             return allSummaries;

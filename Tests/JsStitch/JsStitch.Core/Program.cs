@@ -41,7 +41,6 @@ namespace JsStitch.Core
                     LastHeartbeatReceived = 0
                 }, true);
 
-
                 var data = new DataModule(core.MessageBus, dataStorage);
                 core.AddModule(data);
 

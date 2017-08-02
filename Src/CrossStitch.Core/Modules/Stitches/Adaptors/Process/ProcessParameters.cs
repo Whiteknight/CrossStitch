@@ -1,16 +1,16 @@
-﻿using CrossStitch.Core.Models;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
+using CrossStitch.Core.Models;
 using CrossStitch.Stitch.Process;
 using CrossStitch.Stitch.Utility.Extensions;
 
-namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
+namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 {
-    public class ProcessV1Parameters
+    public class ProcessParameters
     {
-        public ProcessV1Parameters(StitchesConfiguration configuration, StitchFileSystem fileSystem, StitchInstance stitch, Dictionary<string, string> parameters)
+        public ProcessParameters(StitchesConfiguration configuration, StitchFileSystem fileSystem, StitchInstance stitch, PackageFile packageFile)
         {
+            var parameters = packageFile.Adaptor.Parameters;
             // Use the dir if specified, otherwise default to the running dir from the file system
             var defaultRunningDir = fileSystem.GetInstanceRunningDirectory(stitch.Id);
             DirectoryPath = parameters.GetOrAdd(Parameters.DirectoryPath, defaultRunningDir);
@@ -39,6 +39,9 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
             if (!string.IsNullOrEmpty(extConfig.ArgumentsFormat))
                 argsFormat = extConfig.ArgumentsFormat;
             ArgumentsFormat = parameters.GetOrAdd(Parameters.ArgumentsFormat, argsFormat);
+
+            ChannelType = packageFile.Adaptor.Channel;
+            SerializerType = packageFile.Adaptor.Serializer;
         }
 
         public string DirectoryPath { get; set; }
@@ -47,5 +50,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 
         public string ExecutableFormat { get; set; }
         public string ArgumentsFormat { get; set; }
+        public MessageChannelType ChannelType { get; set; }
+        public MessageSerializerType SerializerType { get; set; }
     }
 }

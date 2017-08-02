@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CrossStitch.Stitch.Process;
 
 namespace CrossStitch.Core.Models
 {
@@ -6,6 +7,9 @@ namespace CrossStitch.Core.Models
     {
         public AdaptorType Type { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
+
+        public MessageChannelType Channel { get; set; }
+        public MessageSerializerType Serializer { get; set; }
 
         private bool? _requiresPackageUnzip;
 

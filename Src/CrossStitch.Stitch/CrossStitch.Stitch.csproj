@@ -64,7 +64,11 @@
     <Compile Include="Process\IMessageChannel.cs" />
     <Compile Include="Process\IMessageSerializer.cs" />
     <Compile Include="Process\JsonMessageSerializer.cs" />
+    <Compile Include="Process\MessageChannelType.cs" />
     <Compile Include="Process\Parameters.cs" />
+    <Compile Include="Process\Pipes\CorePipeMessageChannel.cs" />
+    <Compile Include="Process\Pipes\PipeMessageChannel.cs" />
+    <Compile Include="Process\Pipes\StitchPipeMessageChannel.cs" />
     <Compile Include="Process\Stdio\StdioMessageChannel.cs" />
     <Compile Include="Utility\Assert.cs" />
     <Compile Include="Utility\Extensions\DictionaryExtensions.cs" />

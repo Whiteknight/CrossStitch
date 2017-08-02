@@ -11,7 +11,7 @@ namespace PenPal.StitchA
 
         static void Main(string[] args)
         {
-            _manager = new StitchMessageManager(args, new StdioMessageChannel());
+            _manager = new StitchMessageManager(args);
             _manager.ReceiveHeartbeats = true;
             try
             {

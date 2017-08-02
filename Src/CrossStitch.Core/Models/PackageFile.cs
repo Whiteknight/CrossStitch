@@ -10,5 +10,6 @@
         public string FileName { get; set; }
 
         public InstanceAdaptorDetails Adaptor { get; set; }
+
     }
 }

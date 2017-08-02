@@ -35,5 +35,11 @@ namespace CrossStitch.Stitch.Process.Stdio
             _stdout.Write("\nend\n");
             _stdout.Flush();
         }
+
+        public void Dispose()
+        {
+            _stdin?.Dispose();
+            _stdout?.Dispose();
+        }
     }
 }

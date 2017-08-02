@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using CrossStitch.Stitch.Process.Stdio;
 using CrossStitch.Stitch.Process.Stitch;
 
 namespace StitchStart.Client
@@ -10,12 +9,13 @@ namespace StitchStart.Client
         private static StitchMessageManager _manager;
         static void Main(string[] args)
         {
-            _manager = new StitchMessageManager(args, new StdioMessageChannel());
-            _manager.ReceiveHeartbeats = true;
-            _manager.ReceiveExitMessage = true;
             try
             {
+                _manager = new StitchMessageManager(args);
+                _manager.ReceiveHeartbeats = true;
+                _manager.ReceiveExitMessage = true;
                 _manager.Start();
+                
                 while (true)
                 {
                     var msg = _manager.GetNextMessage();
@@ -24,10 +24,12 @@ namespace StitchStart.Client
 
                     if (msg.IsExitMessage())
                     {
+                        //Log("Got EXIT message from manager");
                         return;
                     }
-                    else if (msg.IsHeartbeatMessage())
+                    if (msg.IsHeartbeatMessage())
                     {
+                        Log($"Got HEARTBEAT message from manager");
                         _manager.SyncHeartbeat(msg.Id);
                         _manager.SendLogs(_manager.CrossStitchArguments.Select(kvp => kvp.Key + "=" + kvp.Value).ToArray());
                     }
@@ -48,8 +50,8 @@ namespace StitchStart.Client
 
         public static void Log(string s)
         {
+            //System.IO.File.AppendAllText("D:\\Test\\StitchStart.Client.txt", s + "\n");
             _manager.SendLogs(new[] { s });
-            //File.AppendAllText("D:\\Test\\StitchStart.Client.txt", s + "\n");
         }
     }
 }

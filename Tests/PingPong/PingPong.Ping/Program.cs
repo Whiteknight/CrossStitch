@@ -14,7 +14,7 @@ namespace PingPong.Ping
 
         static void Main(string[] args)
         {
-            _manager = new StitchMessageManager(args, new StdioMessageChannel());
+            _manager = new StitchMessageManager(args);
             try
             {
                 _manager.Start();

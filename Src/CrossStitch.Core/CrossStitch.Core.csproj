@@ -103,11 +103,11 @@
     <Compile Include="Models\StitchLocaleType.cs" />
     <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassV1Parameters.cs" />
     <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassStitchAdaptor.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1AdaptorData.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1ArgsBuilder.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessAdaptorData.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessArguments.cs" />
     <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
     <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1Parameters.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessParameters.cs" />
     <Compile Include="Modules\Stitches\StitchAdaptorCollection.cs" />
     <Compile Include="Modules\Stitches\StitchesService.cs" />
     <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
@@ -156,7 +156,7 @@
     <Compile Include="Messages\Stitches\InstanceInformation.cs" />
     <Compile Include="Messages\Stitches\InstanceInformationRequest.cs" />
     <Compile Include="Messages\Stitches\PackageFileUploadRequest.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\ProcessV1\ProcessV1StitchAdaptor.cs" />
+    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessStitchAdaptor.cs" />
     <Compile Include="Modules\Data\Folders\DataConfiguration.cs" />
     <Compile Include="Modules\Data\DataModule.cs" />
     <Compile Include="Models\StitchInstance.cs" />

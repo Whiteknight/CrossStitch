@@ -1,7 +1,7 @@
 ﻿using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1;
-using CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1;
 using System;
+using CrossStitch.Core.Modules.Stitches.Adaptors.Process;
 using CrossStitch.Stitch;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors
@@ -27,8 +27,8 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
                 //case InstanceRunModeType.AppDomain:
                 //    return new AppDomainAppAdaptor(instance, _network);
                 case AdaptorType.ProcessV1:
-                    var pv1args = new ProcessV1Parameters(_configuration, _fileSystem, stitchInstance, packageFile.Adaptor.Parameters);
-                    return new ProcessV1StitchAdaptor(_nodeId, _configuration, stitchInstance, context, pv1args);
+                    var pv1args = new ProcessParameters(_configuration, _fileSystem, stitchInstance, packageFile);
+                    return new ProcessStitchAdaptor(_nodeId, _configuration, stitchInstance, context, pv1args);
                 case AdaptorType.BuildInClassV1:
                     return new BuiltInClassV1StitchAdaptor(packageFile, stitchInstance, context);
             }

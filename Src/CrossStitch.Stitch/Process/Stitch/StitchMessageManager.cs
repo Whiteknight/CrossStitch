@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CrossStitch.Stitch.Process.Pipes;
+using CrossStitch.Stitch.Process.Stdio;
 using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Stitch.Process.Stitch
@@ -21,11 +23,8 @@ namespace CrossStitch.Stitch.Process.Stitch
         private Thread _readerThread;
         private Thread _coreMonitorThread;
 
-        public StitchMessageManager(string[] processArgs, IMessageChannel messageChannel, IMessageSerializer serializer = null)
+        public StitchMessageManager(string[] processArgs)
         {
-            _messageChannel = messageChannel;
-            _serializer = serializer ?? new JsonMessageSerializer();
-
             int i = 0;
             var csArgs = new Dictionary<string, string>();
             for (; i < processArgs.Length; i++)
@@ -47,6 +46,27 @@ namespace CrossStitch.Stitch.Process.Stitch
             CustomArguments = processArgs.Skip(i).ToArray();
 
             _incomingMessages = new BlockingCollection<ToStitchMessage>();
+
+            _messageChannel = GetMessageChannel();
+
+            _serializer = GetSerializer();
+        }
+
+        private IMessageSerializer GetSerializer()
+        {
+            Enum.TryParse(CrossStitchArguments[Arguments.Serializer], out MessageSerializerType serializerType);
+            return new JsonMessageSerializer();
+        }
+
+        private IMessageChannel GetMessageChannel()
+        {
+            Enum.TryParse(CrossStitchArguments[Arguments.ChannelType], out MessageChannelType channelType);
+            if (channelType == MessageChannelType.Pipe)
+            {
+                var pipeName = PipeMessageChannel.GetPipeName(CrossStitchArguments[Arguments.CodeId], CrossStitchArguments[Arguments.InstanceId]);
+                return new StitchPipeMessageChannel(pipeName);
+            }
+            return new StdioMessageChannel();
         }
 
         public bool ReceiveHeartbeats { get; set; }
@@ -180,11 +200,18 @@ namespace CrossStitch.Stitch.Process.Stitch
         {
             while (true)
             {
-                var messageBuffer = _messageChannel.ReadMessage();
-                if (string.IsNullOrEmpty(messageBuffer))
-                    continue;
-                var message = _serializer.DeserializeToStitchMessage(messageBuffer);
-                _incomingMessages.Add(message);
+                try
+                {
+                    var messageBuffer = _messageChannel.ReadMessage();
+                    if (string.IsNullOrEmpty(messageBuffer))
+                        continue;
+                    var message = _serializer.DeserializeToStitchMessage(messageBuffer);
+                    _incomingMessages.Add(message);
+                }
+                catch (Exception e)
+                {
+                    System.IO.File.AppendAllText("D:\\Test\\StitchStart.Client.txt", e.Message + "\n" + e.StackTrace + "\n");
+                }
             }
         }
 

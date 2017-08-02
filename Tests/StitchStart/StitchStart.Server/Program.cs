@@ -4,13 +4,13 @@ using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
-using CrossStitch.Stitch.ProcessV1;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using CrossStitch.Core.Messages.Stitches;
 using Acquaintance;
 using CrossStitch.Core.Messages.Data;
+using CrossStitch.Stitch.Process;
 
 namespace StitchStart.Server
 {

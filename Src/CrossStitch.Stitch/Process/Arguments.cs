@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Stitch.ProcessV1
+﻿namespace CrossStitch.Stitch.Process
 {
     // These arguments are passed to the Stitch process on the commandline
     public static class Arguments

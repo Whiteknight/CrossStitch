@@ -95,6 +95,7 @@ namespace CrossStitch.Core
 
         private static string GetNodeId(NodeConfiguration config)
         {
+            // TODO: Need to restrict the allowed chars to a-z A-Z 0-9 - and maybe a few others
             if (!string.IsNullOrEmpty(config.NodeId))
                 return config.NodeId;
 

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CrossStitch.Core.Utility.Serialization
 {
-    public class JsonSerializer : ISerializer
+    public class JsonByteSerializer : IByteSerializer
     {
         public byte[] Serialize<T>(T data)
         {

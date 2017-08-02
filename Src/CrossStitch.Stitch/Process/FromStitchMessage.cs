@@ -1,4 +1,4 @@
-namespace CrossStitch.Stitch.ProcessV1
+namespace CrossStitch.Stitch.Process
 {
     public class FromStitchMessage
     {

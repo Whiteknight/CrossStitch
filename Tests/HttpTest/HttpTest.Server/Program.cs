@@ -7,6 +7,7 @@ using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Http.NancyFx;
 using System;
 using System.Collections.Generic;
+using CrossStitch.Stitch.Process;
 
 namespace HttpTest
 {
@@ -40,8 +41,8 @@ namespace HttpTest
                         Type = AdaptorType.ProcessV1,
                         Parameters = new Dictionary<string, string>
                         {
-                            { CrossStitch.Stitch.ProcessV1.Parameters.DirectoryPath, "." },
-                            { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "HttpTest.Stitch.exe" }
+                            { Parameters.DirectoryPath, "." },
+                            { Parameters.ExecutableName, "HttpTest.Stitch.exe" }
                         }
                     },
                 };

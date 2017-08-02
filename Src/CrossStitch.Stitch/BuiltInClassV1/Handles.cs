@@ -1,6 +1,4 @@
-﻿using CrossStitch.Stitch.ProcessV1.Core;
-
-namespace CrossStitch.Stitch.BuiltInClassV1
+﻿namespace CrossStitch.Stitch.BuiltInClassV1
 {
     public interface IHandlesHeartbeat
     {

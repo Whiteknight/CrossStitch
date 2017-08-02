@@ -2,10 +2,10 @@
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
-using CrossStitch.Stitch.ProcessV1;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossStitch.Stitch.Process;
 
 namespace CrossStitch.Core.Modules.Stitches
 {

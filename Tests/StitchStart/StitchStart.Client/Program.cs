@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using CrossStitch.Stitch.ProcessV1.Stitch;
+using CrossStitch.Stitch.Process.Stdio;
+using CrossStitch.Stitch.Process.Stitch;
 
 namespace StitchStart.Client
 {
@@ -9,7 +10,7 @@ namespace StitchStart.Client
         private static StitchMessageManager _manager;
         static void Main(string[] args)
         {
-            _manager = new StitchMessageManager(args);
+            _manager = new StitchMessageManager(args, new StdioMessageChannel());
             _manager.ReceiveHeartbeats = true;
             _manager.ReceiveExitMessage = true;
             try

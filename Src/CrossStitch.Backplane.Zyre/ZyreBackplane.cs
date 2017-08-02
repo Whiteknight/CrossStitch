@@ -16,18 +16,18 @@ namespace CrossStitch.Backplane.Zyre
     {
         private readonly CrossStitchCore _core;
         private readonly BackplaneConfiguration _config;
-        private readonly ISerializer _serializer;
+        private readonly IByteSerializer _byteSerializer;
         private readonly NetMQ.Zyre.Zyre _zyre;
 
         private NetMqMessageMapper _mapper;
         private Guid _uuid;
         private bool _connected;
 
-        public ZyreBackplane(CrossStitchCore core, BackplaneConfiguration config = null, ISerializer serializer = null)
+        public ZyreBackplane(CrossStitchCore core, BackplaneConfiguration config = null, IByteSerializer byteSerializer = null)
         {
             _core = core;
             _config = config ?? BackplaneConfiguration.GetDefault();
-            _serializer = serializer ?? new JsonSerializer();
+            _byteSerializer = byteSerializer ?? new JsonByteSerializer();
 
             // TODO: Need to expose more zyre options in the config, including broadcast port, broadcast interface, 
             // and beacon interval.
@@ -58,7 +58,7 @@ namespace CrossStitch.Backplane.Zyre
             foreach (string zone in _config.Zones.OrEmptyIfNull().Where(z => z != Zones.ZoneAll))
                 _zyre.Join(zone);
 
-            _mapper = new NetMqMessageMapper(_serializer);
+            _mapper = new NetMqMessageMapper(_byteSerializer);
 
             _connected = true;
             return new BackplaneContext

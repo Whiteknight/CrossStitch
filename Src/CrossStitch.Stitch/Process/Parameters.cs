@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Stitch.ProcessV1
+﻿namespace CrossStitch.Stitch.Process
 {
     // These parameters are required in the StitchInstance.Adaptor.Parameters map when the stitch
     // is created

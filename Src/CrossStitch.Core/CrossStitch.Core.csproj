@@ -186,8 +186,8 @@
     <Compile Include="Utility\IMapper.cs" />
     <Compile Include="Utility\IModuleLog.cs" />
     <Compile Include="Utility\NullModuleLog.cs" />
-    <Compile Include="Utility\Serialization\ISerializer.cs" />
-    <Compile Include="Utility\Serialization\JsonSerializer.cs" />
+    <Compile Include="Utility\Serialization\IByteSerializer.cs" />
+    <Compile Include="Utility\Serialization\JsonByteSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CrossStitch.Core.nuspec">

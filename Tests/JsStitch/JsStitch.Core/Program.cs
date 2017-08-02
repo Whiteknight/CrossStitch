@@ -4,9 +4,9 @@ using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
-using CrossStitch.Stitch.ProcessV1;
 using System;
 using System.Collections.Generic;
+using CrossStitch.Stitch.Process;
 
 namespace JsStitch.Core
 {

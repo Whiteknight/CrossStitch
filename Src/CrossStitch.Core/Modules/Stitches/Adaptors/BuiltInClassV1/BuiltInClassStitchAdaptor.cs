@@ -1,8 +1,8 @@
 ﻿using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Stitch.BuiltInClassV1;
-using CrossStitch.Stitch.ProcessV1.Core;
 using System;
+using CrossStitch.Stitch;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
 {

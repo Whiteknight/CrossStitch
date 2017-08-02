@@ -1,6 +1,7 @@
 ﻿using System;
-using CrossStitch.Stitch.ProcessV1;
-using CrossStitch.Stitch.ProcessV1.Stitch;
+using CrossStitch.Stitch.Process;
+using CrossStitch.Stitch.Process.Stdio;
+using CrossStitch.Stitch.Process.Stitch;
 
 namespace PenPal.StitchA
 {
@@ -10,7 +11,7 @@ namespace PenPal.StitchA
 
         static void Main(string[] args)
         {
-            _manager = new StitchMessageManager(args);
+            _manager = new StitchMessageManager(args, new StdioMessageChannel());
             _manager.ReceiveHeartbeats = true;
             try
             {

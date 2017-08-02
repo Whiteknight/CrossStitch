@@ -1,5 +1,6 @@
-﻿using CrossStitch.Stitch.ProcessV1.Stitch;
-using System;
+﻿using System;
+using CrossStitch.Stitch.Process.Stdio;
+using CrossStitch.Stitch.Process.Stitch;
 
 namespace HttpTest.Stitch
 {
@@ -9,7 +10,7 @@ namespace HttpTest.Stitch
 
         static void Main(string[] args)
         {
-            _manager = new StitchMessageManager(args);
+            _manager = new StitchMessageManager(args, new StdioMessageChannel());
             try
             {
                 _manager.Start();

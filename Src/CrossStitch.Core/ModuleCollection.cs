@@ -94,4 +94,4 @@ namespace CrossStitch.Core
 
         public IEnumerable<string> AddedModules => _modules.Keys;
     }
-}w
+}

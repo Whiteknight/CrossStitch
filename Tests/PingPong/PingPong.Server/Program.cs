@@ -6,6 +6,7 @@ using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using System;
 using System.Collections.Generic;
+using CrossStitch.Stitch.Process;
 
 namespace PingPong.Server
 {
@@ -28,8 +29,8 @@ namespace PingPong.Server
                         Type = AdaptorType.ProcessV1,
                         Parameters = new Dictionary<string, string>
                         {
-                            { CrossStitch.Stitch.ProcessV1.Parameters.DirectoryPath, "." },
-                            { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "PingPong.Ping.exe" }
+                            { Parameters.DirectoryPath, "." },
+                            { Parameters.ExecutableName, "PingPong.Ping.exe" }
                         }
                     },
                 };
@@ -51,8 +52,8 @@ namespace PingPong.Server
                         Type = AdaptorType.ProcessV1,
                         Parameters = new Dictionary<string, string>
                         {
-                            { CrossStitch.Stitch.ProcessV1.Parameters.DirectoryPath, "." },
-                            { CrossStitch.Stitch.ProcessV1.Parameters.ExecutableName, "PingPong.Pong.exe" }
+                            { Parameters.DirectoryPath, "." },
+                            { Parameters.ExecutableName, "PingPong.Pong.exe" }
                         }
                     },
                 };

@@ -1,24 +1,24 @@
 ﻿using System;
 using CrossStitch.Stitch.Utility;
 
-namespace CrossStitch.Stitch.ProcessV1.Core
+namespace CrossStitch.Stitch.Process.Core
 {
     // Processor class to run on the Core, to coordinate communications with the Stitch. There 
     // should be once instance of this for every stitch.
-    public class CoreMessageManager : IDisposable
+    public class CoreMessageManager 
     {
         private readonly CoreStitchContext _stitchContext;
-        private readonly FromStitchMessageReader _reader;
-        private readonly ToStitchMessageSender _sender;
+        private readonly IMessageChannel _messageChannel;
+        private readonly IMessageSerializer _serializer;
         private FromStitchReaderThread _readerThread;
 
-        public CoreMessageManager(CoreStitchContext stitchContext, FromStitchMessageReader reader = null, ToStitchMessageSender sender = null)
+        public CoreMessageManager(CoreStitchContext stitchContext, IMessageChannel messageChannel, IMessageSerializer serializer)
         {
             Assert.ArgNotNull(stitchContext, nameof(stitchContext));
 
             _stitchContext = stitchContext;
-            _reader = reader ?? new FromStitchMessageReader(Console.OpenStandardInput());
-            _sender = sender ?? new ToStitchMessageSender(Console.OpenStandardOutput());
+            _messageChannel = messageChannel;
+            _serializer = serializer;
         }
 
         public EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
@@ -27,7 +27,7 @@ namespace CrossStitch.Stitch.ProcessV1.Core
 
         public void Start()
         {
-            _readerThread = new FromStitchReaderThread(_reader);
+            _readerThread = new FromStitchReaderThread(_messageChannel, _serializer);
             _readerThread.MessageReceived += ReaderThreadOnMessageReceived;
             _readerThread.Start();
         }
@@ -35,13 +35,8 @@ namespace CrossStitch.Stitch.ProcessV1.Core
         public void SendMessage(ToStitchMessage message)
         {
             Assert.ArgNotNull(message, nameof(message));
-            _sender.SendMessage(message);
-        }
-
-        public void Dispose()
-        {
-            _reader.Dispose();
-            _sender.Dispose();
+            var messageBuffer = _serializer.Serialize(message);
+            _messageChannel.Send(messageBuffer);
         }
 
         private void ReaderThreadOnMessageReceived(object sender, FromStitchMessageReceivedEventArgs eventArgs)

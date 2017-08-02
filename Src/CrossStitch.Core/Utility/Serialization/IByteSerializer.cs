@@ -1,6 +1,6 @@
 ﻿namespace CrossStitch.Core.Utility.Serialization
 {
-    public interface ISerializer
+    public interface IByteSerializer
     {
         byte[] Serialize<T>(T data);
         T Deserialize<T>(byte[] bytes);

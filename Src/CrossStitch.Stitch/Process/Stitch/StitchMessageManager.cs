@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using CrossStitch.Stitch.Utility.Extensions;
 
-namespace CrossStitch.Stitch.ProcessV1.Stitch
+namespace CrossStitch.Stitch.Process.Stitch
 {
     public class StitchMessageManager : IDisposable
     {
+        private readonly IMessageChannel _messageChannel;
+        private readonly IMessageSerializer _serializer;
         private const int CoreCheckIntervalMs = 5000;
         private const int ExitBecauseOfCoreDisappearance = 1;
         private const int MessageReadTimeoutMs = 10000;
         private const int ExitCodeCoreMissing = 1;
 
-        private readonly ToStitchMessageReader _reader;
-        private readonly FromStitchMessageSender _sender;
         private readonly BlockingCollection<ToStitchMessage> _incomingMessages;
 
         private Thread _readerThread;
         private Thread _coreMonitorThread;
 
-        public StitchMessageManager(string[] processArgs, ToStitchMessageReader reader = null, FromStitchMessageSender sender = null)
+        public StitchMessageManager(string[] processArgs, IMessageChannel messageChannel, IMessageSerializer serializer = null)
         {
+            _messageChannel = messageChannel;
+            _serializer = serializer ?? new JsonMessageSerializer();
+
             int i = 0;
             var csArgs = new Dictionary<string, string>();
             for (; i < processArgs.Length; i++)
@@ -44,8 +46,6 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
             CrossStitchArguments = csArgs;
             CustomArguments = processArgs.Skip(i).ToArray();
 
-            _reader = reader ?? new ToStitchMessageReader(Console.OpenStandardInput());
-            _sender = sender ?? new FromStitchMessageSender(Console.OpenStandardOutput());
             _incomingMessages = new BlockingCollection<ToStitchMessage>();
         }
 
@@ -59,7 +59,7 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
             int corePid = GetIntegerArgument(Arguments.CorePid);
             if (corePid > 0)
             {
-                var coreProcess = Process.GetProcessById(corePid);
+                var coreProcess = System.Diagnostics.Process.GetProcessById(corePid);
                 _coreMonitorThread = new Thread(CoreCheckerThreadFunction);
                 _coreMonitorThread.IsBackground = true;
                 _coreMonitorThread.Start(coreProcess);
@@ -101,7 +101,7 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
 
             if (message.IsHeartbeatMessage() && !ReceiveHeartbeats)
             {
-                _sender.SendSync(message.Id);
+                SyncHeartbeat(message.Id);
                 return null;
             }
 
@@ -110,34 +110,33 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
 
         public void Send(FromStitchMessage message)
         {
-            _sender.SendMessage(message);
+            var messageBuffer = _serializer.Serialize(message);
+            _messageChannel.Send(messageBuffer);
         }
 
         public void SendLogs(string[] logs)
         {
-            _sender.SendMessage(FromStitchMessage.LogMessage(logs));
+            Send(FromStitchMessage.LogMessage(logs));
         }
 
         public void SyncHeartbeat(long id)
         {
-            _sender.SendMessage(FromStitchMessage.Sync(id));
+            Send(FromStitchMessage.Sync(id));
         }
 
         public void AckMessage(long id)
         {
-            _sender.SendMessage(FromStitchMessage.Ack(id));
+            Send(FromStitchMessage.Ack(id));
         }
 
         public void FailMessage(long id)
         {
-            _sender.SendMessage(FromStitchMessage.Fail(id));
+            Send(FromStitchMessage.Fail(id));
         }
 
         public void Dispose()
         {
             Stop();
-            _reader.Dispose();
-            _sender.Dispose();
         }
 
         public string ApplicationGroupName
@@ -181,17 +180,17 @@ namespace CrossStitch.Stitch.ProcessV1.Stitch
         {
             while (true)
             {
-                var message = _reader.ReadMessage();
-                if (message == null)
+                var messageBuffer = _messageChannel.ReadMessage();
+                if (string.IsNullOrEmpty(messageBuffer))
                     continue;
-
+                var message = _serializer.DeserializeToStitchMessage(messageBuffer);
                 _incomingMessages.Add(message);
             }
         }
 
         private void CoreCheckerThreadFunction(object coreProcessObject)
         {
-            var coreProcess = coreProcessObject as Process;
+            var coreProcess = coreProcessObject as System.Diagnostics.Process;
             if (coreProcess == null)
                 return;
 

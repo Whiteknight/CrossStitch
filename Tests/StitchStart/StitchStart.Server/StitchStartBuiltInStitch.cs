@@ -1,5 +1,5 @@
-﻿using CrossStitch.Stitch.BuiltInClassV1;
-using CrossStitch.Stitch.ProcessV1.Core;
+﻿using CrossStitch.Stitch;
+using CrossStitch.Stitch.BuiltInClassV1;
 
 namespace StitchStart.Server
 {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using CrossStitch.Stitch.ProcessV1;
-using CrossStitch.Stitch.ProcessV1.Stitch;
+using CrossStitch.Stitch.Process;
+using CrossStitch.Stitch.Process.Stdio;
+using CrossStitch.Stitch.Process.Stitch;
 
 namespace PingPong.Pong
 {
@@ -13,7 +14,7 @@ namespace PingPong.Pong
 
         static void Main(string[] args)
         {
-            _manager = new StitchMessageManager(args);
+            _manager = new StitchMessageManager(args, new StdioMessageChannel());
             try
             {
                 _manager.Start();

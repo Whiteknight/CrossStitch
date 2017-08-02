@@ -1,8 +1,8 @@
 ﻿using CrossStitch.Core.Models;
-using CrossStitch.Stitch.ProcessV1;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using CrossStitch.Stitch.Process;
 using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1

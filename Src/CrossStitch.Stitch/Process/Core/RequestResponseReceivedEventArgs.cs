@@ -1,6 +1,6 @@
 using System;
 
-namespace CrossStitch.Stitch.ProcessV1.Core
+namespace CrossStitch.Stitch.Process.Core
 {
     public class RequestResponseReceivedEventArgs : EventArgs
     {

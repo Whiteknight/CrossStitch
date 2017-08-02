@@ -20,6 +20,9 @@ namespace CrossStitch.Core.Models
 
         public string AdaptorData { get; set; }
 
+        public MessageChannelType Channel { get; set; }
+        public MessageSerializerType Serializer { get; set; }
+
         public void SetAdaptorDataObject<T>(T data)
         {
             AdaptorData = data == null ? string.Empty : JsonUtility.Serialize(data);
@@ -29,5 +32,16 @@ namespace CrossStitch.Core.Models
         {
             return JsonUtility.Deserialize<T>(AdaptorData ?? string.Empty);
         }
+    }
+
+    public enum MessageChannelType
+    {
+        Stdio,
+        Pipe
+    }
+
+    public enum MessageSerializerType
+    {
+        Json
     }
 }

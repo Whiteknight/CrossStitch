@@ -9,24 +9,24 @@ namespace CrossStitch.Backplane.Zyre
 {
     public class NetMqMessageMapper : IMapper<NetMQMessage, ClusterMessage>, IMapper<ClusterMessage, NetMQMessage>
     {
-        private readonly ISerializer _serializer;
+        private readonly IByteSerializer _byteSerializer;
 
-        public NetMqMessageMapper(ISerializer serializer)
+        public NetMqMessageMapper(IByteSerializer byteSerializer)
         {
-            _serializer = serializer;
+            _byteSerializer = byteSerializer;
         }
 
         public ClusterMessage Map(NetMQMessage source)
         {
             var envelope = new ClusterMessageBuilder().Build();
-            envelope.Header = _serializer.Deserialize<MessageHeader>(source.Pop().Buffer);
+            envelope.Header = _byteSerializer.Deserialize<MessageHeader>(source.Pop().Buffer);
             if (envelope.Header.PayloadType == MessagePayloadType.Raw)
                 envelope.RawFrames = source.Select(f => f.ToByteArray()).ToList();
             else if (envelope.Header.PayloadType == MessagePayloadType.Object || envelope.Header.PayloadType == MessagePayloadType.InternalObject)
             {
                 var bytes = source.FirstOrDefault()?.ToByteArray();
                 if (bytes != null)
-                    envelope.PayloadObject = _serializer.DeserializeObject(bytes);
+                    envelope.PayloadObject = _byteSerializer.DeserializeObject(bytes);
             }
             else if (envelope.Header.PayloadType == MessagePayloadType.CommandString)
             {
@@ -41,7 +41,7 @@ namespace CrossStitch.Backplane.Zyre
         public NetMQMessage Map(ClusterMessage envelope)
         {
             var message = new NetMQMessage();
-            byte[] headerFrame = _serializer.Serialize(envelope.Header);
+            byte[] headerFrame = _byteSerializer.Serialize(envelope.Header);
             message.Append(headerFrame);
             if (envelope.Header.PayloadType == MessagePayloadType.CommandString)
             {
@@ -53,7 +53,7 @@ namespace CrossStitch.Backplane.Zyre
             }
             if (envelope.Header.PayloadType == MessagePayloadType.Object || envelope.Header.PayloadType == MessagePayloadType.InternalObject)
             {
-                var bytes = _serializer.Serialize(envelope.PayloadObject);
+                var bytes = _byteSerializer.Serialize(envelope.PayloadObject);
                 message.Append(bytes);
             }
             else if (envelope.Header.PayloadType == MessagePayloadType.Raw)

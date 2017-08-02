@@ -14,7 +14,7 @@ using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Core.Utility;
-using CrossStitch.Stitch.ProcessV1;
+using CrossStitch.Stitch.Process;
 
 namespace StitchIntegration.ServerA
 {

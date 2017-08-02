@@ -1,7 +1,7 @@
 using System.Text;
 using CrossStitch.Core.Models;
-using CrossStitch.Stitch.ProcessV1;
-using CrossStitch.Stitch.ProcessV1.Core;
+using CrossStitch.Stitch;
+using CrossStitch.Stitch.Process;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.ProcessV1
 {

@@ -21,7 +21,7 @@ namespace CrossStitch.Core.Modules.Stitches
             _messageBus = core.MessageBus;
             configuration = configuration ?? StitchesConfiguration.GetDefault();
             var fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
-            var manager = new StitchInstanceManager(configuration, fileSystem);
+            var manager = new StitchInstanceManager(core.NodeId, configuration, fileSystem);
             var log = new ModuleLog(_messageBus, Name);
             var observer = new StitchEventObserver(_messageBus, log);
             var data = new DataHelperClient(core.MessageBus);

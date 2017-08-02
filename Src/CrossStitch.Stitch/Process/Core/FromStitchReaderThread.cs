@@ -2,17 +2,19 @@
 using System.Threading;
 using CrossStitch.Stitch.Events;
 
-namespace CrossStitch.Stitch.ProcessV1.Core
+namespace CrossStitch.Stitch.Process.Core
 {
     public class FromStitchReaderThread : IDisposable
     {
-        private readonly FromStitchMessageReader _reader;
+        private readonly IMessageChannel _reader;
+        private readonly IMessageSerializer _serializer;
         private readonly Thread _readerThread;
         private const int ReaderDelayMs = 1000;
 
-        public FromStitchReaderThread(FromStitchMessageReader reader)
+        public FromStitchReaderThread(IMessageChannel reader, IMessageSerializer serializer)
         {
             _reader = reader;
+            _serializer = serializer;
             _readerThread = new Thread(ReaderThreadFunction);
             _readerThread.IsBackground = true;
         }
@@ -41,7 +43,7 @@ namespace CrossStitch.Stitch.ProcessV1.Core
         {
             while (true)
             {
-                var message = _reader.ReadMessage();
+                var message = Read();
                 if (message == null)
                 {
                     Thread.Sleep(ReaderDelayMs);
@@ -49,6 +51,15 @@ namespace CrossStitch.Stitch.ProcessV1.Core
                 }
                 OnMessageReceived(message);
             }
+        }
+
+        private FromStitchMessage Read()
+        {
+            var messageBuffer = _reader.ReadMessage();
+            if (string.IsNullOrEmpty(messageBuffer))
+                return null;
+            var message = _serializer.DeserializeFromStitchMessage(messageBuffer);
+            return message;
         }
 
         private void OnMessageReceived(FromStitchMessage message)

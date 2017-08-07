@@ -1,9 +1,12 @@
+using System;
+
 namespace CrossStitch.Stitch.Process
 {
     public class ToStitchMessage
     {
         public const string ChannelNameHeartbeat = "_heartbeat";
         public const string ChannelNameExit = "_exit";
+        public const string ChannelNameError = "_error";
 
         // Cluster-unique message Id
         public long Id { get; set; }
@@ -25,6 +28,16 @@ namespace CrossStitch.Stitch.Process
             };
         }
 
+        public static ToStitchMessage Error(Exception e)
+        {
+            return new ToStitchMessage
+            {
+                ChannelName = ChannelNameError,
+                Id = 0,
+                Data = e.Message + "\n" + e.StackTrace
+            };
+        }
+
         public bool IsHeartbeatMessage()
         {
             return ChannelName == ChannelNameHeartbeat;
@@ -33,6 +46,11 @@ namespace CrossStitch.Stitch.Process
         public bool IsExitMessage()
         {
             return ChannelName == ChannelNameExit;
+        }
+
+        public bool IsErrorMessage()
+        {
+            return ChannelName == ChannelNameError;
         }
     }
 }

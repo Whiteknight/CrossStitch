@@ -48,12 +48,13 @@ namespace CrossStitch.Core.Modules.Stitches
             var instances = _data.GetAll<StitchInstance>();
             foreach (var instance in instances.Where(i => i.State == InstanceStateType.Running || i.State == InstanceStateType.Started))
             {
+                var packageFile = _data.Get<PackageFile>(instance.GroupName.ToString());
+
+                // Best effort. The StartInstanceInternal method logs errors
                 var request = new InstanceRequest
                 {
                     Id = instance.Id
                 };
-                var packageFile = _data.Get<PackageFile>(instance.GroupName.ToString());
-                // Best effort. The StartInstanceInternal method logs errors
                 StartInstanceInternal(request, packageFile, instance);
             }
             _log.LogDebug("Startup stitches started");
@@ -76,9 +77,11 @@ namespace CrossStitch.Core.Modules.Stitches
                 GroupName = groupName
             };
             bool ok = _data.Save(packageFile, true);
+            if (!ok)
+                _log.LogError("Could not save PackageFile Id={0}", groupName.ToString());
 
             _log.LogDebug("Uploaded package file {0}", groupName);
-            return new PackageFileUploadResponse(true, groupName, result.FilePath);
+            return new PackageFileUploadResponse(ok, groupName, result.FilePath);
         }
 
         public PackageFileUploadResponse UploadStitchPackageFileFromRemote(PackageFileUploadRequest request)
@@ -97,9 +100,11 @@ namespace CrossStitch.Core.Modules.Stitches
                 GroupName = request.GroupName
             };
             bool ok = _data.Save(packageFile, true);
+            if (!ok)
+                _log.LogError("Could not save PackageFile Id={0} from remote", request.GroupName.ToString());
 
             _log.LogDebug("Uploaded package file {0}", request.GroupName);
-            return new PackageFileUploadResponse(true, request.GroupName, result.FilePath);
+            return new PackageFileUploadResponse(ok, request.GroupName, result.FilePath);
         }
 
         // Creates an unzipped copy of the executable for the Stitch, and any other resource
@@ -110,17 +115,11 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 var response = new LocalCreateInstanceResponse();
                 if (request == null || !request.IsValid() || request.NumberOfInstances <= 0)
-                {
-                    response.IsSuccess = false;
-                    return response;
-                }
+                    return response.AsFailure();
 
                 var packageFile = _data.Get<PackageFile>(request.GroupName.ToString());
                 if (packageFile == null)
-                {
-                    response.IsSuccess = false;
-                    return response;
-                }
+                    return response.AsFailure();
 
                 for (int i = 0; i < request.NumberOfInstances; i++)
                 {

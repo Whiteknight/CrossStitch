@@ -39,6 +39,12 @@ namespace CrossStitch.Core.Messages.Stitches
 
         public bool IsSuccess { get; set; }
         public List<string> CreatedIds { get; set; }
+
+        public LocalCreateInstanceResponse AsFailure()
+        {
+            IsSuccess = false;
+            return this;
+        }
     }
 
     public class CreateInstanceResponse : LocalCreateInstanceResponse

@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading;
 using CrossStitch.Stitch.Process;
-using CrossStitch.Stitch.Process.Stdio;
 using CrossStitch.Stitch.Process.Stitch;
 
 namespace PingPong.Ping
@@ -21,7 +20,7 @@ namespace PingPong.Ping
                 Thread.Sleep(5000);
 
                 // Start the chain by sending a ping to the entire group
-                string groupName = _manager.CrossStitchArguments[Arguments.Application];
+                string groupName = _manager.CrossStitchParameters.ApplicationGroupName;
                 _manager.Send(FromStitchMessage.ToGroupData(groupName, "ping?"));
 
                 while (true)

@@ -15,11 +15,12 @@ namespace CrossStitch.Core.Modules.Stitches
         private readonly StitchAdaptorFactory _adaptorFactory;
         private readonly StitchAdaptorCollection _adaptors;
 
-        public StitchInstanceManager(string nodeId, StitchesConfiguration configuration, StitchFileSystem fileSystem)
+        public StitchInstanceManager(StitchFileSystem fileSystem, StitchAdaptorFactory adaptorFactory)
         {
             _fileSystem = fileSystem;
+            
             // TODO: We need a way to get the unique string name of the node at this point.
-            _adaptorFactory = new StitchAdaptorFactory(nodeId, configuration, _fileSystem);
+            _adaptorFactory = adaptorFactory;
             _adaptors = new StitchAdaptorCollection();
         }
 

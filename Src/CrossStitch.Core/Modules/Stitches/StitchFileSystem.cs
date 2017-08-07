@@ -89,12 +89,11 @@ namespace CrossStitch.Core.Modules.Stitches
             Directory.CreateDirectory(runningDirectory);
 
             using (FileStream fileStream = File.Open(libraryFilePath, FileMode.Open, FileAccess.Read))
+            using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Read, true))
             {
-                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Read, true))
-                {
-                    archive.ExtractToDirectory(runningDirectory);
-                }
+                archive.ExtractToDirectory(runningDirectory);
             }
+            
             return new Result
             {
                 Success = true,

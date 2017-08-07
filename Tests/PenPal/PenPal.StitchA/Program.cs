@@ -1,6 +1,5 @@
 ﻿using System;
 using CrossStitch.Stitch.Process;
-using CrossStitch.Stitch.Process.Stdio;
 using CrossStitch.Stitch.Process.Stitch;
 
 namespace PenPal.StitchA
@@ -16,7 +15,7 @@ namespace PenPal.StitchA
             try
             {
                 _manager.Start();
-                string groupName = _manager.CrossStitchArguments[Arguments.Application];
+                string groupName = _manager.CrossStitchParameters.ApplicationGroupName;
 
                 while (true)
                 {

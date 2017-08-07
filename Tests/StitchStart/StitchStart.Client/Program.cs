@@ -31,7 +31,7 @@ namespace StitchStart.Client
                     {
                         Log($"Got HEARTBEAT message from manager");
                         _manager.SyncHeartbeat(msg.Id);
-                        _manager.SendLogs(_manager.CrossStitchArguments.Select(kvp => kvp.Key + "=" + kvp.Value).ToArray());
+                        _manager.SendLogs(_manager.CrossStitchParameters.ToString());
                     }
                     else
                     {

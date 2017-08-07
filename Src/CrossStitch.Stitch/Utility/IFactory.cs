@@ -1,4 +1,4 @@
-﻿namespace CrossStitch.Core.Utility
+﻿namespace CrossStitch.Stitch.Utility
 {
     public interface IFactory<T>
     {

@@ -3,7 +3,7 @@
     // These arguments are passed to the Stitch process on the commandline
     public static class Arguments
     {
-        public const string CodeId = "coreid";
+        public const string CoreId = "coreid";
         public const string CorePid = "corepid";
         public const string InstanceId = "instanceid";
         public const string Application = "application";

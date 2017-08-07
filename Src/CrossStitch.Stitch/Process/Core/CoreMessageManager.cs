@@ -5,7 +5,7 @@ namespace CrossStitch.Stitch.Process.Core
 {
     // Processor class to run on the Core, to coordinate communications with the Stitch. There 
     // should be once instance of this for every stitch.
-    public class CoreMessageManager 
+    public class CoreMessageManager : IDisposable
     {
         private readonly CoreStitchContext _stitchContext;
         private readonly IMessageChannel _messageChannel;
@@ -67,6 +67,12 @@ namespace CrossStitch.Stitch.Process.Core
                     // TODO: Log that we have received a weird error
                     break;
             }
+        }
+
+        public void Dispose()
+        {
+            _messageChannel?.Dispose();
+            _readerThread?.Dispose();
         }
     }
 }

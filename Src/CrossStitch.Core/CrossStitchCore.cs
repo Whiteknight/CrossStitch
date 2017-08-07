@@ -35,6 +35,8 @@ namespace CrossStitch.Core
 
         public IMessageBus MessageBus { get; }
 
+        public int CorePid => System.Diagnostics.Process.GetCurrentProcess().Id;
+
         public void AddModule(IModule module)
         {
             if (module.Name == ModuleNames.Core)

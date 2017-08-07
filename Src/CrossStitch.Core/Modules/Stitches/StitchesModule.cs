@@ -6,6 +6,7 @@ using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Versions;
 using System.Collections.Generic;
+using CrossStitch.Core.Modules.Stitches.Adaptors;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -20,9 +21,10 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             _messageBus = core.MessageBus;
             configuration = configuration ?? StitchesConfiguration.GetDefault();
-            var fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
-            var manager = new StitchInstanceManager(core.NodeId, configuration, fileSystem);
             var log = new ModuleLog(_messageBus, Name);
+            var fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
+            var adaptorFactory = new StitchAdaptorFactory(core, configuration, fileSystem, log);
+            var manager = new StitchInstanceManager(fileSystem, adaptorFactory);
             var observer = new StitchEventObserver(_messageBus, log);
             var data = new DataHelperClient(core.MessageBus);
             var notifier = new StitchEventNotifier(_messageBus);

@@ -14,20 +14,20 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             _stitchContext = stitchContext;
         }
 
-        public string BuildCoreArgumentsString(StitchInstance stitchInstance, string nodeId, int parentPid, MessageChannelType channelType, MessageSerializerType serializerType)
+        public string BuildCoreArgumentsString(StitchInstance stitchInstance, CrossStitchCore core, ProcessParameters parameters)
         {
             var sb = new StringBuilder();
 
-            AddArgument(sb, Arguments.CodeId, nodeId);
-            AddArgument(sb, Arguments.CorePid, parentPid.ToString());
+            AddArgument(sb, Arguments.CoreId, core.NodeId);
+            AddArgument(sb, Arguments.CorePid, core.CorePid.ToString());
             AddArgument(sb, Arguments.InstanceId, stitchInstance.Id);
             AddArgument(sb, Arguments.Application, stitchInstance.GroupName.Application);
             AddArgument(sb, Arguments.Component, stitchInstance.GroupName.Component);
             AddArgument(sb, Arguments.Version, stitchInstance.GroupName.Version);
             AddArgument(sb, Arguments.GroupName, stitchInstance.GroupName.ToString());
             AddArgument(sb, Arguments.DataDirectory, _stitchContext.DataDirectory);
-            AddArgument(sb, Arguments.ChannelType, channelType.ToString());
-            AddArgument(sb, Arguments.Serializer, serializerType.ToString());
+            AddArgument(sb, Arguments.ChannelType, parameters.ChannelType.ToString());
+            AddArgument(sb, Arguments.Serializer, parameters.SerializerType.ToString());
 
             return sb.ToString();
         }

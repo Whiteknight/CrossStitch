@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading;
 using CrossStitch.Stitch.Process;
-using CrossStitch.Stitch.Process.Stdio;
 using CrossStitch.Stitch.Process.Stitch;
 
 namespace PingPong.Pong

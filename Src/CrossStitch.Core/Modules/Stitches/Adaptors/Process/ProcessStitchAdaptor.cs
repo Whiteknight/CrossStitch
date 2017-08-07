@@ -1,39 +1,46 @@
 ﻿using System;
-using System.Diagnostics;
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Utility;
 using CrossStitch.Stitch;
 using CrossStitch.Stitch.Process;
 using CrossStitch.Stitch.Process.Core;
-using CrossStitch.Stitch.Process.Pipes;
-using CrossStitch.Stitch.Process.Stdio;
 using CrossStitch.Stitch.Utility;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 {
     public class ProcessStitchAdaptor : IStitchAdaptor
     {
-        private readonly string _csNodeId;
+        private readonly CrossStitchCore _core;
         private readonly StitchInstance _stitchInstance;
         private readonly ProcessParameters _parameters;
+        private readonly IModuleLog _log;
+        private readonly CoreMessageChannelFactory _channelFactory;
+        private readonly MessageSerializerFactory _serializerFactory;
+        private readonly ProcessFactory _processFactory;
 
         public CoreStitchContext StitchContext { get; }
         private System.Diagnostics.Process _process;
         private CoreMessageManager _channel;
-        private readonly StitchesConfiguration _configuration;
 
-        public ProcessStitchAdaptor(string csNodeId, StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext, ProcessParameters parameters)
+        public ProcessStitchAdaptor(CrossStitchCore core, StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext, ProcessParameters parameters, IModuleLog log)
         {
+            Assert.ArgNotNull(core, nameof(core));
             Assert.ArgNotNull(configuration, nameof(configuration));
             Assert.ArgNotNull(stitchInstance, nameof(stitchInstance));
             Assert.ArgNotNull(stitchContext, nameof(stitchContext));
             Assert.ArgNotNull(parameters, nameof(parameters));
+            Assert.ArgNotNull(log, nameof(log));
 
-            _csNodeId = csNodeId;
+            _core = core;
             _stitchInstance = stitchInstance;
             StitchContext = stitchContext;
             _parameters = parameters;
-            _configuration = configuration;
+            _log = log;
+
+            _channelFactory = new CoreMessageChannelFactory(core.NodeId, stitchInstance.Id);
+            _serializerFactory = new MessageSerializerFactory();
+            _processFactory = new ProcessFactory(stitchInstance, core, stitchContext, log);
         }
 
         public AdaptorType Type => AdaptorType.ProcessV1;
@@ -42,15 +49,20 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
         {
             try
             {
-                var data = _stitchInstance.GetAdaptorDataObject<ProcessAdaptorData>() ?? new ProcessAdaptorData();
-                if (data.Pid > 0)
-                    _process = AttachExistingProcess(data.Pid, _parameters.ChannelType);
+                //var data = _stitchInstance.GetAdaptorDataObject<ProcessAdaptorData>() ?? new ProcessAdaptorData();
+                // TODO: Need a strategy to handle a zombified child process from the previous attempt
+                // Do we try to re-attach? Force-kill it? Alert? Wait?
+                //if (data.Pid > 0)
+                //    _process = AttachExistingProcess(data.Pid, _parameters.ChannelType);
+                //if (_process == null)
+                _process = _processFactory.Create(_parameters);
                 if (_process == null)
-                    _process = CreateNewProcess(_parameters.ChannelType);
-                ;
-                if (_process == null)
+                {
+                    _log.LogError("Could not create process");
                     return false;
+                }
 
+                _process.Exited += ProcessOnExited;
                 PersistProcessData();
 
                 SetupChannel(_parameters.ChannelType, _parameters.SerializerType);
@@ -58,8 +70,11 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
                 StitchContext.RaiseProcessEvent(true, true);
 
                 return true;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
+                _log.LogError(e, "Could not create and start process");
+                StitchContext.RaiseProcessEvent(false, false);
                 return false;
             }
         }
@@ -94,7 +109,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             _channel.SendMessage(new ToStitchMessage
             {
                 Id = 0,
-                NodeId = _csNodeId,
+                NodeId = _core.NodeId,
                 ChannelName = ToStitchMessage.ChannelNameExit,
                 Data = ""
             });
@@ -119,28 +134,11 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 
         private void SetupChannel(MessageChannelType channelType, MessageSerializerType serializerType)
         {
-            var messageChannel = CreateChannel(channelType);
-            var serializer = CreateSerializer(serializerType);
+            var messageChannel = _channelFactory.Create(channelType, _process);
+            var serializer = _serializerFactory.Create(serializerType);
 
             _channel = new CoreMessageManager(StitchContext, messageChannel, serializer);
             _channel.Start();
-        }
-
-        private IMessageSerializer CreateSerializer(MessageSerializerType serializerType)
-        {
-            return new JsonMessageSerializer();
-        }
-
-        private IMessageChannel CreateChannel(MessageChannelType channelType)
-        {
-            if (channelType == MessageChannelType.Pipe)
-            {
-                var pipeName = PipeMessageChannel.GetPipeName(_csNodeId, _stitchInstance.Id);
-                return new CorePipeMessageChannel(pipeName);
-            }
-
-            return new StdioMessageChannel(_process.StandardOutput, _process.StandardInput);
-            
         }
 
         private void PersistProcessData()
@@ -150,76 +148,6 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
                 Pid = _process.Id,
                 Name = _process.ProcessName
             });
-        }
-
-        private System.Diagnostics.Process CreateNewProcess(MessageChannelType channelType)
-        {
-            try
-            {
-                //var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
-                _process = CreateNewProcessInternal(channelType == MessageChannelType.Stdio);
-
-                if (_process.Start())
-                    return _process;
-
-                _process.Dispose();
-                return null;
-            }
-            catch (Exception e)
-            {
-                // TODO: Logging
-                return null;
-            }
-        }
-
-        private System.Diagnostics.Process CreateNewProcessInternal(bool useStdio)
-        {
-            var executableFile = _parameters.ExecutableFormat
-                .Replace("{ExecutableName}", _parameters.ExecutableName)
-                .Replace("{DirectoryPath}", _parameters.DirectoryPath);
-
-            int parentPid = System.Diagnostics.Process.GetCurrentProcess().Id;
-
-            var coreArgs = new ProcessArguments(StitchContext).BuildCoreArgumentsString(_stitchInstance, _csNodeId, parentPid, _parameters.ChannelType, _parameters.SerializerType);
-            var arguments = _parameters.ArgumentsFormat
-                .Replace("{ExecutableName}", _parameters.ExecutableName)
-                .Replace("{DirectoryPath}", _parameters.DirectoryPath)
-                .Replace("{CoreArgs}", coreArgs)
-                .Replace("{CustomArgs}", _parameters.ExecutableArguments);
-
-            var process = new System.Diagnostics.Process
-            {
-                EnableRaisingEvents = true,
-                StartInfo =
-                {
-                    CreateNoWindow = true,
-                    ErrorDialog = false,
-                    FileName = executableFile,
-                    WorkingDirectory = _parameters.DirectoryPath,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    UseShellExecute = false,
-                    RedirectStandardError = useStdio,
-                    RedirectStandardInput = useStdio,
-                    RedirectStandardOutput = useStdio,
-                    Arguments = arguments
-                }
-            };
-
-            process.Exited += ProcessOnExited;
-            return process;
-        }
-
-        private System.Diagnostics.Process AttachExistingProcess(int pid, MessageChannelType channelType)
-        {
-            var process = System.Diagnostics.Process.GetProcessById(pid);
-            _process = process;
-            _process.EnableRaisingEvents = true;
-            _process.Exited += ProcessOnExited;
-            var messageChannel = new StdioMessageChannel(_process.StandardOutput, _process.StandardInput);
-            _channel = new CoreMessageManager(StitchContext, messageChannel, new JsonMessageSerializer());
-            _channel.Start();
-            StitchContext.RaiseProcessEvent(true, true);
-            return process;
         }
 
         private void ProcessOnExited(object sender, EventArgs e)
@@ -239,7 +167,8 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
                 _process.Kill();
                 _process = null;
             }
-        
+
+            _channel.Dispose();
             _channel = null;
 
             StitchContext.RaiseProcessEvent(false, requested);

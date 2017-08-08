@@ -15,7 +15,6 @@ namespace CrossStitch.Core.Models
         public StitchGroupName GroupName { get; set; }
 
         public InstanceStateType State { get; set; }
-        public long LastHeartbeatReceived { get; set; }
 
         public StitchFullId FullId => new StitchFullId(OwnerNodeId, Id);
 

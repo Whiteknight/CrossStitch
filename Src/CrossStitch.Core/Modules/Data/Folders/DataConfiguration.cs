@@ -6,7 +6,13 @@ namespace CrossStitch.Core.Modules.Data.Folders
     {
         public static Configuration GetDefault()
         {
-            return ConfigurationLoader.GetConfiguration<Configuration>("data.json");
+            var config = ConfigurationLoader.TryGetConfiguration<Configuration>("data.json");
+            if (config == null)
+            {
+                config = new Configuration();
+                config.ValidateAndSetDefaults();
+            }
+            return config;
         }
 
         public string DataPath { get; set; }

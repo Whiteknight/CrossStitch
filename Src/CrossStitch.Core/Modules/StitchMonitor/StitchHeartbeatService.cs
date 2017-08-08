@@ -1,61 +1,66 @@
 ﻿using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Messages.StitchMonitor;
-using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
-using System.Threading;
 
 namespace CrossStitch.Core.Modules.StitchMonitor
 {
     public class StitchHeartbeatService
     {
-        private readonly IDataRepository _data;
         private readonly IModuleLog _log;
         private readonly IHeartbeatSender _sender;
+        private readonly StitchStateTracker _tracker;
+        private readonly HeartbeatSequence _sequence;
+        private readonly StitchHealthCalculator _calculator;
 
-        private long _heartbeatId;
-
-        public StitchHeartbeatService(IDataRepository data, IModuleLog log, IHeartbeatSender sender)
+        public StitchHeartbeatService(IModuleLog log, IHeartbeatSender sender, IStitchHealthNotifier notifier, StitchHealthCalculator calculator)
         {
-            _data = data;
             _log = log;
             _sender = sender;
-            _heartbeatId = 0;
+            _sequence = new HeartbeatSequence();
+            _calculator = calculator;
+            _tracker = new StitchStateTracker(notifier, _calculator);
         }
 
         public long GetCurrentHeartbeatId()
         {
-            long id = Interlocked.Read(ref _heartbeatId);
-            return id;
+            return _sequence.GetCurrentHeartbeatId();
         }
 
         public void StitchSyncReceived(StitchInstanceEvent e)
         {
             long heartbeatId = e.DataId;
+
+            _tracker.ReceiveSync(heartbeatId, e.InstanceId);
+
             _log.LogDebug("Stitch Id={0} Heartbeat sync received: {1}", e.InstanceId, heartbeatId);
-            _data.Update<StitchInstance>(e.InstanceId, si =>
-            {
-                if (si.LastHeartbeatReceived < heartbeatId)
-                    si.LastHeartbeatReceived = heartbeatId;
-            });
         }
 
         public void SendScheduledHeartbeat()
         {
-            long id = Interlocked.Increment(ref _heartbeatId);
+            var id = _sequence.MoveToNextHeartbeatId();
             _log.LogDebug("Sending heartbeat {0}", id);
 
             _sender.SendHeartbeat(id);
+
+            _tracker.DetectUnhealthyStitches(id);
         }
 
         public StitchHealthResponse GetStitchHealthReport(StitchHealthRequest arg)
         {
-            var heartbeatId = GetCurrentHeartbeatId();
-            var stitch = _data.Get<StitchInstance>(arg.StitchId);
-            if (stitch == null)
-                return StitchHealthResponse.Create(arg, 0, 0, StitchHealthType.Missing);
+            var heartbeatId = _sequence.GetCurrentHeartbeatId();
+            var lastSyncReceived = _tracker.GetLastHeartbeatSync(arg.StitchId);
+            var report = _calculator.CalculateHealth(heartbeatId, lastSyncReceived);
+            return StitchHealthResponse.Create(arg, report.LastHeartbeatSync, heartbeatId, report.HealthType);
+        }
 
-            var health = StitchHealthResponse.CalculateHealth(heartbeatId, stitch.LastHeartbeatReceived);
-            return StitchHealthResponse.Create(arg, stitch.LastHeartbeatReceived, heartbeatId, health);
+        public void StitchStarted(string id)
+        {
+            _tracker.StitchStarted(id, GetCurrentHeartbeatId());
+        }
+
+        public void StitchStopped(string id)
+        {
+            _tracker.StitchStopped(id);
         }
     }
 }

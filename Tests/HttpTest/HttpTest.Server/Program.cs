@@ -52,8 +52,7 @@ namespace HttpTest
                     Name = "HttpTest.Stitch",
                     GroupName = groupName,
 
-                    State = InstanceStateType.Running,
-                    LastHeartbeatReceived = 0
+                    State = InstanceStateType.Running
                 };
                 dataStorage.Save(stitch, true);
 

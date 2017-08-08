@@ -1,0 +1,4 @@
+﻿{
+    "HeartbeatIntervalMinutes": "1",
+    "MissedHeartbeatsThreshold":  "2" 
+}

@@ -37,8 +37,7 @@ namespace JsStitch.Core
                 {
                     Name = "JsStitch.Stitch",
                     GroupName = groupName,
-                    State = InstanceStateType.Running,
-                    LastHeartbeatReceived = 0
+                    State = InstanceStateType.Running
                 }, true);
 
                 var data = new DataModule(core.MessageBus, dataStorage);

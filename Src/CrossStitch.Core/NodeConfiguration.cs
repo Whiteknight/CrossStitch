@@ -6,13 +6,19 @@ namespace CrossStitch.Core
     {
         public static NodeConfiguration GetDefault()
         {
-            return ConfigurationLoader.GetConfiguration<NodeConfiguration>("node.json");
+            var config = ConfigurationLoader.TryGetConfiguration<NodeConfiguration>("node.json");
+            if (config != null)
+                return config;
+            config = new NodeConfiguration();
+            config.ValidateAndSetDefaults();
+            return config;
         }
 
         public string NodeId { get; set; }
         public string NodeName { get; set; }
+
+        public int MissedHeartbeatsThreshold { get; set; }
         public int HeartbeatIntervalMinutes { get; set; }
-        public int StitchMonitorIntervalMinutes { get; set; }
         public int StatusBroadcastIntervalMinutes { get; set; }
         public string StateFileFolder { get; set; }
 
@@ -20,8 +26,8 @@ namespace CrossStitch.Core
         {
             if (HeartbeatIntervalMinutes <= 0)
                 HeartbeatIntervalMinutes = 1;
-            if (StitchMonitorIntervalMinutes <= 0)
-                StitchMonitorIntervalMinutes = 5;
+            if (MissedHeartbeatsThreshold <= 0)
+                MissedHeartbeatsThreshold = 5;
             if (StatusBroadcastIntervalMinutes <= 0)
                 StatusBroadcastIntervalMinutes = 5;
             if (string.IsNullOrEmpty(StateFileFolder))

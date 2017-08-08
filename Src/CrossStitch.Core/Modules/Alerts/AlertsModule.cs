@@ -22,7 +22,7 @@ namespace CrossStitch.Core.Modules.Alerts
         {
             return new Dictionary<string, string>
             {
-                {"Senders", _senders.Length.ToString() }
+                { "Senders", _senders.Length.ToString() }
             };
         }
 

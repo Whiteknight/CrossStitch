@@ -30,16 +30,5 @@
                 HeartbeatsMissed = currentHeartbeatId - lastHeartbeatId
             };
         }
-
-        // TODO: Maybe move this into a proper calculator class
-        public static StitchHealthType CalculateHealth(long lastHeartbeatId, long lastSyncId)
-        {
-            long missedHeartbeats = lastHeartbeatId - lastSyncId;
-            if (missedHeartbeats <= 1)
-                return StitchHealthType.Green;
-            if (missedHeartbeats <= 3)
-                return StitchHealthType.Yellow;
-            return StitchHealthType.Red;
-        }
     }
 }

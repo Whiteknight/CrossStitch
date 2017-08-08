@@ -21,7 +21,6 @@ namespace CrossStitch.Core.Modules.Stitches
                 Id = null,
                 StoreVersion = 0,
                 GroupName = request.GroupName,
-                LastHeartbeatReceived = 0,
                 Name = request.Name,
                 OwnerNodeName = _nodeName,
                 OwnerNodeId = _nodeId

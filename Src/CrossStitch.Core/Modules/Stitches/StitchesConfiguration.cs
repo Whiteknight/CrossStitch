@@ -7,7 +7,13 @@ namespace CrossStitch.Core.Modules.Stitches
     {
         public static StitchesConfiguration GetDefault()
         {
-            return ConfigurationLoader.GetConfiguration<StitchesConfiguration>("stitches.json");
+            var config = ConfigurationLoader.TryGetConfiguration<StitchesConfiguration>("stitches.json");
+            if (config == null)
+            {
+                config = new StitchesConfiguration();
+                config.ValidateAndSetDefaults();
+            }
+            return config;
         }
 
         public string DataBasePath { get; set; }

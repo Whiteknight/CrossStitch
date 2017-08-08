@@ -38,8 +38,7 @@ namespace PingPong.Server
                 {
                     Name = "PingPong.Ping",
                     GroupName = pingGroup,
-                    State = InstanceStateType.Running,
-                    LastHeartbeatReceived = 0
+                    State = InstanceStateType.Running
                 };
 
                 var pongGroup = new StitchGroupName("PingPong", "Pong", "1");
@@ -61,8 +60,7 @@ namespace PingPong.Server
                 {
                     Name = "PingPong.Pong",
                     GroupName = pongGroup,
-                    State = InstanceStateType.Running,
-                    LastHeartbeatReceived = 0
+                    State = InstanceStateType.Running
                 };
 
                 dataStorage.Save(pingPackage, true);

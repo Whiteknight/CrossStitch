@@ -79,6 +79,7 @@
     <Compile Include="Messages\Master\CommandType.cs" />
     <Compile Include="Messages\Master\JobCompleteEvent.cs" />
     <Compile Include="Messages\Master\StitchSummaryRequest.cs" />
+    <Compile Include="Messages\StitchMonitor\StitchHealthEvent.cs" />
     <Compile Include="Models\AdaptorType.cs" />
     <Compile Include="Models\InstanceAdaptorDetails.cs" />
     <Compile Include="Models\InstanceStateType.cs" />
@@ -114,8 +115,13 @@
     <Compile Include="Modules\Stitches\StitchesService.cs" />
     <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
     <Compile Include="Modules\Stitches\StitchInstanceMapper.cs" />
+    <Compile Include="Modules\StitchMonitor\HeartbeatSequence.cs" />
     <Compile Include="Modules\StitchMonitor\IHeartbeatSender.cs" />
+    <Compile Include="Modules\StitchMonitor\IStitchHealthNotifier.cs" />
+    <Compile Include="Modules\StitchMonitor\StitchHealthCalculator.cs" />
+    <Compile Include="Modules\StitchMonitor\StitchHealthReport.cs" />
     <Compile Include="Modules\StitchMonitor\StitchHeartbeatService.cs" />
+    <Compile Include="Modules\StitchMonitor\StitchStateTracker.cs" />
     <Compile Include="Utility\IDataRepository.cs" />
     <Compile Include="Messages\Alerts\AlertEvent.cs" />
     <Compile Include="Messages\Backplane\NetworkEvent.cs" />

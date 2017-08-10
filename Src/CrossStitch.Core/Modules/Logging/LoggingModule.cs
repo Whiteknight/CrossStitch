@@ -9,24 +9,25 @@ namespace CrossStitch.Core.Modules.Logging
     {
         private readonly IMessageBus _messageBus;
         private readonly ILog _log;
+        private readonly SubscriptionCollection _subscriptions;
 
-        private SubscriptionCollection _subscriptions;
         private int _threadId;
 
         public LoggingModule(CrossStitchCore core, ILog log)
         {
             _log = log;
             _messageBus = core.MessageBus;
+            _subscriptions = new SubscriptionCollection(_messageBus);
+
         }
 
         public string Name => ModuleNames.Log;
 
         public void Start()
         {
-            _subscriptions = new SubscriptionCollection(_messageBus);
-
             _threadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
+            _subscriptions.Clear();
             _subscriptions.Subscribe<LogEvent>(b => b
                 .WithChannelName(LogEvent.LevelDebug)
                 .Invoke(l => _log.Debug(l.Message))
@@ -56,8 +57,7 @@ namespace CrossStitch.Core.Modules.Logging
 
         public void Stop()
         {
-            _subscriptions?.Dispose();
-            _subscriptions = null;
+            _subscriptions.Dispose();
 
             _messageBus?.ThreadPool?.StopDedicatedWorker(_threadId);
             _threadId = 0;

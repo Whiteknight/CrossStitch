@@ -12,31 +12,27 @@ namespace CrossStitch.Core.Modules.Stitches
 {
     public class StitchesModule : IModule
     {
-        private readonly IMessageBus _messageBus;
         private readonly StitchesService _service;
-
-        private SubscriptionCollection _subscriptions;
+        private readonly SubscriptionCollection _subscriptions;
 
         public StitchesModule(CrossStitchCore core, StitchesConfiguration configuration = null)
         {
-            _messageBus = core.MessageBus;
             configuration = configuration ?? StitchesConfiguration.GetDefault();
-            var log = new ModuleLog(_messageBus, Name);
+            var log = new ModuleLog(core.MessageBus, Name);
             var fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
             var adaptorFactory = new StitchAdaptorFactory(core, configuration, fileSystem, log);
             var manager = new StitchInstanceManager(fileSystem, adaptorFactory);
-            var observer = new StitchEventObserver(_messageBus, log);
+            var observer = new StitchEventObserver(core.MessageBus, log);
             var data = new DataHelperClient(core.MessageBus);
-            var notifier = new StitchEventNotifier(_messageBus);
+            var notifier = new StitchEventNotifier(core.MessageBus);
             _service = new StitchesService(core, data, fileSystem, manager, observer, log, notifier);
+            _subscriptions = new SubscriptionCollection(core.MessageBus);
         }
 
         public string Name => ModuleNames.Stitches;
 
         public void Start()
         {
-            _subscriptions = new SubscriptionCollection(_messageBus);
-
             // On Core initialization, startup all necessary Stitches
             _subscriptions.Subscribe<CoreEvent>(b => b
                 .WithChannelName(CoreEvent.ChannelInitialized)
@@ -92,8 +88,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public void Stop()
         {
             _service.StopAllOnShutdown();
-            _subscriptions?.Dispose();
-            _subscriptions = null;
+            _subscriptions.Dispose();
         }
 
         public IReadOnlyDictionary<string, string> GetStatusDetails()

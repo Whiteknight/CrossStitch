@@ -20,10 +20,10 @@ namespace CrossStitch.Core.Modules.Master
         private readonly IMessageBus _messageBus;
         private readonly MasterDataRepository _data;
         private readonly ModuleLog _log;
+        private readonly SubscriptionCollection _subscriptions;
 
         private int _cacheThreadId;
-        private SubscriptionCollection _subscriptions;
-
+        
         public MasterModule(CrossStitchCore core, NodeConfiguration configuration)
         {
             _configuration = configuration;
@@ -34,6 +34,7 @@ namespace CrossStitch.Core.Modules.Master
             var stitches = new StitchRequestHandler(core.MessageBus);
             var sender = new ClusterMessageSender(core.MessageBus);
             _service = new MasterService(core, _log, _data, stitches, sender);
+            _subscriptions = new SubscriptionCollection(_messageBus);
         }
 
         // TODO: We need to keep track of Backplane zones, so we can know to schedule certain
@@ -68,7 +69,7 @@ namespace CrossStitch.Core.Modules.Master
         public void Start()
         {
             _data.Initialize();
-            _subscriptions = new SubscriptionCollection(_messageBus);
+            
             _cacheThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
             // On startup, publish the node status and get info from the backplane
@@ -161,8 +162,7 @@ namespace CrossStitch.Core.Modules.Master
 
         public void Stop()
         {
-            _subscriptions?.Dispose();
-            _subscriptions = null;
+            _subscriptions.Dispose();
         }
 
         public IReadOnlyDictionary<string, string> GetStatusDetails()

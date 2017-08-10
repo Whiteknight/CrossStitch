@@ -9,28 +9,24 @@ namespace CrossStitch.Core.Modules.StitchMonitor
     public class StitchMonitorModule : IModule
     {
         private readonly NodeConfiguration _configuration;
-        private readonly IMessageBus _messageBus;
         private readonly StitchHeartbeatService _heartbeatService;
-
-        private SubscriptionCollection _subscriptions;
+        private readonly SubscriptionCollection _subscriptions;
 
         public StitchMonitorModule(CrossStitchCore core, NodeConfiguration configuration)
         {
-            _messageBus = core.MessageBus;
             _configuration = configuration;
-            var log = new ModuleLog(_messageBus, Name);
+            var log = new ModuleLog(core.MessageBus, Name);
             var calculator = new StitchHealthCalculator(configuration.MissedHeartbeatsThreshold);
-            var heartbeatSender = new HeartbeatSender(_messageBus);
-            var healthNotifier = new StitchHealthNotifier(_messageBus);
+            var heartbeatSender = new HeartbeatSender(core.MessageBus);
+            var healthNotifier = new StitchHealthNotifier(core.MessageBus);
             _heartbeatService = new StitchHeartbeatService(log, heartbeatSender, healthNotifier, calculator);
+            _subscriptions = new SubscriptionCollection(core.MessageBus);
         }
 
         public string Name => ModuleNames.StitchMonitor;
 
         public void Start()
         {
-            _subscriptions = new SubscriptionCollection(_messageBus);
-
             int heartbeatTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
             _subscriptions.TimerSubscribe(heartbeatTickMultiple, b => b
                 .Invoke(e => _heartbeatService.SendScheduledHeartbeat()));
@@ -52,8 +48,7 @@ namespace CrossStitch.Core.Modules.StitchMonitor
 
         public void Stop()
         {
-            _subscriptions?.Dispose();
-            _subscriptions = null;
+            _subscriptions.Dispose();
         }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()

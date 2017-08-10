@@ -11,14 +11,15 @@ namespace CrossStitch.Core.Modules.Data
     {
         private readonly IMessageBus _messageBus;
         private readonly DataService _service;
+        private readonly SubscriptionCollection _subscriptions;
 
-        private SubscriptionCollection _subscriptions;
         private int _workerThreadId;
 
         public DataModule(IMessageBus messageBus, IDataStorage storage = null)
         {
             _messageBus = messageBus;
             _service = new DataService(storage ?? new InMemoryDataStorage(), new ModuleLog(messageBus, Name));
+            _subscriptions = new SubscriptionCollection(_messageBus);
         }
 
         public string Name => ModuleNames.Data;
@@ -27,7 +28,6 @@ namespace CrossStitch.Core.Modules.Data
         {
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
-            _subscriptions = new SubscriptionCollection(_messageBus);
             _subscriptions.Clear();
             _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l
                 .OnDefaultChannel()
@@ -49,10 +49,7 @@ namespace CrossStitch.Core.Modules.Data
 
         public void Stop()
         {
-            if (_subscriptions == null)
-                return;
             _subscriptions.Dispose();
-            _subscriptions = null;
             _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
             _workerThreadId = 0;
         }

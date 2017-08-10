@@ -28,7 +28,7 @@ namespace CrossStitch.Core.Modules.Data
             _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
 
             _subscriptions = new SubscriptionCollection(_messageBus);
-
+            _subscriptions.Clear();
             _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l
                 .OnDefaultChannel()
                 .Invoke(_service.HandleRequest)

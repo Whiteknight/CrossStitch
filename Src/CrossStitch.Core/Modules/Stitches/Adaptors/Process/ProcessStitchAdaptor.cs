@@ -22,6 +22,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
         public CoreStitchContext StitchContext { get; }
         private System.Diagnostics.Process _process;
         private CoreMessageManager _channel;
+        private bool _stopRequested;
 
         public ProcessStitchAdaptor(CrossStitchCore core, StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext, ProcessParameters parameters, IModuleLog log)
         {
@@ -41,6 +42,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             _channelFactory = new CoreMessageChannelFactory(core.NodeId, stitchInstance.Id);
             _serializerFactory = new MessageSerializerFactory();
             _processFactory = new ProcessFactory(stitchInstance, core, stitchContext, log);
+            _stopRequested = false;
         }
 
         public AdaptorType Type => AdaptorType.ProcessV1;
@@ -106,6 +108,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 
         public void Stop()
         {
+            _stopRequested = true;
             _channel.SendMessage(new ToStitchMessage
             {
                 Id = 0,
@@ -113,7 +116,6 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
                 ChannelName = ToStitchMessage.ChannelNameExit,
                 Data = ""
             });
-            Cleanup(true);
         }
 
         public StitchResourceUsage GetResources()
@@ -153,7 +155,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
         private void ProcessOnExited(object sender, EventArgs e)
         {
             // TODO: Can we get any information about why/how the process exited?
-            Cleanup(false);
+            Cleanup(_stopRequested);
         }
 
         private void Cleanup(bool requested)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CrossStitch.Core.Models;
 using CrossStitch.Stitch.Utility;
 
@@ -43,14 +42,14 @@ namespace CrossStitch.Core.Modules.Data
             if (_allData.ContainsKey(key))
             {
                 var json1 = _allData[key];
-                return Stitch.Utility.JsonUtility.Deserialize<TEntity>(json1);
+                return JsonUtility.Deserialize<TEntity>(json1);
             }
 
             var entity = _inner.Get<TEntity>(id);
             if (entity == null)
                 return null;
 
-            var json2 = Stitch.Utility.JsonUtility.Serialize(entity);
+            var json2 = JsonUtility.Serialize(entity);
             _allData.Add(key, json2);
             return entity;
         }
@@ -60,16 +59,16 @@ namespace CrossStitch.Core.Modules.Data
         {
             // No real way to cache this, because we don't know if we have all data. We could
             // iterate over the results and make sure they are in the cache in case we want to
-            // get each one individually later.s
+            // get each one individually later.
             return _inner.GetAll<TEntity>();
         }
 
         public long Save<TEntity>(TEntity entity, bool force)
             where TEntity : class, IDataEntity
         {
-            long id = _inner.Save<TEntity>(entity, force);
+            long id = _inner.Save(entity, force);
             string key = GetKey<TEntity>(entity.Id);
-            string json = Stitch.Utility.JsonUtility.Serialize(entity);
+            string json = JsonUtility.Serialize(entity);
             _allData.Add(key, json);
             return id;
         }

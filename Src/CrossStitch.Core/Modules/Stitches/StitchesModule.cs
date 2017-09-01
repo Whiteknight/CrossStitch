@@ -35,53 +35,53 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             // On Core initialization, startup all necessary Stitches
             _subscriptions.Subscribe<CoreEvent>(b => b
-                .WithChannelName(CoreEvent.ChannelInitialized)
+                .WithTopic(CoreEvent.ChannelInitialized)
                 .Invoke(m => _service.StartRunningStitchesOnStartup())
                 .OnWorkerThread());
 
             // Upload package files
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
-                .WithChannelName(PackageFileUploadRequest.ChannelLocal)
+                .WithTopic(PackageFileUploadRequest.ChannelLocal)
                 .Invoke(_service.UploadStitchPackageFile));
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
-                .WithChannelName(PackageFileUploadRequest.ChannelFromRemote)
+                .WithTopic(PackageFileUploadRequest.ChannelFromRemote)
                 .Invoke(_service.UploadStitchPackageFileFromRemote));
 
             _subscriptions.Listen<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.CreateNewInstance));
 
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelClone)
+                .WithTopic(InstanceRequest.ChannelClone)
                 .Invoke(_service.CloneInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelStart)
+                .WithTopic(InstanceRequest.ChannelStart)
                 .Invoke(_service.StartInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelStop)
+                .WithTopic(InstanceRequest.ChannelStop)
                 .Invoke(_service.StopInstance));
             _subscriptions.Listen<InstanceRequest, InstanceResponse>(l => l
-                .WithChannelName(InstanceRequest.ChannelDelete)
+                .WithTopic(InstanceRequest.ChannelDelete)
                 .Invoke(_service.DeleteStitchInstance));
 
             _subscriptions.Listen<InstanceInformationRequest, List<InstanceInformation>>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(m => _service.GetInstanceInformation()));
             _subscriptions.Listen<StitchResourceUsageRequest, StitchResourceUsage>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(m => _service.GetInstanceResources(m.StitchInstanceId)));
 
             _subscriptions.Subscribe<StitchDataMessage>(b => b
-                .WithChannelName(StitchDataMessage.ChannelSendLocal)
+                .WithTopic(StitchDataMessage.ChannelSendLocal)
                 .Invoke(_service.SendDataMessageToStitch)
                 .OnWorkerThread()
                 .WithFilter(m => !string.IsNullOrEmpty(m.ToStitchInstanceId)));
             _subscriptions.Subscribe<ObjectReceivedEvent<StitchDataMessage>>(b => b
-                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .WithTopic(ReceivedEvent.ChannelReceived)
                 .Invoke(m => _service.SendDataMessageToStitch(m.Object)));
 
             _subscriptions.Subscribe<SendHeartbeatEvent>(b => b
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(m => _service.SendHeartbeat(m.HeartbeatId)));
         }
 

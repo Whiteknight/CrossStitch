@@ -9,7 +9,6 @@ namespace CrossStitch.Core.Modules.Data
 {
     public sealed class DataModule : IModule
     {
-        private readonly IMessageBus _messageBus;
         private readonly DataService _service;
         private readonly SubscriptionCollection _subscriptions;
 
@@ -17,32 +16,30 @@ namespace CrossStitch.Core.Modules.Data
 
         public DataModule(IMessageBus messageBus, IDataStorage storage = null)
         {
-            _messageBus = messageBus;
             _service = new DataService(storage ?? new InMemoryDataStorage(), new ModuleLog(messageBus, Name));
-            _subscriptions = new SubscriptionCollection(_messageBus);
+            _subscriptions = new SubscriptionCollection(messageBus);
         }
 
         public string Name => ModuleNames.Data;
 
         public void Start()
         {
-            _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
-
             _subscriptions.Clear();
+            _workerThreadId = _subscriptions.WorkerPool.StartDedicatedWorker().ThreadId;
             _subscriptions.Listen<DataRequest<StitchInstance>, DataResponse<StitchInstance>>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.HandleRequest)
                 .OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<NodeStatus>, DataResponse<NodeStatus>>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.HandleRequest)
                 .OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<CommandJob>, DataResponse<CommandJob>>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.HandleRequest)
                 .OnThread(_workerThreadId));
             _subscriptions.Listen<DataRequest<PackageFile>, DataResponse<PackageFile>>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.HandleRequest)
                 .OnThread(_workerThreadId));
         }
@@ -50,7 +47,6 @@ namespace CrossStitch.Core.Modules.Data
         public void Stop()
         {
             _subscriptions.Dispose();
-            _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
             _workerThreadId = 0;
         }
 

@@ -7,7 +7,6 @@ namespace CrossStitch.Core.Modules.Logging
     // This module serves as an adaptor between the ILog and IMessageBus
     public class LoggingModule : IModule
     {
-        private readonly IMessageBus _messageBus;
         private readonly ILog _log;
         private readonly SubscriptionCollection _subscriptions;
 
@@ -16,35 +15,33 @@ namespace CrossStitch.Core.Modules.Logging
         public LoggingModule(CrossStitchCore core, ILog log)
         {
             _log = log;
-            _messageBus = core.MessageBus;
-            _subscriptions = new SubscriptionCollection(_messageBus);
-
+            IMessageBus messageBus = core.MessageBus;
+            _subscriptions = new SubscriptionCollection(messageBus);
         }
 
         public string Name => ModuleNames.Log;
 
         public void Start()
         {
-            _threadId = _messageBus.ThreadPool.StartDedicatedWorker();
-
             _subscriptions.Clear();
+            _threadId = _subscriptions.WorkerPool.StartDedicatedWorker().ThreadId;
             _subscriptions.Subscribe<LogEvent>(b => b
-                .WithChannelName(LogEvent.LevelDebug)
+                .WithTopic(LogEvent.LevelDebug)
                 .Invoke(l => _log.Debug(l.Message))
                 .OnThread(_threadId));
 
             _subscriptions.Subscribe<LogEvent>(b => b
-                .WithChannelName(LogEvent.LevelInformation)
+                .WithTopic(LogEvent.LevelInformation)
                 .Invoke(l => _log.Info(l.Message))
                 .OnThread(_threadId));
 
             _subscriptions.Subscribe<LogEvent>(b => b
-                .WithChannelName(LogEvent.LevelWarning)
+                .WithTopic(LogEvent.LevelWarning)
                 .Invoke(l => _log.Warn(l.Message))
                 .OnThread(_threadId));
 
             _subscriptions.Subscribe<LogEvent>(b => b
-                .WithChannelName(LogEvent.LevelError)
+                .WithTopic(LogEvent.LevelError)
                 .Invoke(l =>
                 {
                     if (l.Exception != null)
@@ -58,8 +55,6 @@ namespace CrossStitch.Core.Modules.Logging
         public void Stop()
         {
             _subscriptions.Dispose();
-
-            _messageBus?.ThreadPool?.StopDedicatedWorker(_threadId);
             _threadId = 0;
         }
 

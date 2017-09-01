@@ -21,7 +21,7 @@ namespace CrossStitch.Core.MessageBus
             where TEntity : class, IDataEntity
         {
             return Bus
-                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Get(id))
+                .RequestWait<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Get(id))
                 ?.Entity;
         }
 
@@ -29,7 +29,7 @@ namespace CrossStitch.Core.MessageBus
             where TEntity : class, IDataEntity
         {
             var response = Bus
-                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Delete(id));
+                .RequestWait<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.Delete(id));
             return response.Type == DataResponseType.Success;
         }
 
@@ -38,7 +38,7 @@ namespace CrossStitch.Core.MessageBus
         {
             entity.StoreVersion = 0;
             var request = DataRequest<TEntity>.Save(entity);
-            var response = Bus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request);
+            var response = Bus.RequestWait<DataRequest<TEntity>, DataResponse<TEntity>>(request);
             if (response == null || response.Type != DataResponseType.Success)
                 return null;
 
@@ -49,7 +49,7 @@ namespace CrossStitch.Core.MessageBus
             where TEntity : class, IDataEntity
         {
             var request = DataRequest<TEntity>.Save(id, update);
-            return Bus.Request<DataRequest<TEntity>, DataResponse<TEntity>>(request)?.Entity;
+            return Bus.RequestWait<DataRequest<TEntity>, DataResponse<TEntity>>(request)?.Entity;
         }
 
         public bool Save<TEntity>(TEntity entity, bool force = false)
@@ -68,7 +68,7 @@ namespace CrossStitch.Core.MessageBus
             where TEntity : class, IDataEntity
         {
             var response = Bus
-                .Request<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.GetAll());
+                .RequestWait<DataRequest<TEntity>, DataResponse<TEntity>>(DataRequest<TEntity>.GetAll());
             return response == null ? Enumerable.Empty<TEntity>() : response.Entities;
         }
     }

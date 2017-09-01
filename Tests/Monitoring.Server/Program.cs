@@ -28,10 +28,10 @@ namespace Monitoring.Server
                 core.AddModule(logging);
 
                 core.MessageBus.Subscribe<StitchHealthEvent>(b => b
-                    .WithChannelName(StitchHealthEvent.TopicUnhealthy)
+                    .WithTopic(StitchHealthEvent.TopicUnhealthy)
                     .Invoke(e => core.Log.LogInformation("Stitch {0} is unhealthy", e.InstanceId)));
                 core.MessageBus.Subscribe<StitchHealthEvent>(b => b
-                    .WithChannelName(StitchHealthEvent.TopicReturnToHealth)
+                    .WithTopic(StitchHealthEvent.TopicReturnToHealth)
                     .Invoke(e => core.Log.LogInformation("Stitch {0} is Healthy again", e.InstanceId)));
 
                 core.Start();
@@ -46,7 +46,7 @@ namespace Monitoring.Server
         private static void StartBuiltinStitch(CrossStitchCore core)
         {
             var group3 = new StitchGroupName("Monitoring", "BuiltIn", "1");
-            var packageResult3 = core.MessageBus.Request<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
+            var packageResult3 = core.MessageBus.RequestWait<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
             {
                 Id = group3.ToString(),
                 GroupName = group3,
@@ -59,13 +59,13 @@ namespace Monitoring.Server
                     }
                 },
             }, true));
-            var createResult3 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
+            var createResult3 = core.MessageBus.RequestWait<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
             {
                 Name = "Monitoring.BuiltIn",
                 GroupName = group3,
                 NumberOfInstances = 1
             });
-            core.MessageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
+            core.MessageBus.RequestWait<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
             {
                 Id = createResult3.CreatedIds.FirstOrDefault()
             });

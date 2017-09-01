@@ -1,7 +1,5 @@
 ﻿using CrossStitch.Core;
 using CrossStitch.Core.Models;
-using CrossStitch.Core.Modules.Data;
-using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using System;
@@ -48,7 +46,7 @@ namespace StitchStart.Server
         private static void StartBuiltinStitch(CrossStitchCore core)
         {
             var group3 = new StitchGroupName("StitchStart", "BuiltIn", "1");
-            var packageResult3 = core.MessageBus.Request<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
+            var packageResult3 = core.MessageBus.RequestWait<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
             {
                 Id = group3.ToString(),
                 GroupName = group3,
@@ -61,13 +59,13 @@ namespace StitchStart.Server
                     }
                 },
             }, true));
-            var createResult3 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
+            var createResult3 = core.MessageBus.RequestWait<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
             {
                 Name = "StitchStart.BuiltIn",
                 GroupName = group3,
                 NumberOfInstances = 1
             });
-            core.MessageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
+            core.MessageBus.RequestWait<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
             {
                 Id = createResult3.CreatedIds.FirstOrDefault()
             });
@@ -76,7 +74,7 @@ namespace StitchStart.Server
         private static void StartProcessStitch(CrossStitchCore core, string name, MessageChannelType channelType)
         {
             var group1 = new StitchGroupName("StitchStart", name, "1");
-            var packageResult1 = core.MessageBus.Request<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
+            var packageResult1 = core.MessageBus.RequestWait<DataRequest<PackageFile>, DataResponse<PackageFile>>(DataRequest<PackageFile>.Save(new PackageFile
             {
                 Id = group1.ToString(),
                 GroupName = group1,
@@ -92,13 +90,13 @@ namespace StitchStart.Server
                     Channel = channelType
                 }
             }, true));
-            var createResult1 = core.MessageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
+            var createResult1 = core.MessageBus.RequestWait<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(new LocalCreateInstanceRequest
             {
                 Name = "StitchStart." + name,
                 GroupName = group1,
                 NumberOfInstances = 1,
             });
-            core.MessageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
+            core.MessageBus.RequestWait<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, new InstanceRequest
             {
                 Id = createResult1.CreatedIds.FirstOrDefault()
             });

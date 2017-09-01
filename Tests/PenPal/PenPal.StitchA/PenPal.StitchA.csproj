@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj">
-      <Project>{4bd40e13-2f9a-41c9-aed4-dc160b3d48a6}</Project>
+      <Project>{19dad234-cd73-42bd-b3f5-8bdaba68fc12}</Project>
       <Name>CrossStitch.Stitch</Name>
     </ProjectReference>
   </ItemGroup>

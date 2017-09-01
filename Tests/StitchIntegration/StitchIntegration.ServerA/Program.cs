@@ -40,7 +40,7 @@ namespace StitchIntegration.ServerA
                 _testLog.LogInformation("Waiting for ServerB");
                 // Wait until we get a node joined event with ServerB. Kick off the test and unsubscribe
                 core.MessageBus.Subscribe<ClusterMemberEvent>(b => b
-                    .WithChannelName(ClusterMemberEvent.EnteringEvent)
+                    .WithTopic(ClusterMemberEvent.EnteringEvent)
                     .Invoke(m => TestStep1(core.MessageBus, m.NodeId, m.NetworkNodeId))
                     .OnThreadPool()
                     .MaximumEvents(1));
@@ -75,14 +75,14 @@ namespace StitchIntegration.ServerA
 
             // Subscribe to the Job complete event, so we can move to the next step as soon as it is ready
             messageBus.Subscribe<JobCompleteEvent>(b => b
-                .WithChannelName(JobCompleteEvent.ChannelSuccess)
+                .WithTopic(JobCompleteEvent.ChannelSuccess)
                 .Invoke(m => TestStep2(messageBus, m))
                 .OnThreadPool()
                 .MaximumEvents(1));
 
             // "Upload" the stitch file to ServerA, which will broadcast to ServerB
             _testLog.LogInformation("Uploading the Stitch.zip package file");
-            var response = messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(new PackageFileUploadRequest
+            var response = messageBus.RequestWait<PackageFileUploadRequest, PackageFileUploadResponse>(new PackageFileUploadRequest
             {
                 Contents = stream,
                 FileName = "Stitch.zip",
@@ -113,13 +113,13 @@ namespace StitchIntegration.ServerA
 
             // Subscribe to the Job complete event, so we can move to the next step as soon as it is ready
             messageBus.Subscribe<JobCompleteEvent>(b => b
-                .WithChannelName(JobCompleteEvent.ChannelSuccess)
+                .WithTopic(JobCompleteEvent.ChannelSuccess)
                 .Invoke(m => TestStep3(messageBus, m))
                 .OnThreadPool()
                 .MaximumEvents(1));
 
             // Command ServerB to create a new stitch instance
-            var response = messageBus.Request<CreateInstanceRequest, CreateInstanceResponse>(new CreateInstanceRequest
+            var response = messageBus.RequestWait<CreateInstanceRequest, CreateInstanceResponse>(new CreateInstanceRequest
             {
                 GroupName = _groupName,
                 LocalOnly = false,
@@ -138,13 +138,13 @@ namespace StitchIntegration.ServerA
             Thread.Sleep(5000);
 
             messageBus.Subscribe<JobCompleteEvent>(b => b
-                .WithChannelName(JobCompleteEvent.ChannelSuccess)
+                .WithTopic(JobCompleteEvent.ChannelSuccess)
                 .Invoke(m => TestStep4(messageBus, m))
                 .OnThreadPool()
                 .MaximumEvents(1));
 
             // Command ServerB to start the stitch instance
-            var response = messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
+            var response = messageBus.RequestWait<CommandRequest, CommandResponse>(new CommandRequest
             {
                 Command = CommandType.StartStitchGroup,
                 Target = _groupName.ToString()

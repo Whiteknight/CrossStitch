@@ -32,7 +32,7 @@ namespace CrossStitch.Core.Modules.Core
         public void Start()
         {
             _subscriptions.Listen<ModuleStatusRequest, ModuleStatusResponse>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(GetModuleStatus));
         }
 

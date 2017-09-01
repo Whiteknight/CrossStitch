@@ -1,242 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props" Condition="Exists('..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A9A30EDF-7047-4D0F-A756-816EB85D0384}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CrossStitch.Core</RootNamespace>
-    <AssemblyName>CrossStitch.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.2.0</Version>
+    <Authors>Andrew F. Whitworth</Authors>
+    <Company />
+    <Product>CrossStitch</Product>
+    <Description>A light-weight, low-ceremony app fabric for .NET: Core Library</Description>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\net46</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release 4.5|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <OutputPath>bin\Release\net45\</OutputPath>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Acquaintance, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Acquaintance.1.0.1\lib\net46\Acquaintance.dll</HintPath>
+    <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Acquaintance" Version="2.0.0-alpha1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CrossStitch.Stitch\CrossStitch.Stitch.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration">
+      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2\System.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Common.Logging.Core, Version=3.4.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Common.Logging.Core.3.4.0\lib\net40\Common.Logging.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Configuration\IModuleConfiguration.cs" />
-    <Compile Include="Messages\Backplane\ClusterMessage.cs" />
-    <Compile Include="Messages\Backplane\ClusterMessageBuilder.cs" />
-    <Compile Include="Messages\Backplane\FileTransferRequest.cs" />
-    <Compile Include="Messages\Backplane\IRequiresNetworkNodeId.cs" />
-    <Compile Include="Messages\Backplane\MessageHeader.cs" />
-    <Compile Include="Messages\Backplane\MessagePayloadType.cs" />
-    <Compile Include="Messages\Backplane\TargetType.cs" />
-    <Compile Include="Messages\Master\CommandReceipt.cs" />
-    <Compile Include="Messages\Master\CommandRequest.cs" />
-    <Compile Include="Messages\Master\CommandResponse.cs" />
-    <Compile Include="Messages\Master\CommandResultType.cs" />
-    <Compile Include="Messages\Master\CommandType.cs" />
-    <Compile Include="Messages\Master\JobCompleteEvent.cs" />
-    <Compile Include="Messages\Master\StitchSummaryRequest.cs" />
-    <Compile Include="Messages\StitchMonitor\StitchHealthEvent.cs" />
-    <Compile Include="Models\AdaptorType.cs" />
-    <Compile Include="Models\InstanceAdaptorDetails.cs" />
-    <Compile Include="Models\InstanceStateType.cs" />
-    <Compile Include="Models\PackageFile.cs" />
-    <Compile Include="Models\StitchFullId.cs" />
-    <Compile Include="Modules\Master\Handlers\StartAllStitchGroupCommandHandler.cs" />
-    <Compile Include="Modules\Master\Handlers\StitchGroupCommandHandler.cs" />
-    <Compile Include="Modules\Master\Handlers\StopAllStitchGroupCommandHandler.cs" />
-    <Compile Include="Modules\Master\IClusterMessageSender.cs" />
-    <Compile Include="Messages\Stitches\CreateInstanceRequest.cs" />
-    <Compile Include="Models\CommandJob.cs" />
-    <Compile Include="Modules\Master\JobManager.cs" />
-    <Compile Include="Modules\Master\MasterStitchCache.cs" />
-    <Compile Include="Modules\Master\Handlers\ICommandHandler.cs" />
-    <Compile Include="Modules\Master\Handlers\PingCommandHandler.cs" />
-    <Compile Include="Modules\Master\Handlers\RemoveStitchCommandHandler.cs" />
-    <Compile Include="Modules\Master\Handlers\StartStitchCommandHandler.cs" />
-    <Compile Include="Modules\Master\Handlers\StitchCommandHandler.cs" />
-    <Compile Include="Modules\Master\Handlers\StopStitchCommandHandler.cs" />
-    <Compile Include="Modules\Master\MasterDataRepository.cs" />
-    <Compile Include="Modules\Master\Models\StitchSummary.cs" />
-    <Compile Include="Models\StitchLocaleType.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassV1Parameters.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\BuiltInClassV1\BuiltInClassStitchAdaptor.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\Process\CoreMessageChannelFactory.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessAdaptorData.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessArguments.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessFactory.cs" />
-    <Compile Include="Modules\Stitches\IStitchEventNotifier.cs" />
-    <Compile Include="Modules\Master\IStitchRequestHandler.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessParameters.cs" />
-    <Compile Include="Modules\Stitches\StitchAdaptorCollection.cs" />
-    <Compile Include="Modules\Stitches\StitchesService.cs" />
-    <Compile Include="Modules\Stitches\StitchEventObserver.cs" />
-    <Compile Include="Modules\Stitches\StitchInstanceMapper.cs" />
-    <Compile Include="Modules\StitchMonitor\HeartbeatSequence.cs" />
-    <Compile Include="Modules\StitchMonitor\IHeartbeatSender.cs" />
-    <Compile Include="Modules\StitchMonitor\IStitchHealthNotifier.cs" />
-    <Compile Include="Modules\StitchMonitor\StitchHealthCalculator.cs" />
-    <Compile Include="Modules\StitchMonitor\StitchHealthReport.cs" />
-    <Compile Include="Modules\StitchMonitor\StitchHeartbeatService.cs" />
-    <Compile Include="Modules\StitchMonitor\StitchStateTracker.cs" />
-    <Compile Include="Utility\IDataRepository.cs" />
-    <Compile Include="Messages\Alerts\AlertEvent.cs" />
-    <Compile Include="Messages\Backplane\NetworkEvent.cs" />
-    <Compile Include="Messages\Backplane\ReceivedEvent.cs" />
-    <Compile Include="Messages\Core\ModuleStatusRequest.cs" />
-    <Compile Include="Messages\Data\DataRequestType.cs" />
-    <Compile Include="Messages\Data\DataResponse.cs" />
-    <Compile Include="Messages\Data\DataResponseType.cs" />
-    <Compile Include="Messages\Backplane\ClusterMemberEvent.cs" />
-    <Compile Include="Messages\Backplane\ZoneMemberEvent.cs" />
-    <Compile Include="Messages\StitchDataMessage.cs" />
-    <Compile Include="Messages\Stitches\InstanceRequest.cs" />
-    <Compile Include="Messages\StitchMonitor\StitchHealthRequest.cs" />
-    <Compile Include="Models\StitchGroupName.cs" />
-    <Compile Include="ModuleCollection.cs" />
-    <Compile Include="Modules\Alerts\AlertsModule.cs" />
-    <Compile Include="Modules\Core\CoreModule.cs" />
-    <Compile Include="Modules\Core\CoreService.cs" />
-    <Compile Include="Modules\Data\DataCache.cs" />
-    <Compile Include="Modules\Data\DataService.cs" />
-    <Compile Include="Modules\Data\InMemory\InMemoryDataStorage.cs" />
-    <Compile Include="Modules\Logging\LoggingModule.cs" />
-    <Compile Include="MessageBus\ModuleLog.cs" />
-    <Compile Include="Modules\Master\DataMessageAddresser.cs" />
-    <Compile Include="Modules\Master\MasterService.cs" />
-    <Compile Include="Modules\Master\NodeStatusBuilder.cs" />
-    <Compile Include="Modules\ModuleNames.cs" />
-    <Compile Include="Modules\Stitches\StitchFileSystem.cs" />
-    <Compile Include="Messages\Stitches\StitchResourceUsage.cs" />
-    <Compile Include="Modules\Stitches\StitchesConfiguration.cs" />
-    <Compile Include="Modules\Stitches\StitchesModule.cs" />
-    <Compile Include="Modules\Stitches\Versions\DateTimeVersionManager.cs" />
-    <Compile Include="Modules\Stitches\Versions\IVersionManager.cs" />
-    <Compile Include="Messages\Stitches\StitchInstanceEvent.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\IStitchAdaptor.cs" />
-    <Compile Include="Modules\Stitches\InstanceActionResult.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\StitchAdaptorFactory.cs" />
-    <Compile Include="Modules\Stitches\StitchInstanceManager.cs" />
-    <Compile Include="Messages\Stitches\InstanceResponse.cs" />
-    <Compile Include="Messages\Stitches\InstanceInformation.cs" />
-    <Compile Include="Messages\Stitches\InstanceInformationRequest.cs" />
-    <Compile Include="Messages\Stitches\PackageFileUploadRequest.cs" />
-    <Compile Include="Modules\Stitches\Adaptors\Process\ProcessStitchAdaptor.cs" />
-    <Compile Include="Modules\Data\Folders\DataConfiguration.cs" />
-    <Compile Include="Modules\Data\DataModule.cs" />
-    <Compile Include="Models\StitchInstance.cs" />
-    <Compile Include="Modules\Data\Folders\FolderDataStorage.cs" />
-    <Compile Include="Models\IDataEntity.cs" />
-    <Compile Include="Modules\Data\IDataStorage.cs" />
-    <Compile Include="Messages\Data\DataRequest.cs" />
-    <Compile Include="MessageBus\MessageBusExtensions.cs" />
-    <Compile Include="Messages\Logging\LogEvent.cs" />
-    <Compile Include="Configuration\ConfigurationException.cs" />
-    <Compile Include="Configuration\ConfigurationLoader.cs" />
-    <Compile Include="Modules\Master\Events\NodeAddedToClusterEvent.cs" />
-    <Compile Include="Modules\Master\Events\NodeRemovedFromCluster.cs" />
-    <Compile Include="Messages\GenericResponse.cs" />
-    <Compile Include="MessageBus\DataHelperClient.cs" />
-    <Compile Include="Modules\StitchMonitor\StitchMonitorModule.cs" />
-    <Compile Include="Modules\Timer\MessageTimerModule.cs" />
-    <Compile Include="Modules\IModule.cs" />
-    <Compile Include="Monitoring\Events\ObservationEvent.cs" />
-    <Compile Include="Messages\CoreEvent.cs" />
-    <Compile Include="Models\NodeStatus.cs" />
-    <Compile Include="NodeConfiguration.cs" />
-    <Compile Include="CrossStitchCore.cs" />
-    <Compile Include="Modules\Master\MasterModule.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utility\IMapper.cs" />
-    <Compile Include="Utility\IModuleLog.cs" />
-    <Compile Include="Utility\NullModuleLog.cs" />
-    <Compile Include="Utility\Serialization\IByteSerializer.cs" />
-    <Compile Include="Utility\Serialization\JsonByteSerializer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="CrossStitch.Core.nuspec">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Modules\Alerts\README.md" />
-    <None Include="Modules\Core\README.md" />
-    <None Include="Modules\Data\README.md" />
-    <None Include="Modules\Logging\README.md" />
-    <None Include="Modules\Master\README.md" />
-    <None Include="Modules\Stitches\README.md" />
-    <None Include="Modules\StitchMonitor\README.md" />
-    <None Include="Modules\Timer\README.md" />
-    <None Include="nupkg-build.bat" />
-    <None Include="nupkg-publish.bat" />
-    <None Include="packages.config" />
-    <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CrossStitch.Stitch\CrossStitch.Stitch.csproj">
-      <Project>{4bd40e13-2f9a-41c9-aed4-dc160b3d48a6}</Project>
-      <Name>CrossStitch.Stitch</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Target Name="Package">
-    <!-- Ensure the Package directory exists for this project -->
-    <RemoveDir Directories="NuGet" />
-    <MakeDir Directories="NuGet" />
-    <!-- Package the project -->
-    <Exec WorkingDirectory="$(BuildDir)" Command="NuGet.exe pack CrossStitch.Core.csproj -Verbosity detailed -OutputDir &quot;NuGet&quot; -Properties &quot;Configuration=$(Configuration)&quot;" />
-  </Target>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Net.Compilers.2.0.1\build\Microsoft.Net.Compilers.props'))" />
-  </Target>
+
 </Project>

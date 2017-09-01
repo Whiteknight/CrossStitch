@@ -30,7 +30,7 @@ namespace CrossStitch.Core.Modules.Alerts
         {
             _subscriptions = new SubscriptionCollection(_messageBus);
             _subscriptions.Subscribe<AlertEvent>(b => b
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(ReceiveAlert));
         }
 

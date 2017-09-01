@@ -21,7 +21,7 @@ namespace CrossStitch.Core.Tests.Modules.Core
             var core = new CrossStitchCore(config);
             var target = core.CoreModule;
             target.Start();
-            var response = core.MessageBus.Request<ModuleStatusRequest, ModuleStatusResponse>(new ModuleStatusRequest
+            var response = core.MessageBus.RequestWait<ModuleStatusRequest, ModuleStatusResponse>(new ModuleStatusRequest
             {
                 ModuleName = "Core"
             });
@@ -62,7 +62,7 @@ namespace CrossStitch.Core.Tests.Modules.Core
             core.AddModule(new DummyModule());
             var target = core.CoreModule;
             target.Start();
-            var response = core.MessageBus.Request<ModuleStatusRequest, ModuleStatusResponse>(new ModuleStatusRequest
+            var response = core.MessageBus.RequestWait<ModuleStatusRequest, ModuleStatusResponse>(new ModuleStatusRequest
             {
                 ModuleName = "Core"
             });
@@ -85,7 +85,7 @@ namespace CrossStitch.Core.Tests.Modules.Core
             core.AddModule(new DummyModule());
             var target = core.CoreModule;
             target.Start();
-            var response = core.MessageBus.Request<ModuleStatusRequest, ModuleStatusResponse>(new ModuleStatusRequest
+            var response = core.MessageBus.RequestWait<ModuleStatusRequest, ModuleStatusResponse>(new ModuleStatusRequest
             {
                 ModuleName = "DUMMY"
             });

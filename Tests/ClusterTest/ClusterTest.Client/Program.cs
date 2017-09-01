@@ -15,10 +15,10 @@ namespace ClusterTest.Client
             using (var core = new CrossStitchCore(nodeConfig))
             {
                 core.MessageBus.Subscribe<NodeAddedToClusterEvent>(l => l
-                    .WithChannelName(NodeAddedToClusterEvent.EventName)
+                    .WithTopic(NodeAddedToClusterEvent.EventName)
                     .Invoke(NodeAdded));
                 core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(l => l
-                    .WithChannelName(NodeRemovedFromClusterEvent.EventName)
+                    .WithTopic(NodeRemovedFromClusterEvent.EventName)
                     .Invoke(NodeRemoved));
 
                 core.AddModule(new BackplaneModule(core));

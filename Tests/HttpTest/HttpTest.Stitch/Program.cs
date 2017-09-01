@@ -1,5 +1,4 @@
 ﻿using System;
-using CrossStitch.Stitch.Process.Stdio;
 using CrossStitch.Stitch.Process.Stitch;
 
 namespace HttpTest.Stitch

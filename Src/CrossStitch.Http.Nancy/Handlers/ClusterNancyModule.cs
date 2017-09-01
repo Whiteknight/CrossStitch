@@ -27,7 +27,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
                 NodeId = _.NodeId.ToString()
             });
 
-            Get["/nodes/{NodeId}/stitches/{StitchId}"] = _ => messageBus.Request<StitchSummaryRequest, List<StitchSummary>>(new StitchSummaryRequest
+            Get["/nodes/{NodeId}/stitches/{StitchId}"] = _ => messageBus.RequestWait<StitchSummaryRequest, List<StitchSummary>>(new StitchSummaryRequest
             {
                 NodeId = _.NodeId.ToString(),
                 StitchId = _.StitchId.ToString()

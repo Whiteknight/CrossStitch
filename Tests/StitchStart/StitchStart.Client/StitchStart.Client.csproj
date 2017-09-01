@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Acquaintance, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acquaintance.1.0.1\lib\net46\Acquaintance.dll</HintPath>
+    <Reference Include="Acquaintance, Version=2.0.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Acquaintance.2.0.0-alpha1\lib\netstandard2.0\Acquaintance.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Src\CrossStitch.Stitch\CrossStitch.Stitch.csproj">
-      <Project>{4bd40e13-2f9a-41c9-aed4-dc160b3d48a6}</Project>
+      <Project>{19dad234-cd73-42bd-b3f5-8bdaba68fc12}</Project>
       <Name>CrossStitch.Stitch</Name>
     </ProjectReference>
   </ItemGroup>

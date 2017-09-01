@@ -1,15 +1,15 @@
-﻿using CrossStitch.Core;
+﻿using System;
+using System.Collections.Generic;
+using CrossStitch.Core;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Data;
 using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Http.NancyFx;
-using System;
-using System.Collections.Generic;
 using CrossStitch.Stitch.Process;
 
-namespace HttpTest
+namespace HttpTest.Server
 {
     class Program
     {

@@ -32,17 +32,17 @@ namespace CrossStitch.Core.Modules.StitchMonitor
                 .Invoke(e => _heartbeatService.SendScheduledHeartbeat()));
 
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
-                .WithChannelName(StitchInstanceEvent.ChannelSynced)
+                .WithTopic(StitchInstanceEvent.ChannelSynced)
                 .Invoke(_heartbeatService.StitchSyncReceived));
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
-                .WithChannelName(StitchInstanceEvent.ChannelStarted)
+                .WithTopic(StitchInstanceEvent.ChannelStarted)
                 .Invoke(m => _heartbeatService.StitchStarted(m.InstanceId)));
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
-                .WithChannelName(StitchInstanceEvent.ChannelStopped)
+                .WithTopic(StitchInstanceEvent.ChannelStopped)
                 .Invoke(m => _heartbeatService.StitchStopped(m.InstanceId)));
 
             _subscriptions.Listen<StitchHealthRequest, StitchHealthResponse>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_heartbeatService.GetStitchHealthReport));
         }
 

@@ -20,10 +20,10 @@ namespace ClusterTest.Master
             var nodeConfig = NodeConfiguration.GetDefault();
             using (var core = new CrossStitchCore(nodeConfig))
             {
-                core.MessageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithChannelName(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
-                core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithChannelName(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
+                core.MessageBus.Subscribe<NodeAddedToClusterEvent>(s => s.WithTopic(NodeAddedToClusterEvent.EventName).Invoke(NodeAdded));
+                core.MessageBus.Subscribe<NodeRemovedFromClusterEvent>(s => s.WithTopic(NodeRemovedFromClusterEvent.EventName).Invoke(NodeRemoved));
                 core.MessageBus.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
-                    .WithChannelName(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
+                    .WithTopic(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
                     .Invoke(ReceiveNodeStatus));
                 core.MessageBus.TimerSubscribe(1, b => b.Invoke(m => SendPing(core)));
 
@@ -56,7 +56,7 @@ namespace ClusterTest.Master
                 Command = CommandType.Ping,
                 Target = _remoteNodeId
             };
-            var response = core.MessageBus.Request<CommandRequest, CommandResponse>(request);
+            var response = core.MessageBus.RequestWait<CommandRequest, CommandResponse>(request);
             Console.WriteLine($"Sent ping Response={response.Result} JobId={response.ScheduledJobId}");
         }
 

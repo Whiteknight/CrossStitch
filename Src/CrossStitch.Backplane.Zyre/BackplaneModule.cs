@@ -25,12 +25,13 @@ namespace CrossStitch.Backplane.Zyre
         private readonly BackplaneConfiguration _configuration;
 
         private int _workerThreadId;
-        private SubscriptionCollection _subscriptions;
+        private readonly SubscriptionCollection _subscriptions;
         private Guid _nodeNetworkId;
 
         public BackplaneModule(CrossStitchCore core, IClusterBackplane backplane = null, BackplaneConfiguration configuration = null)
         {
             _messageBus = core.MessageBus;
+            _subscriptions = new SubscriptionCollection(_messageBus);
             _log = new ModuleLog(_messageBus, Name);
 
             _configuration = configuration ?? BackplaneConfiguration.GetDefault();
@@ -51,18 +52,16 @@ namespace CrossStitch.Backplane.Zyre
         public void Start()
         {
             // Setup subscriptions
-            _workerThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
-            _subscriptions = new SubscriptionCollection(_messageBus);
-
+            _workerThreadId = _subscriptions.WorkerPool.StartDedicatedWorker().ThreadId;
             _subscriptions.Subscribe<ClusterMessage>(s => s
-                .WithChannelName(ClusterMessage.SendEventName)
+                .WithTopic(ClusterMessage.SendEventName)
                 .Invoke(e => _backplane.Send(e))
                 .OnThread(_workerThreadId));
             _subscriptions.Subscribe<CoreEvent>(b => b
-                .WithChannelName(CoreEvent.ChannelInitialized)
+                .WithTopic(CoreEvent.ChannelInitialized)
                 .Invoke(BroadcastNetworkInformation));
             _subscriptions.Subscribe<FileTransferRequest>(b => b
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(m => _backplane.TransferPackageFile(m.GroupName, m.NetworkNodeId, m.FilePath, m.FileName, m.Adaptor, m.JobId, m.TaskId)));
 
             // TODO: Listen to requests to get current network id, zones, etc.
@@ -83,8 +82,6 @@ namespace CrossStitch.Backplane.Zyre
             _backplane.ZoneMember -= ZoneMemberHandler;
 
             _subscriptions.Dispose();
-            _subscriptions = null;
-            _messageBus.ThreadPool.StopDedicatedWorker(_workerThreadId);
         }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, string> GetStatusDetails()
@@ -203,7 +200,7 @@ namespace CrossStitch.Backplane.Zyre
             using (var stream = new MemoryStream(request.Contents))
             {
                 // TODO: Get more sophisticated with chunking, restart/retry, checksums, etc
-                var response = _messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelFromRemote, new PackageFileUploadRequest
+                var response = _messageBus.RequestWait<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelFromRemote, new PackageFileUploadRequest
                 {
                     Contents = stream,
                     FileName = request.FileName,

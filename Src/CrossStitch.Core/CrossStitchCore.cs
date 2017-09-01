@@ -60,7 +60,7 @@ namespace CrossStitch.Core
             // current node or query the last-known status of the requested node.
             // Also, be clear whether we are querying by NodeId or NetworkNodeId (the former is
             // more likely)
-            //_subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.OnDefaultChannel().Invoke(r => GetStatus(r.NodeId)));
+            //_subscriptions.Listen<NodeStatusRequest, NodeStatus>(l => l.WithDefaultTopic().Invoke(r => GetStatus(r.NodeId)));
 
             Modules.AddMissingModules(this);
             CoreModule.Start();

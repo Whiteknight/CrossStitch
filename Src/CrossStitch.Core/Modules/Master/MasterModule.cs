@@ -70,17 +70,17 @@ namespace CrossStitch.Core.Modules.Master
         {
             _data.Initialize();
             
-            _cacheThreadId = _messageBus.ThreadPool.StartDedicatedWorker();
+            _cacheThreadId = _subscriptions.WorkerPool.StartDedicatedWorker().ThreadId;
 
             // On startup, publish the node status and get info from the backplane
             _subscriptions.Subscribe<CoreEvent>(b => b
-                .WithChannelName(CoreEvent.ChannelInitialized)
+                .WithTopic(CoreEvent.ChannelInitialized)
                 .Invoke(m => GenerateAndPublishNodeStatus()));
             _subscriptions.Subscribe<BackplaneEvent>(b => b
-                .WithChannelName(BackplaneEvent.ChannelNetworkIdChanged)
+                .WithTopic(BackplaneEvent.ChannelNetworkIdChanged)
                 .Invoke(m => _service.SetNetworkNodeId(m.Data)));
             _subscriptions.Subscribe<BackplaneEvent>(b => b
-                .WithChannelName(BackplaneEvent.ChannelSetZones)
+                .WithTopic(BackplaneEvent.ChannelSetZones)
                 .Invoke(m => _service.SetClusterZones((m.Data ?? string.Empty).Split(','))));
 
             // Publish the status of the node every 60 seconds
@@ -92,37 +92,37 @@ namespace CrossStitch.Core.Modules.Master
             // TODO: Publish NodeStatus to cluster when Modules or StitchInstances change
 
             _subscriptions.Listen<StitchSummaryRequest, List<StitchSummary>>(b => b
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.GetStitchSummaries));
 
             _subscriptions.Subscribe<ClusterMemberEvent>(b => b
-                .WithChannelName(ClusterMemberEvent.EnteringEvent)
+                .WithTopic(ClusterMemberEvent.EnteringEvent)
                 .Invoke(SendNodeStatusToNewClusterNode));
 
             // Save node status from other nodes
             _subscriptions.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
-                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .WithTopic(ReceivedEvent.ChannelReceived)
                 .Invoke(m => _service.SaveNodeStatus(m.Object)));
 
             // Subscribe to events for caching stitch status
             _subscriptions.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
-                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .WithTopic(ReceivedEvent.ChannelReceived)
                 .Invoke(m => _data.StitchCache.AddNodeStatus(m, m.Object))
                 .OnThread(_cacheThreadId));
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
-                .WithChannelName(StitchInstanceEvent.ChannelCreated)
+                .WithTopic(StitchInstanceEvent.ChannelCreated)
                 .Invoke(_service.HandleLocalStitchCreated)
                 .OnThread(_cacheThreadId));
             _subscriptions.Subscribe<ObjectReceivedEvent<StitchInstanceEvent>>(b => b
-                .WithChannelName(ReceivedEvent.ReceivedEventName(StitchInstanceEvent.ChannelCreated))
+                .WithTopic(ReceivedEvent.ReceivedEventName(StitchInstanceEvent.ChannelCreated))
                 .Invoke(m => _service.HandleRemoteStitchCreated(m, m.Object))
                 .OnThread(_cacheThreadId));
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b
-                .WithChannelName(StitchInstanceEvent.ChannelDeleted)
+                .WithTopic(StitchInstanceEvent.ChannelDeleted)
                 .Invoke(_service.HandleLocalStitchDeleted)
                 .OnThread(_cacheThreadId));
             _subscriptions.Subscribe<ObjectReceivedEvent<StitchInstanceEvent>>(b => b
-                .WithChannelName(ReceivedEvent.ReceivedEventName(StitchInstanceEvent.ChannelDeleted))
+                .WithTopic(ReceivedEvent.ReceivedEventName(StitchInstanceEvent.ChannelDeleted))
                 .Invoke(m => _service.HandleRemoteStitchDeleted(m, m.Object))
                 .OnThread(_cacheThreadId));
 
@@ -131,32 +131,32 @@ namespace CrossStitch.Core.Modules.Master
 
             // Upload package files and distribute to all nodes
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(UploadPackageFile));
             // Create new stitch instances 
             _subscriptions.Listen<CreateInstanceRequest, CreateInstanceResponse>(l => l
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.CreateNewInstances));
             _subscriptions.Subscribe<ObjectReceivedEvent<CreateInstanceRequest>>(b => b
-                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .WithTopic(ReceivedEvent.ChannelReceived)
                 .Invoke(m => _service.CreateNewInstanceFromRemote(m, m.Object)));
 
             // Handle incoming commands
             _subscriptions.Listen<CommandRequest, CommandResponse>(b => b
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.DispatchCommandRequest));
             _subscriptions.Subscribe<ObjectReceivedEvent<CommandRequest>>(b => b
-                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .WithTopic(ReceivedEvent.ChannelReceived)
                 .Invoke(ore => _service.ReceiveCommandFromRemote(ore, ore.Object)));
 
             // Handle incoming command receipt messages
             _subscriptions.Subscribe<ObjectReceivedEvent<CommandReceipt>>(b => b
-                .WithChannelName(ReceivedEvent.ChannelReceived)
+                .WithTopic(ReceivedEvent.ChannelReceived)
                 .Invoke(m => _service.ReceiveReceiptFromRemote(m, m.Object)));
 
             // Route StitchDataMessage to the correct node
             _subscriptions.Subscribe<StitchDataMessage>(b => b
-                .OnDefaultChannel()
+                .WithDefaultTopic()
                 .Invoke(_service.EnrichStitchDataMessageWithAddress));
         }
 
@@ -216,7 +216,7 @@ namespace CrossStitch.Core.Modules.Master
 
         private PackageFileUploadResponse UploadPackageFile(PackageFileUploadRequest request)
         {
-            var response = _messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelLocal, request);
+            var response = _messageBus.RequestWait<PackageFileUploadRequest, PackageFileUploadResponse>(PackageFileUploadRequest.ChannelLocal, request);
             if (!response.IsSuccess)
             {
                 _log.LogError("Could not upload package file");
@@ -243,7 +243,7 @@ namespace CrossStitch.Core.Modules.Master
                 {
                     Id = instanceId
                 };
-                var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, request);
+                var response = _messageBus.RequestWait<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStart, request);
                 return response.IsSuccess;
             }
 
@@ -253,7 +253,7 @@ namespace CrossStitch.Core.Modules.Master
                 {
                     Id = instanceId
                 };
-                var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, request);
+                var response = _messageBus.RequestWait<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelStop, request);
                 return response.IsSuccess;
             }
 
@@ -263,7 +263,7 @@ namespace CrossStitch.Core.Modules.Master
                 {
                     Id = instanceId
                 };
-                var response = _messageBus.Request<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelDelete, request);
+                var response = _messageBus.RequestWait<InstanceRequest, InstanceResponse>(InstanceRequest.ChannelDelete, request);
                 return response.IsSuccess;
             }
 
@@ -294,7 +294,7 @@ namespace CrossStitch.Core.Modules.Master
                     _messageBus.Publish(ClusterMessage.SendEventName, message);
                     return null;
                 }
-                return _messageBus.Request<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(request);
+                return _messageBus.RequestWait<LocalCreateInstanceRequest, LocalCreateInstanceResponse>(request);
             }
         }
 

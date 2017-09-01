@@ -6,16 +6,16 @@ namespace StitchStart.Server
 
     public class StitchStartBuiltInStitch : IHandlesStart, IHandlesHeartbeat
     {
-        private CoreStitchContext _context;
+        private IStitchEventObserver _observer;
 
         public bool ReceiveHeartbeat(long id)
         {
             return true;
         }
 
-        public bool Start(CoreStitchContext context)
+        public bool Start(IStitchEventObserver observer)
         {
-            _context = context;
+            _observer = observer;
             return true;
         }
     }

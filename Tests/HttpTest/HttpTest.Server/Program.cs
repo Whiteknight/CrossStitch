@@ -41,7 +41,7 @@ namespace HttpTest.Server
                         Type = AdaptorType.ProcessV1,
                         Parameters = new Dictionary<string, string>
                         {
-                            { Parameters.DirectoryPath, "." },
+                            { Parameters.RunningDirectory, "." },
                             { Parameters.ExecutableName, "HttpTest.Stitch.exe" }
                         }
                     },

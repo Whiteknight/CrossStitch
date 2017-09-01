@@ -13,7 +13,10 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             var parameters = packageFile.Adaptor.Parameters;
             // Use the dir if specified, otherwise default to the running dir from the file system
             var defaultRunningDir = fileSystem.GetInstanceRunningDirectory(stitch.Id);
-            DirectoryPath = parameters.GetOrAdd(Parameters.DirectoryPath, defaultRunningDir);
+            RunningDirectory = parameters.GetOrAdd(Parameters.RunningDirectory, defaultRunningDir);
+
+            var defaultDataDir = fileSystem.GetInstanceDataDirectoryPath(stitch.Id);
+            DataDirectory = parameters.GetOrAdd(Parameters.DataDirectory, defaultDataDir);
 
             // Executable name must be specified. Get it and validate
             ExecutableName = parameters.GetOrDefault(Parameters.ExecutableName);
@@ -44,7 +47,8 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             SerializerType = packageFile.Adaptor.Serializer;
         }
 
-        public string DirectoryPath { get; set; }
+        public string RunningDirectory { get; set; }
+        public string DataDirectory { get; set; }
         public string ExecutableName { get; set; }
         public string ExecutableArguments { get; set; }
 

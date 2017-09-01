@@ -13,6 +13,5 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors
         void SendHeartbeat(long id);
         void SendMessage(long messageId, string channel, string data, string nodeId, string senderStitchInstanceId);
         StitchResourceUsage GetResources();
-        CoreStitchContext StitchContext { get; }
     }
 }

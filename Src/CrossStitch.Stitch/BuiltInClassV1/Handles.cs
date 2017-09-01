@@ -12,7 +12,7 @@
 
     public interface IHandlesStart
     {
-        bool Start(CoreStitchContext context);
+        bool Start(IStitchEventObserver observer);
     }
 
     public interface IHandlesStop

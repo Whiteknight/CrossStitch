@@ -18,7 +18,7 @@ namespace CrossStitch.Core.Modules.Stitches
         private readonly IStitchEventNotifier _notifier;
         private readonly CrossStitchCore _core;
 
-        public StitchesService(CrossStitchCore core, IDataRepository data, StitchFileSystem fileSystem, StitchInstanceManager stitchInstanceManager, StitchEventObserver observer, IModuleLog log, IStitchEventNotifier notifier)
+        public StitchesService(CrossStitchCore core, IDataRepository data, StitchFileSystem fileSystem, StitchInstanceManager stitchInstanceManager, IModuleLog log, IStitchEventNotifier notifier)
         {
             _fileSystem = fileSystem;
             _data = data;
@@ -27,11 +27,6 @@ namespace CrossStitch.Core.Modules.Stitches
             _log = log;
 
             _stitchInstanceManager = stitchInstanceManager;
-            _stitchInstanceManager.StitchStateChange += observer.StitchInstancesOnStitchStateChanged;
-            _stitchInstanceManager.HeartbeatReceived += observer.StitchInstanceManagerOnHeartbeatReceived;
-            _stitchInstanceManager.LogsReceived += observer.StitchInstanceManagerOnLogsReceived;
-            _stitchInstanceManager.RequestResponseReceived += observer.StitchInstanceManagerOnRequestResponseReceived;
-            _stitchInstanceManager.DataMessageReceived += observer.StitchInstanceManagerOnDataMessageReceived;
         }
 
         public int NumberOfRunningStitches => _stitchInstanceManager.GetNumberOfRunningStitches();
@@ -158,7 +153,7 @@ namespace CrossStitch.Core.Modules.Stitches
                     return null;
                 }
                 // TODO: We should move this into a class specific to ProcessV1 types.
-                _data.Update<PackageFile>(packageFile.Id, pf => pf.Adaptor.Parameters[Parameters.DirectoryPath] = result.Path);
+                _data.Update<PackageFile>(packageFile.Id, pf => pf.Adaptor.Parameters[Parameters.RunningDirectory] = result.Path);
             }
 
             _data.Save(instance);

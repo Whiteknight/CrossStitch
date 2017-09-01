@@ -19,13 +19,14 @@ namespace CrossStitch.Core.Modules.Stitches
         {
             configuration = configuration ?? StitchesConfiguration.GetDefault();
             var log = new ModuleLog(core.MessageBus, Name);
-            var fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
-            var adaptorFactory = new StitchAdaptorFactory(core, configuration, fileSystem, log);
-            var manager = new StitchInstanceManager(fileSystem, adaptorFactory);
             var observer = new StitchEventObserver(core.MessageBus, log);
+            var fileSystem = new StitchFileSystem(configuration, new DateTimeVersionManager());
+            var adaptorFactory = new StitchAdaptorFactory(core, configuration, fileSystem, log, observer);
+            var manager = new StitchInstanceManager(fileSystem, adaptorFactory);
+            
             var data = new DataHelperClient(core.MessageBus);
             var notifier = new StitchEventNotifier(core.MessageBus);
-            _service = new StitchesService(core, data, fileSystem, manager, observer, log, notifier);
+            _service = new StitchesService(core, data, fileSystem, manager, log, notifier);
             _subscriptions = new SubscriptionCollection(core.MessageBus);
         }
 

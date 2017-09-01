@@ -13,35 +13,35 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
     {
         private readonly CrossStitchCore _core;
         private readonly StitchInstance _stitchInstance;
+        private readonly IStitchEventObserver _observer;
         private readonly ProcessParameters _parameters;
         private readonly IModuleLog _log;
         private readonly CoreMessageChannelFactory _channelFactory;
         private readonly MessageSerializerFactory _serializerFactory;
         private readonly ProcessFactory _processFactory;
 
-        public CoreStitchContext StitchContext { get; }
         private System.Diagnostics.Process _process;
         private CoreMessageManager _channel;
-        private bool _stopRequested;
+        private volatile bool _stopRequested;
 
-        public ProcessStitchAdaptor(CrossStitchCore core, StitchesConfiguration configuration, StitchInstance stitchInstance, CoreStitchContext stitchContext, ProcessParameters parameters, IModuleLog log)
+        public ProcessStitchAdaptor(CrossStitchCore core, StitchesConfiguration configuration, StitchInstance stitchInstance, IStitchEventObserver observer, ProcessParameters parameters, IModuleLog log)
         {
             Assert.ArgNotNull(core, nameof(core));
             Assert.ArgNotNull(configuration, nameof(configuration));
             Assert.ArgNotNull(stitchInstance, nameof(stitchInstance));
-            Assert.ArgNotNull(stitchContext, nameof(stitchContext));
+            Assert.ArgNotNull(observer, nameof(observer));
             Assert.ArgNotNull(parameters, nameof(parameters));
             Assert.ArgNotNull(log, nameof(log));
 
             _core = core;
             _stitchInstance = stitchInstance;
-            StitchContext = stitchContext;
+            _observer = observer;
             _parameters = parameters;
             _log = log;
 
             _channelFactory = new CoreMessageChannelFactory(core.NodeId, stitchInstance.Id);
             _serializerFactory = new MessageSerializerFactory();
-            _processFactory = new ProcessFactory(stitchInstance, core, stitchContext, log);
+            _processFactory = new ProcessFactory(stitchInstance, core, log);
             _stopRequested = false;
         }
 
@@ -69,14 +69,14 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 
                 SetupChannel(_parameters.ChannelType, _parameters.SerializerType);
 
-                StitchContext.RaiseProcessEvent(true, true);
+                _observer.StitchInstancesOnStitchStateChanged(_stitchInstance.Id, true, true);
 
                 return true;
             }
             catch (Exception e)
             {
                 _log.LogError(e, "Could not create and start process");
-                StitchContext.RaiseProcessEvent(false, false);
+                _observer.StitchInstancesOnStitchStateChanged(_stitchInstance.Id, false, false);
                 return false;
             }
         }
@@ -139,7 +139,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             var messageChannel = _channelFactory.Create(channelType, _process);
             var serializer = _serializerFactory.Create(serializerType);
 
-            _channel = new CoreMessageManager(StitchContext, messageChannel, serializer);
+            _channel = new CoreMessageManager(_stitchInstance.Id, _observer, messageChannel, serializer);
             _channel.Start();
         }
 
@@ -173,7 +173,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             _channel.Dispose();
             _channel = null;
 
-            StitchContext.RaiseProcessEvent(false, requested);
+            _observer.StitchInstancesOnStitchStateChanged(_stitchInstance.Id, false, requested);
         }
     }
 }

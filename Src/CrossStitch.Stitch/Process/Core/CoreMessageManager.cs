@@ -7,23 +7,21 @@ namespace CrossStitch.Stitch.Process.Core
     // should be once instance of this for every stitch.
     public class CoreMessageManager : IDisposable
     {
-        private readonly CoreStitchContext _stitchContext;
+        private readonly string _instanceId;
+        private readonly IStitchEventObserver _observer;
         private readonly IMessageChannel _messageChannel;
         private readonly IMessageSerializer _serializer;
         private FromStitchReaderThread _readerThread;
 
-        public CoreMessageManager(CoreStitchContext stitchContext, IMessageChannel messageChannel, IMessageSerializer serializer)
+        public CoreMessageManager(string instanceId, IStitchEventObserver observer, IMessageChannel messageChannel, IMessageSerializer serializer)
         {
-            Assert.ArgNotNull(stitchContext, nameof(stitchContext));
+            Assert.ArgNotNull(observer, nameof(observer));
 
-            _stitchContext = stitchContext;
+            _instanceId = instanceId;
+            _observer = observer;
             _messageChannel = messageChannel;
             _serializer = serializer;
         }
-
-        public EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
-        public EventHandler<RequestResponseReceivedEventArgs> RequestResponseReceived;
-        public EventHandler<LogsReceivedEventArgs> LogsReceived;
 
         public void Start()
         {
@@ -48,20 +46,20 @@ namespace CrossStitch.Stitch.Process.Core
             switch (message.Command)
             {
                 case FromStitchMessage.CommandSync:
-                    _stitchContext.ReceiveHeartbeatSync(message.Id);
+                    _observer.StitchInstanceManagerOnHeartbeatReceived(_instanceId, message.Id);
                     break;
                 case FromStitchMessage.CommandAck:
-                    _stitchContext.ReceiveResponse(message.Id, true);
+                    _observer.StitchInstanceManagerOnRequestResponseReceived(_instanceId, message.Id, true);
                     break;
                 case FromStitchMessage.CommandFail:
-                    _stitchContext.ReceiveResponse(message.Id, false);
+                    _observer.StitchInstanceManagerOnRequestResponseReceived(_instanceId, message.Id, false);
                     break;
                 case FromStitchMessage.CommandData:
                     // TODO: This
-                    _stitchContext.ReceiveData(message.Id, message.ToGroupName, message.ToStitchInstanceId, message.DataChannel, message.Data);
+                    _observer.StitchInstanceManagerOnDataMessageReceived(_instanceId, message.Id, message.ToGroupName, message.ToStitchInstanceId, message.DataChannel, message.Data);
                     break;
                 case FromStitchMessage.CommandLogs:
-                    _stitchContext.ReceiveLogs(message.Logs);
+                    _observer.StitchInstanceManagerOnLogsReceived(_instanceId, message.Logs);
                     break;
                 default:
                     // TODO: Log that we have received a weird error

@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
-using CrossStitch.Stitch;
 using CrossStitch.Stitch.Process;
 using CrossStitch.Stitch.Utility;
 
@@ -12,14 +11,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
     {
         private readonly StitchInstance _stitchInstance;
         private readonly CrossStitchCore _core;
-        private readonly CoreStitchContext _stitchContext;
         private readonly IModuleLog _log;
 
-        public ProcessFactory(StitchInstance stitchInstance, CrossStitchCore core, CoreStitchContext stitchContext, IModuleLog log)
+        public ProcessFactory(StitchInstance stitchInstance, CrossStitchCore core, IModuleLog log)
         {
             _stitchInstance = stitchInstance;
             _core = core;
-            _stitchContext = stitchContext;
             _log = log;
         }
 
@@ -52,12 +49,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 
             var executableFile = parameters.ExecutableFormat
                 .Replace("{ExecutableName}", parameters.ExecutableName)
-                .Replace("{DirectoryPath}", parameters.DirectoryPath);
+                .Replace("{DirectoryPath}", parameters.RunningDirectory);
 
-            var coreArgs = new ProcessArguments(_stitchContext).BuildCoreArgumentsString(_stitchInstance, _core, parameters);
+            var coreArgs = new ProcessArguments().BuildCoreArgumentsString(_stitchInstance, _core, parameters);
             var arguments = parameters.ArgumentsFormat
                 .Replace("{ExecutableName}", parameters.ExecutableName)
-                .Replace("{DirectoryPath}", parameters.DirectoryPath)
+                .Replace("{DirectoryPath}", parameters.RunningDirectory)
                 .Replace("{CoreArgs}", coreArgs)
                 .Replace("{CustomArgs}", parameters.ExecutableArguments);
 
@@ -69,7 +66,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
                     CreateNoWindow = true,
                     ErrorDialog = false,
                     FileName = executableFile,
-                    WorkingDirectory = parameters.DirectoryPath,
+                    WorkingDirectory = parameters.RunningDirectory,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     UseShellExecute = false,
                     RedirectStandardError = useStdio,

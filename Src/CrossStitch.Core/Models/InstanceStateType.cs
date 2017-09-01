@@ -11,6 +11,9 @@
         // The stitch could not be started
         Error,
 
+        // The stitch has been sent the exit command
+        Stopping,
+
         // The stitch has been stopped
         Stopped,
 

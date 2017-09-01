@@ -2,10 +2,8 @@
 using CrossStitch.Core.Messages.Stitches;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Modules.Stitches.Adaptors;
-using CrossStitch.Stitch.Events;
 using System;
 using System.Collections.Generic;
-using CrossStitch.Stitch.Process.Core;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -23,12 +21,6 @@ namespace CrossStitch.Core.Modules.Stitches
             _adaptorFactory = adaptorFactory;
             _adaptors = new StitchAdaptorCollection();
         }
-
-        public event EventHandler<StitchProcessEventArgs> StitchStateChange;
-        public event EventHandler<HeartbeatSyncReceivedEventArgs> HeartbeatReceived;
-        public event EventHandler<RequestResponseReceivedEventArgs> RequestResponseReceived;
-        public event EventHandler<LogsReceivedEventArgs> LogsReceived;
-        public event EventHandler<DataMessageReceivedEventArgs> DataMessageReceived;
 
         public InstanceActionResult Start(PackageFile packageFile, StitchInstance stitchInstance)
         {
@@ -74,7 +66,7 @@ namespace CrossStitch.Core.Modules.Stitches
                     return InstanceActionResult.NotFound(stitchInstance.Id);
 
                 adaptor.Stop();
-                stitchInstance.State = InstanceStateType.Stopped;
+                stitchInstance.State = InstanceStateType.Stopping;
 
                 return InstanceActionResult.Result(stitchInstance.Id, true, stitchInstance);
             }
@@ -177,40 +169,9 @@ namespace CrossStitch.Core.Modules.Stitches
                 return adaptor;
 
             adaptor = _adaptorFactory.Create(packageFile, stitchInstance);
-            adaptor.StitchContext.DataDirectory = _fileSystem.GetInstanceDataDirectoryPath(stitchInstance.Id);
-            adaptor.StitchContext.StitchStateChange += OnStitchStateChange;
-            adaptor.StitchContext.HeartbeatReceived += OnStitchHeartbeatSyncReceived;
-            adaptor.StitchContext.LogsReceived += OnStitchLogsReceived;
-            adaptor.StitchContext.RequestResponseReceived += OnStitchResponseReceived;
-            adaptor.StitchContext.DataMessageReceived += OnDataMessageReceived;
 
             _adaptors.Add(stitchInstance.Id, adaptor);
             return adaptor;
-        }
-
-        private void OnStitchStateChange(object sender, StitchProcessEventArgs stitchProcessEventArgs)
-        {
-            StitchStateChange.Raise(this, stitchProcessEventArgs);
-        }
-
-        private void OnStitchLogsReceived(object sender, LogsReceivedEventArgs e)
-        {
-            LogsReceived.Raise(this, e);
-        }
-
-        private void OnStitchHeartbeatSyncReceived(object sender, HeartbeatSyncReceivedEventArgs e)
-        {
-            HeartbeatReceived.Raise(this, e);
-        }
-
-        private void OnStitchResponseReceived(object sender, RequestResponseReceivedEventArgs e)
-        {
-            RequestResponseReceived.Raise(this, e);
-        }
-
-        private void OnDataMessageReceived(object sender, DataMessageReceivedEventArgs e)
-        {
-            DataMessageReceived.Raise(this, e);
         }
     }
 }

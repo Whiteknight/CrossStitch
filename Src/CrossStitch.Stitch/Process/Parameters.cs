@@ -4,7 +4,8 @@
     // is created
     public static class Parameters
     {
-        public const string DirectoryPath = "DirectoryPath";
+        public const string RunningDirectory = "RunningDirectory";
+        public const string DataDirectory = "DataDirectory";
         public const string ExecutableName = "ExecutableName";
         public const string ExecutableArguments = "ExecutableArguments";
         public const string ExecutableFormat = "ExecutableFormat";

@@ -9,18 +9,20 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
 {
     public class BuiltInClassV1StitchAdaptor : IStitchAdaptor
     {
+        private readonly StitchInstance _instance;
         private readonly IModuleLog _log;
         private readonly BuiltInClassV1Parameters _parameters;
         private object _stitchObject;
 
-        public BuiltInClassV1StitchAdaptor(PackageFile packageFile, CoreStitchContext stitchContext, IModuleLog log)
+        public BuiltInClassV1StitchAdaptor(PackageFile packageFile, StitchInstance instance, IStitchEventObserver observer, IModuleLog log)
         {
-            StitchContext = stitchContext;
+            Observer = observer;
+            _instance = instance;
             _log = log;
             _parameters = new BuiltInClassV1Parameters(packageFile.Adaptor.Parameters);
         }
 
-        public CoreStitchContext StitchContext { get; }
+        public IStitchEventObserver Observer { get; }
 
         public AdaptorType Type => AdaptorType.BuildInClassV1;
 
@@ -38,7 +40,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
             {
                 var handles = _stitchObject as IHandlesHeartbeat;
                 if (handles == null || handles.ReceiveHeartbeat(id))
-                    StitchContext.ReceiveHeartbeatSync(id);
+                    Observer.StitchInstanceManagerOnHeartbeatReceived(_instance.Id, id);
             }
             catch (Exception e)
             {
@@ -53,11 +55,11 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
                 var handles = _stitchObject as IHandlesMessages;
                 if (handles == null)
                 {
-                    StitchContext.ReceiveResponse(messageId, false);
+                    Observer.StitchInstanceManagerOnRequestResponseReceived(_instance.Id, messageId, false);
                     return;
                 }
                 bool ok = handles.ReceiveMessage(messageId, channel, data, nodeId, senderStitchInstanceId);
-                StitchContext.ReceiveResponse(messageId, ok);
+                Observer.StitchInstanceManagerOnRequestResponseReceived(_instance.Id, messageId, ok);
             }
             catch (Exception e)
             {
@@ -71,7 +73,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
             {
                 _stitchObject = Activator.CreateInstance(_parameters.StitchType);
                 var handlesStart = _stitchObject as IHandlesStart;
-                return handlesStart == null || handlesStart.Start(StitchContext);
+                return handlesStart == null || handlesStart.Start(Observer);
             }
             catch (Exception e)
             {

@@ -28,7 +28,7 @@ namespace JsStitch.Core
                         Type = AdaptorType.ProcessV1,
                         Parameters = new Dictionary<string, string>
                         {
-                            { Parameters.DirectoryPath, "." },
+                            { Parameters.RunningDirectory, "." },
                             { Parameters.ExecutableName, "JsStitch.Stitch.js" }
                         }
                     },

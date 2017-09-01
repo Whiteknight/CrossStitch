@@ -1,19 +1,11 @@
 using System.Text;
 using CrossStitch.Core.Models;
-using CrossStitch.Stitch;
 using CrossStitch.Stitch.Process;
 
 namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 {
     public class ProcessArguments
     {
-        private readonly CoreStitchContext _stitchContext;
-
-        public ProcessArguments(CoreStitchContext stitchContext)
-        {
-            _stitchContext = stitchContext;
-        }
-
         public string BuildCoreArgumentsString(StitchInstance stitchInstance, CrossStitchCore core, ProcessParameters parameters)
         {
             var sb = new StringBuilder();
@@ -25,14 +17,14 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             AddArgument(sb, Arguments.Component, stitchInstance.GroupName.Component);
             AddArgument(sb, Arguments.Version, stitchInstance.GroupName.Version);
             AddArgument(sb, Arguments.GroupName, stitchInstance.GroupName.ToString());
-            AddArgument(sb, Arguments.DataDirectory, _stitchContext.DataDirectory);
+            AddArgument(sb, Arguments.DataDirectory, parameters.DataDirectory);
             AddArgument(sb, Arguments.ChannelType, parameters.ChannelType.ToString());
             AddArgument(sb, Arguments.Serializer, parameters.SerializerType.ToString());
 
             return sb.ToString();
         }
 
-        private void AddArgument(StringBuilder sb, string name, string value)
+        private static void AddArgument(StringBuilder sb, string name, string value)
         {
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(value))
                 return;

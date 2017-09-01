@@ -11,7 +11,7 @@ namespace CrossStitch.Stitch.Process.Core
         private readonly IStitchEventObserver _observer;
         private readonly IMessageChannel _messageChannel;
         private readonly IMessageSerializer _serializer;
-        private FromStitchReaderThread _readerThread;
+        private readonly FromStitchReaderThread _readerThread;
 
         public CoreMessageManager(string instanceId, IStitchEventObserver observer, IMessageChannel messageChannel, IMessageSerializer serializer)
         {
@@ -21,12 +21,12 @@ namespace CrossStitch.Stitch.Process.Core
             _observer = observer;
             _messageChannel = messageChannel;
             _serializer = serializer;
+            _readerThread = new FromStitchReaderThread(_messageChannel, _serializer);
+            _readerThread.MessageReceived += ReaderThreadOnMessageReceived;
         }
 
         public void Start()
         {
-            _readerThread = new FromStitchReaderThread(_messageChannel, _serializer);
-            _readerThread.MessageReceived += ReaderThreadOnMessageReceived;
             _readerThread.Start();
         }
 
@@ -42,8 +42,8 @@ namespace CrossStitch.Stitch.Process.Core
             if (string.IsNullOrEmpty(eventArgs?.Message?.Command))
                 return;
 
-            var message = eventArgs.Message;
-            switch (message.Command)
+            var message = eventArgs?.Message;
+            switch (message?.Command)
             {
                 case FromStitchMessage.CommandSync:
                     _observer.StitchInstanceManagerOnHeartbeatReceived(_instanceId, message.Id);
@@ -55,14 +55,10 @@ namespace CrossStitch.Stitch.Process.Core
                     _observer.StitchInstanceManagerOnRequestResponseReceived(_instanceId, message.Id, false);
                     break;
                 case FromStitchMessage.CommandData:
-                    // TODO: This
                     _observer.StitchInstanceManagerOnDataMessageReceived(_instanceId, message.Id, message.ToGroupName, message.ToStitchInstanceId, message.DataChannel, message.Data);
                     break;
                 case FromStitchMessage.CommandLogs:
                     _observer.StitchInstanceManagerOnLogsReceived(_instanceId, message.Logs);
-                    break;
-                default:
-                    // TODO: Log that we have received a weird error
                     break;
             }
         }

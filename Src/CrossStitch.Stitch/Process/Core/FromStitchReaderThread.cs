@@ -15,8 +15,10 @@ namespace CrossStitch.Stitch.Process.Core
         {
             _reader = reader;
             _serializer = serializer;
-            _readerThread = new Thread(ReaderThreadFunction);
-            _readerThread.IsBackground = true;
+            _readerThread = new Thread(ReaderThreadFunction)
+            {
+                IsBackground = true
+            };
         }
 
         public event EventHandler<FromStitchMessageReceivedEventArgs> MessageReceived;

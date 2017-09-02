@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using CrossStitch.Stitch.Utility;
+using System.Text;
 using CrossStitch.Stitch.Utility.Extensions;
 
 namespace CrossStitch.Stitch.Process.Stitch
@@ -16,7 +16,10 @@ namespace CrossStitch.Stitch.Process.Stitch
 
         public override string ToString()
         {
-            return JsonUtility.Serialize(_arguments);
+            var builder = new StringBuilder();
+            foreach (var kvp in _arguments)
+                builder.AppendFormat("{0}:{1}\n", kvp.Key, kvp.Value);
+            return builder.ToString();
         }
 
         public string CoreId => GetCrossStitchArgument(Arguments.CoreId);

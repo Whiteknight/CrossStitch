@@ -1,4 +1,4 @@
-﻿using CrossStitch.Stitch.Process;
+﻿using System.Linq;
 using CrossStitch.Stitch.Utility;
 
 namespace CrossStitch.Core.Models
@@ -28,6 +28,11 @@ namespace CrossStitch.Core.Models
         public T GetAdaptorDataObject<T>()
         {
             return JsonUtility.Deserialize<T>(AdaptorData ?? string.Empty);
+        }
+
+        public bool InState(params InstanceStateType[] possibleStates)
+        {
+            return possibleStates.Any(state => State == state);
         }
     }
 }

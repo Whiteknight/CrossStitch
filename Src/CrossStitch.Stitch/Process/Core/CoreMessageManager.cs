@@ -46,19 +46,19 @@ namespace CrossStitch.Stitch.Process.Core
             switch (message?.Command)
             {
                 case FromStitchMessage.CommandSync:
-                    _observer.StitchInstanceManagerOnHeartbeatReceived(_instanceId, message.Id);
+                    _observer.HeartbeatSyncReceived(_instanceId, message.Id);
                     break;
                 case FromStitchMessage.CommandAck:
-                    _observer.StitchInstanceManagerOnRequestResponseReceived(_instanceId, message.Id, true);
+                    _observer.MessageResponseReceived(_instanceId, message.Id, true);
                     break;
                 case FromStitchMessage.CommandFail:
-                    _observer.StitchInstanceManagerOnRequestResponseReceived(_instanceId, message.Id, false);
+                    _observer.MessageResponseReceived(_instanceId, message.Id, false);
                     break;
                 case FromStitchMessage.CommandData:
-                    _observer.StitchInstanceManagerOnDataMessageReceived(_instanceId, message.Id, message.ToGroupName, message.ToStitchInstanceId, message.DataChannel, message.Data);
+                    _observer.DataMessageReceived(_instanceId, message.Id, message.ToGroupName, message.ToStitchInstanceId, message.DataChannel, message.Data);
                     break;
                 case FromStitchMessage.CommandLogs:
-                    _observer.StitchInstanceManagerOnLogsReceived(_instanceId, message.Logs);
+                    _observer.LogsReceived(_instanceId, message.Logs);
                     break;
             }
         }

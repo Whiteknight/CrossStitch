@@ -15,8 +15,7 @@ namespace CrossStitch.Core.Modules.Logging
         public LoggingModule(CrossStitchCore core, ILog log)
         {
             _log = log;
-            IMessageBus messageBus = core.MessageBus;
-            _subscriptions = new SubscriptionCollection(messageBus);
+            _subscriptions = new SubscriptionCollection(core.MessageBus);
         }
 
         public string Name => ModuleNames.Log;

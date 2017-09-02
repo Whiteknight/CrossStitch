@@ -4,6 +4,7 @@ using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CrossStitch.Stitch.Process;
 
@@ -241,11 +242,12 @@ namespace CrossStitch.Core.Modules.Stitches
                 _log.LogError("Could not find stitch {0}", request.Id);
                 return InstanceResponse.Failure(request);
             }
+            Debug.Assert(request.Id == instance.Id);
 
             var stopResult = _stitchInstanceManager.Stop(instance);
             _data.Save(stopResult.StitchInstance);
 
-            if (!stopResult.Success || stopResult.StitchInstance.State != InstanceStateType.Stopped)
+            if (!stopResult.Success || stopResult.StitchInstance.InState(InstanceStateType.Stopping, InstanceStateType.Stopped))
             {
                 _log.LogError("Could not stop stitch {0}", request.Id);
                 return InstanceResponse.Create(request, false);

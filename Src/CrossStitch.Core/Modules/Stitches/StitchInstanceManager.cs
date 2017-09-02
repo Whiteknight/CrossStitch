@@ -24,16 +24,15 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public InstanceActionResult Start(PackageFile packageFile, StitchInstance stitchInstance)
         {
-            if (string.IsNullOrEmpty(stitchInstance?.Id))
+            if (stitchInstance == null || string.IsNullOrEmpty(stitchInstance.Id))
                 return InstanceActionResult.BadRequest();
 
+            stitchInstance.State = InstanceStateType.Stopped;
             string instanceId = stitchInstance.Id;
-            IStitchAdaptor adaptor = null;
 
             try
             {
-                stitchInstance.State = InstanceStateType.Stopped;
-                adaptor = GetOrCreateStitchAdaptor(packageFile, stitchInstance);
+                var adaptor = GetOrCreateStitchAdaptor(packageFile, stitchInstance);
                 if (adaptor == null)
                 {
                     stitchInstance.State = InstanceStateType.Missing;
@@ -53,7 +52,7 @@ namespace CrossStitch.Core.Modules.Stitches
             catch (Exception e)
             {
                 stitchInstance.State = InstanceStateType.Error;
-                return InstanceActionResult.Failure(stitchInstance.Id, adaptor != null, e);
+                return InstanceActionResult.Failure(stitchInstance.Id, true, e);
             }
         }
 

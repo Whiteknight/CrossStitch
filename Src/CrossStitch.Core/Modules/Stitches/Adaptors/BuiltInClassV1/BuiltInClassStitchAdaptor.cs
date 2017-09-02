@@ -40,7 +40,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
             {
                 var handles = _stitchObject as IHandlesHeartbeat;
                 if (handles == null || handles.ReceiveHeartbeat(id))
-                    Observer.StitchInstanceManagerOnHeartbeatReceived(_instance.Id, id);
+                    Observer.HeartbeatSyncReceived(_instance.Id, id);
             }
             catch (Exception e)
             {
@@ -55,11 +55,11 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.BuiltInClassV1
                 var handles = _stitchObject as IHandlesMessages;
                 if (handles == null)
                 {
-                    Observer.StitchInstanceManagerOnRequestResponseReceived(_instance.Id, messageId, false);
+                    Observer.MessageResponseReceived(_instance.Id, messageId, false);
                     return;
                 }
                 bool ok = handles.ReceiveMessage(messageId, channel, data, nodeId, senderStitchInstanceId);
-                Observer.StitchInstanceManagerOnRequestResponseReceived(_instance.Id, messageId, ok);
+                Observer.MessageResponseReceived(_instance.Id, messageId, ok);
             }
             catch (Exception e)
             {

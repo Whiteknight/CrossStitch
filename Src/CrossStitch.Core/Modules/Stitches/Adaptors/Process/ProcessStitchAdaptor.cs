@@ -69,14 +69,14 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 
                 SetupChannel(_parameters.ChannelType, _parameters.SerializerType);
 
-                _observer.StitchInstancesOnStitchStateChanged(_stitchInstance.Id, true, true);
+                _observer.StitchStateChanged(_stitchInstance.Id, true, true);
 
                 return true;
             }
             catch (Exception e)
             {
                 _log.LogError(e, "Could not create and start process");
-                _observer.StitchInstancesOnStitchStateChanged(_stitchInstance.Id, false, false);
+                _observer.StitchStateChanged(_stitchInstance.Id, false, false);
                 return false;
             }
         }
@@ -173,7 +173,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             _channel.Dispose();
             _channel = null;
 
-            _observer.StitchInstancesOnStitchStateChanged(_stitchInstance.Id, false, requested);
+            _observer.StitchStateChanged(_stitchInstance.Id, false, requested);
         }
     }
 }

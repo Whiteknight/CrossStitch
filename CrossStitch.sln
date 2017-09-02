@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core", "Src\CrossStitch.Core\CrossStitch.Core.csproj", "{A9A30EDF-7047-4D0F-A756-816EB85D0384}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossStitch.Core", "Src\CrossStitch.Core\CrossStitch.Core.csproj", "{A9A30EDF-7047-4D0F-A756-816EB85D0384}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D3382E8E-25E0-43E1-BF41-9AE916E10A10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Http.NancyFx", "src\CrossStitch.Http.Nancy\CrossStitch.Http.NancyFx.csproj", "{1ABDC1B3-7213-44A7-A4AE-0AB40606C827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossStitch.Http.NancyFx", "src\CrossStitch.Http.Nancy\CrossStitch.Http.NancyFx.csproj", "{1ABDC1B3-7213-44A7-A4AE-0AB40606C827}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Backplane.Zyre", "Src\CrossStitch.Backplane.Zyre\CrossStitch.Backplane.Zyre.csproj", "{4FCBE339-B357-4F32-937D-4AB1D1196B67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossStitch.Backplane.Zyre", "Src\CrossStitch.Backplane.Zyre\CrossStitch.Backplane.Zyre.csproj", "{4FCBE339-B357-4F32-937D-4AB1D1196B67}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BD2CE792-ED97-433E-80D7-C1D90B708AEE}"
 	ProjectSection(SolutionItems) = preProject

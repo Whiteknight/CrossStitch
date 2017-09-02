@@ -12,5 +12,10 @@ namespace CrossStitch.Stitch.Process.Stitch
 
         public IReadOnlyDictionary<string, string> CrossStitchArguments { get; }
         public IReadOnlyList<string> CustomArguments { get; }
+
+        public CrossStitchArguments GetCoreArgumentsObject()
+        {
+            return new CrossStitchArguments(CrossStitchArguments);
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace CrossStitch.Stitch.Process.Stitch
         {
             var args = new StitchArgumentParser().Parse(processArgs);
             CustomArguments = args.CustomArguments;
-            CrossStitchParameters = new CrossStitchArguments(args.CrossStitchArguments);
+            CrossStitchParameters = args.GetCoreArgumentsObject();
 
             int corePid = CrossStitchParameters.CorePid;
             if (corePid > 0)

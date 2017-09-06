@@ -17,7 +17,7 @@
         <PackageReference Include="NetMQ" Version="4.0.0.1" />
         <PackageReference Include="NetMQ.Zyre.Standard" Version="1.0.0-rc1" />
         <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-        <PackageReference Include="Acquaintance" Version="2.0.0-alpha2" />
+        <PackageReference Include="Acquaintance" Version="2.0.0-beta1" />
     </ItemGroup>
 
     <ItemGroup>

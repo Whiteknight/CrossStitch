@@ -85,9 +85,9 @@ namespace CrossStitch.Core.Modules.Master
 
             // Publish the status of the node every 60 seconds
             int timerTickMultiple = (_configuration.StatusBroadcastIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
-            _subscriptions.TimerSubscribe(timerTickMultiple, b => b
+            _subscriptions.TimerSubscribe("tick", timerTickMultiple, b => b
                 .Invoke(t => GenerateAndPublishNodeStatus())
-                .OnWorkerThread());
+                .OnWorker());
 
             // TODO: Publish NodeStatus to cluster when Modules or StitchInstances change
 

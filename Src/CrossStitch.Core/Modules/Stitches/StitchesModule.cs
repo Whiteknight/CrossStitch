@@ -39,7 +39,7 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Subscribe<CoreEvent>(b => b
                 .WithTopic(CoreEvent.ChannelInitialized)
                 .Invoke(m => _service.StartRunningStitchesOnStartup())
-                .OnWorkerThread());
+                .OnWorker());
 
             // Upload package files
             _subscriptions.Listen<PackageFileUploadRequest, PackageFileUploadResponse>(l => l
@@ -76,7 +76,7 @@ namespace CrossStitch.Core.Modules.Stitches
             _subscriptions.Subscribe<StitchDataMessage>(b => b
                 .WithTopic(StitchDataMessage.ChannelSendLocal)
                 .Invoke(_service.SendDataMessageToStitch)
-                .OnWorkerThread()
+                .OnWorker()
                 .WithFilter(m => !string.IsNullOrEmpty(m.ToStitchInstanceId)));
             _subscriptions.Subscribe<ObjectReceivedEvent<StitchDataMessage>>(b => b
                 .WithTopic(ReceivedEvent.ChannelReceived)

@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Acquaintance, Version=2.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acquaintance.2.0.0-alpha2\lib\netstandard2.0\Acquaintance.dll</HintPath>
+      <HintPath>..\..\..\packages\Acquaintance.2.0.0-beta1\lib\netstandard2.0\Acquaintance.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

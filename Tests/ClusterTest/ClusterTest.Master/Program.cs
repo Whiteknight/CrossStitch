@@ -25,7 +25,7 @@ namespace ClusterTest.Master
                 core.MessageBus.Subscribe<ObjectReceivedEvent<NodeStatus>>(b => b
                     .WithTopic(ReceivedEvent.ReceivedEventName(NodeStatus.BroadcastEvent))
                     .Invoke(ReceiveNodeStatus));
-                core.MessageBus.TimerSubscribe(1, b => b.Invoke(m => SendPing(core)));
+                core.MessageBus.TimerSubscribe("tick", 1, b => b.Invoke(m => SendPing(core)));
 
                 core.AddModule(new BackplaneModule(core));
                 core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));

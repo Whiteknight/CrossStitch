@@ -70,7 +70,7 @@ namespace CrossStitch.Core.Modules.Timer
             try
             {
                 long sequence = Interlocked.Increment(ref _sequence);
-                _messageBus.Publish(Acquaintance.Timers.MessageTimerEvent.EventName, new Acquaintance.Timers.MessageTimerEvent(null, sequence));
+                _messageBus.Publish("tick", new Acquaintance.Timers.MessageTimerEvent(null, sequence));
             }
             catch (Exception e)
             {

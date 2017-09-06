@@ -28,7 +28,7 @@ namespace CrossStitch.Core.Modules.StitchMonitor
         public void Start()
         {
             int heartbeatTickMultiple = (_configuration.HeartbeatIntervalMinutes * 60) / Timer.MessageTimerModule.TimerIntervalSeconds;
-            _subscriptions.TimerSubscribe(heartbeatTickMultiple, b => b
+            _subscriptions.TimerSubscribe("tick", heartbeatTickMultiple, b => b
                 .Invoke(e => _heartbeatService.SendScheduledHeartbeat()));
 
             _subscriptions.Subscribe<StitchInstanceEvent>(b => b

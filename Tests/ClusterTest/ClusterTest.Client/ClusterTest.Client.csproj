@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Acquaintance, Version=2.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Acquaintance.2.0.0-alpha2\lib\netstandard2.0\Acquaintance.dll</HintPath>
+      <HintPath>..\..\..\packages\Acquaintance.2.0.0-beta1\lib\netstandard2.0\Acquaintance.dll</HintPath>
     </Reference>
     <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\AsyncIO.0.1.26.0\lib\net40\AsyncIO.dll</HintPath>

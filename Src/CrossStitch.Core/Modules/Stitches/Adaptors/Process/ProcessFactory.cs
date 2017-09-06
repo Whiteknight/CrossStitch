@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Text;
 using CrossStitch.Core.Models;
 using CrossStitch.Core.Utility;
 using CrossStitch.Stitch.Process;
@@ -22,14 +23,12 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
 
         public System.Diagnostics.Process Create(ProcessParameters parameters)
         {
+            var process = CreateNewProcessInternal(parameters);
             try
             {
-                //var executableName = Path.Combine(_parameters.DirectoryPath, _parameters.ExecutableName);
-                var process = CreateNewProcessInternal(parameters);
-
                 if (!process.Start())
                 {
-                    _log.LogError("Process could not be started.");
+                    _log.LogError("Process could not be started but there was no error. The process may already exist.");
                     process.Dispose();
                     return null;
                 }
@@ -38,7 +37,11 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             }
             catch (Exception e)
             {
-                _log.LogError(e, "Process could not be created");
+                var sb = new StringBuilder();
+                sb.AppendLine("Process could not be started because of an error");
+                sb.AppendLine($"    FileName={process.StartInfo.FileName}");
+                sb.AppendLine($"    CurrentDirectory={System.IO.Directory.GetCurrentDirectory()}");
+                _log.LogError(e, sb.ToString());
                 return null;
             }
         }
@@ -47,16 +50,30 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
         {
             bool useStdio = parameters.ChannelType == MessageChannelType.Stdio;
 
+            var sb = new StringBuilder();
+            sb.AppendLine("Process Create Parameters:");
+            sb.AppendLine($"    ExecutableFormat: {parameters.ExecutableFormat}");
+            sb.AppendLine($"    ExecutableName: {parameters.ExecutableName}");
+            sb.AppendLine($"    RunningDirectory: {parameters.RunningDirectory}");
+
             var executableFile = parameters.ExecutableFormat
                 .Replace("{ExecutableName}", parameters.ExecutableName)
                 .Replace("{DirectoryPath}", parameters.RunningDirectory);
+            sb.AppendLine($"    ExecutableFile: {executableFile}");
 
             var coreArgs = new ProcessArguments().BuildCoreArgumentsString(_stitchInstance, _core, parameters);
+
+            sb.AppendLine($"    ArgumentsFormat: {parameters.ArgumentsFormat}");
+            sb.AppendLine($"    CoreArgs: {coreArgs}");
+            sb.AppendLine($"    CustomArgs: {parameters.ExecutableArguments}");
+
             var arguments = parameters.ArgumentsFormat
                 .Replace("{ExecutableName}", parameters.ExecutableName)
                 .Replace("{DirectoryPath}", parameters.RunningDirectory)
                 .Replace("{CoreArgs}", coreArgs)
                 .Replace("{CustomArgs}", parameters.ExecutableArguments);
+            sb.AppendLine($"    Arguments: {arguments}");
+            _log.LogDebugRaw(sb.ToString());
 
             var process = new System.Diagnostics.Process
             {

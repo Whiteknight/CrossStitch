@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Data.Folders
 {
@@ -12,18 +13,20 @@ namespace CrossStitch.Core.Modules.Data.Folders
     public class FolderDataStorage : IDataStorage
     {
         private readonly Configuration _config;
+        private readonly string _basePath;
 
         public FolderDataStorage(Configuration config = null)
         {
             _config = config ?? Configuration.GetDefault();
-            if (!Directory.Exists(_config.DataPath))
-                Directory.CreateDirectory(_config.DataPath);
+            _basePath = FileSystem.FixPath(_config.DataPath);
+            if (!Directory.Exists(_basePath))
+                Directory.CreateDirectory(_basePath);
         }
 
         public bool Delete<TEntity>(string id)
             where TEntity : class, IDataEntity
         {
-            string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, id);
+            string filePath = GetEntityFullFilePath<TEntity>(_basePath, id);
             if (!File.Exists(filePath))
                 return false;
 
@@ -34,14 +37,14 @@ namespace CrossStitch.Core.Modules.Data.Folders
         public TEntity Get<TEntity>(string id)
             where TEntity : class, IDataEntity
         {
-            string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, id);
+            string filePath = GetEntityFullFilePath<TEntity>(_basePath, id);
             return !File.Exists(filePath) ? null : GetEntityFromFile<TEntity>(filePath);
         }
 
         public IEnumerable<TEntity> GetAll<TEntity>()
             where TEntity : class, IDataEntity
         {
-            string entityDirectoryPath = GetEntityDirectory<TEntity>(_config.DataPath);
+            string entityDirectoryPath = GetEntityDirectory<TEntity>(_basePath);
             if (!Directory.Exists(entityDirectoryPath))
                 return Enumerable.Empty<TEntity>();
 
@@ -80,7 +83,7 @@ namespace CrossStitch.Core.Modules.Data.Folders
         {
             entity.Id = CreateId(entity);
             entity.StoreVersion = 1;
-            string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, entity.Id);
+            string filePath = GetEntityFullFilePath<TEntity>(_basePath, entity.Id);
             if (File.Exists(filePath))
                 return false;
 
@@ -100,7 +103,7 @@ namespace CrossStitch.Core.Modules.Data.Folders
             where TEntity : class, IDataEntity
         {
             entity.StoreVersion++;
-            string filePath = GetEntityFullFilePath<TEntity>(_config.DataPath, entity.Id);
+            string filePath = GetEntityFullFilePath<TEntity>(_basePath, entity.Id);
             string contents = JsonUtility.Serialize(entity);
             File.WriteAllText(filePath, contents);
         }

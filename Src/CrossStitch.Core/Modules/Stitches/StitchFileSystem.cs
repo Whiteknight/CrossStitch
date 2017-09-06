@@ -4,6 +4,7 @@ using CrossStitch.Core.Modules.Stitches.Versions;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core.Modules.Stitches
 {
@@ -28,6 +29,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public SavePackageResult SavePackageToLibrary(string appName, string componentName, Stream contents)
         {
             string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
+            libraryDirectoryPath = FileSystem.FixPath(libraryDirectoryPath);
             if (!Directory.Exists(libraryDirectoryPath))
                 Directory.CreateDirectory(libraryDirectoryPath);
 
@@ -51,6 +53,7 @@ namespace CrossStitch.Core.Modules.Stitches
         public SavePackageResult SavePackageToLibrary(string appName, string componentName, string versionName, Stream contents)
         {
             string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, appName, componentName);
+            libraryDirectoryPath = FileSystem.FixPath(libraryDirectoryPath);
             if (!Directory.Exists(libraryDirectoryPath))
                 Directory.CreateDirectory(libraryDirectoryPath);
 
@@ -80,8 +83,10 @@ namespace CrossStitch.Core.Modules.Stitches
         public Result UnzipLibraryPackageToRunningBase(StitchGroupName groupName, string instanceId)
         {
             string libraryDirectoryPath = Path.Combine(_config.AppLibraryBasePath, groupName.Application, groupName.Component);
+            libraryDirectoryPath = FileSystem.FixPath(libraryDirectoryPath);
             if (!Directory.Exists(libraryDirectoryPath))
                 return Result.Failure();
+
             string libraryFilePath = Path.Combine(libraryDirectoryPath, groupName.Version + ".zip");
             var runningDirectory = GetInstanceRunningDirectory(instanceId);
             if (Directory.Exists(runningDirectory))
@@ -93,7 +98,7 @@ namespace CrossStitch.Core.Modules.Stitches
             {
                 archive.ExtractToDirectory(runningDirectory);
             }
-            
+
             return new Result
             {
                 Success = true,
@@ -103,12 +108,14 @@ namespace CrossStitch.Core.Modules.Stitches
 
         public string GetInstanceDataDirectoryPath(string instanceId)
         {
-            return Path.Combine(_config.DataBasePath, instanceId);
+            var path = Path.Combine(_config.DataBasePath, instanceId);
+            return FileSystem.FixPath(path);
         }
 
         public string GetInstanceRunningDirectory(string instanceId)
         {
-            return Path.Combine(_config.RunningAppBasePath, instanceId);
+            var path = Path.Combine(_config.RunningAppBasePath, instanceId);
+            return FileSystem.FixPath(path);
         }
 
         public bool DeleteRunningInstanceDirectory(string instanceId)
@@ -146,7 +153,9 @@ namespace CrossStitch.Core.Modules.Stitches
                 return 0;
             if (!Directory.Exists(path))
                 return 0;
-            return new DirectoryInfo(path).EnumerateFiles("*", SearchOption.AllDirectories).Aggregate(0L, (current, file) => current + file.Length);
+            return new DirectoryInfo(path)
+                .EnumerateFiles("*", SearchOption.AllDirectories)
+                .Aggregate(0L, (current, file) => current + file.Length);
         }
     }
 }

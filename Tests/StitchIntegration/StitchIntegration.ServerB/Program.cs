@@ -3,6 +3,7 @@ using CrossStitch.Backplane.Zyre;
 using CrossStitch.Core;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
+using Microsoft.Extensions.Logging;
 
 namespace StitchIntegration.ServerB
 {
@@ -18,7 +19,8 @@ namespace StitchIntegration.ServerB
                 Console.Title = core.Name;
                 core.AddModule(new BackplaneModule(core));
                 core.AddModule(new StitchesModule(core));
-                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
                 // This Node just runs. ServerA will generate and send commands to this node to produce changes
                 core.Start();

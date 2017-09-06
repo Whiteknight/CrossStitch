@@ -15,6 +15,7 @@ using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Core.Utility;
 using CrossStitch.Stitch.Process;
+using Microsoft.Extensions.Logging;
 
 namespace StitchIntegration.ServerA
 {
@@ -33,7 +34,8 @@ namespace StitchIntegration.ServerA
                 _testLog = new ModuleLog(core.MessageBus, "ServerA");
                 core.AddModule(new BackplaneModule(core));
                 core.AddModule(new StitchesModule(core));
-                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
                 core.Start();
 

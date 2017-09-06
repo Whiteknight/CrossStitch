@@ -1,5 +1,5 @@
 ﻿using Acquaintance;
-using Common.Logging;
+using Microsoft.Extensions.Logging;
 using CrossStitch.Core.Messages.Logging;
 
 namespace CrossStitch.Core.Modules.Logging
@@ -7,12 +7,12 @@ namespace CrossStitch.Core.Modules.Logging
     // This module serves as an adaptor between the ILog and IMessageBus
     public class LoggingModule : IModule
     {
-        private readonly ILog _log;
+        private readonly ILogger _log;
         private readonly SubscriptionCollection _subscriptions;
 
         private int _threadId;
 
-        public LoggingModule(CrossStitchCore core, ILog log)
+        public LoggingModule(CrossStitchCore core, ILogger log)
         {
             _log = log;
             _subscriptions = new SubscriptionCollection(core.MessageBus);
@@ -26,28 +26,22 @@ namespace CrossStitch.Core.Modules.Logging
             _threadId = _subscriptions.WorkerPool.StartDedicatedWorker().ThreadId;
             _subscriptions.Subscribe<LogEvent>(b => b
                 .WithTopic(LogEvent.LevelDebug)
-                .Invoke(l => _log.Debug(l.Message))
+                .Invoke(LogDebug)
                 .OnThread(_threadId));
 
             _subscriptions.Subscribe<LogEvent>(b => b
                 .WithTopic(LogEvent.LevelInformation)
-                .Invoke(l => _log.Info(l.Message))
+                .Invoke(LogInformation)
                 .OnThread(_threadId));
 
             _subscriptions.Subscribe<LogEvent>(b => b
                 .WithTopic(LogEvent.LevelWarning)
-                .Invoke(l => _log.Warn(l.Message))
+                .Invoke(LogWarning)
                 .OnThread(_threadId));
 
             _subscriptions.Subscribe<LogEvent>(b => b
                 .WithTopic(LogEvent.LevelError)
-                .Invoke(l =>
-                {
-                    if (l.Exception != null)
-                        _log.Error(l.Message, l.Exception);
-                    else
-                        _log.Error(l.Message);
-                })
+                .Invoke(LogError)
                 .OnThread(_threadId));
         }
 
@@ -65,6 +59,29 @@ namespace CrossStitch.Core.Modules.Logging
         public void Dispose()
         {
             Stop();
+        }
+
+        private void LogDebug(LogEvent l)
+        {
+            _log.LogDebug(l.Message);
+        }
+
+        private void LogInformation(LogEvent l)
+        {
+            _log.LogInformation(l.Message);
+        }
+
+        private void LogWarning(LogEvent l)
+        {
+            _log.LogWarning(l.Message);
+        }
+
+        private void LogError(LogEvent l)
+        {
+            if (l.Exception != null)
+                _log.LogError(l.Exception, l.Message);
+            else
+                _log.LogError(l.Message);
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using Acquaintance;
+﻿using System.Net;
+using Acquaintance;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Modules;
-using Nancy.Hosting.Self;
-using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Nancy.Owin;
 
 namespace CrossStitch.Http.NancyFx
 {
@@ -10,23 +12,23 @@ namespace CrossStitch.Http.NancyFx
     // StitchesNancyModule, for example, if the Stitches module isn't loaded.
     public class NancyHttpModule : IModule
     {
-        private readonly NancyHost _host;
         private readonly HttpConfiguration _httpConfiguration;
         private readonly ModuleLog _log;
+        private readonly IWebHost _host;
 
         public NancyHttpModule(IMessageBus messageBus, HttpConfiguration httpConfiguration = null)
         {
-            var bootstrapper = new HttpModuleBootstrapper(messageBus);
-            var hostConfig = new HostConfiguration
-            {
-                UrlReservations = new UrlReservations
-                {
-                    CreateAutomatically = true
-                }
-            };
-            httpConfiguration = httpConfiguration ?? HttpConfiguration.GetDefault();
-            _host = new NancyHost(new Uri("http://localhost:" + httpConfiguration.Port), bootstrapper, hostConfig);
-            _httpConfiguration = httpConfiguration;
+            _httpConfiguration = httpConfiguration ?? HttpConfiguration.GetDefault();
+            _host = new WebHostBuilder()
+                .Configure(cfg => cfg
+                    .UseOwin(x => x
+                        .UseNancy(new NancyOptions {
+                            Bootstrapper = new HttpModuleBootstrapper(messageBus)
+                        })))
+                .UseKestrel(o => o.Listen(IPAddress.Any, _httpConfiguration.Port))
+                .Build();
+
+            
             _log = new ModuleLog(messageBus, Name);
         }
 
@@ -40,7 +42,7 @@ namespace CrossStitch.Http.NancyFx
 
         public void Stop()
         {
-            _host.Stop();
+            _host.StopAsync().Wait();
             _log.LogInformation("REST API stopped Listening on port {0}", _httpConfiguration.Port);
         }
 

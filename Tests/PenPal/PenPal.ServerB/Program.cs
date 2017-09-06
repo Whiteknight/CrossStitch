@@ -8,6 +8,7 @@ using CrossStitch.Core.Modules.Data.InMemory;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Stitch.Process;
+using Microsoft.Extensions.Logging;
 
 namespace PenPal.ServerB
 {
@@ -30,7 +31,8 @@ namespace PenPal.ServerB
                 core.AddModule(new StitchesModule(core, stitchesConfig));
 
                 // Setup logging.
-                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
                 // Create a stitch instance to run on startup
                 var groupName = new StitchGroupName("PenPal.StitchB.1");

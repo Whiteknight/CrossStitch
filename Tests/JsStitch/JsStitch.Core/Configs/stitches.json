@@ -4,7 +4,8 @@
   "RunningAppBasePath": ".\\RunningApps",
   "Extensions": {
     ".js": {
-      "ExecutableFormat": "C:\\Program Files\\nodejs\\node.exe",
+      //"ExecutableFormat": "C:\\Program Files\\nodejs\\node.exe",
+      "ExecutableFormat": "/usr/bin/nodejs",
       "ArgumentsFormat": "{DirectoryPath}\\{ExecutableName} {CoreArgs} -- {CustomArgs}"
     }
   }

@@ -8,6 +8,7 @@ using Acquaintance.Timers;
 using CrossStitch.Core.Messages.Backplane;
 using CrossStitch.Core.Messages.Master;
 using CrossStitch.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ClusterTest.Master
 {
@@ -28,7 +29,8 @@ namespace ClusterTest.Master
                 core.MessageBus.TimerSubscribe("tick", 1, b => b.Invoke(m => SendPing(core)));
 
                 core.AddModule(new BackplaneModule(core));
-                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
                 core.Start();
                 core.Log.LogInformation("Started MASTER node {0}", core.NodeId);

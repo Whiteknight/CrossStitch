@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "StitchStart.Server": {
+      "commandName": "Project",
+      "workingDirectory": "..\\Debug\\netcoreapp2.0\\win7-x64\\"
+    }
+  }
+}

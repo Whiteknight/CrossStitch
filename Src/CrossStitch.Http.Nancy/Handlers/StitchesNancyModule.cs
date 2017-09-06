@@ -1,3 +1,4 @@
+using System;
 using Acquaintance;
 using CrossStitch.Core.MessageBus;
 using CrossStitch.Core.Messages.Master;
@@ -17,41 +18,32 @@ namespace CrossStitch.Http.NancyFx.Handlers
             var data = new DataHelperClient(messageBus);
 
             // TODO: Method to get all StitchSummaries from the entire cluster (MasterModule)
-            Get["/"] = _ => data.GetAll<StitchInstance>().ToList();
+            Get("/", _ => data.GetAll<StitchInstance>().ToList());
 
-            Get["/{StitchId}"] = _ => data.Get<StitchInstance>(_.StitchId.ToString());
+            Get("/{StitchId}", _ => data.Get<StitchInstance>(_.StitchId.ToString()));
 
-            Post["/{StitchId}/start"] = _ =>
+            Post<CommandResponse>("/{StitchId}/start", _ => messageBus.RequestWait<CommandRequest, CommandResponse>(new CommandRequest
             {
-                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
-                {
-                    Command = CommandType.StartStitchInstance,
-                    Target = _.StitchId.ToString()
-                });
-            };
+                Command = CommandType.StartStitchInstance,
+                Target = _.StitchId.ToString()
+            }));
 
-            Post["/{StitchId}/stop"] = _ =>
+            Post<CommandResponse>("/{StitchId}/stop", _ => messageBus.RequestWait<CommandRequest, CommandResponse>(new CommandRequest
             {
-                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
-                {
-                    Command = CommandType.StopStitchInstance,
-                    Target = _.StitchId.ToString()
-                });
-            };
+                Command = CommandType.StopStitchInstance,
+                Target = _.StitchId.ToString()
+            }));
 
-            Get["/{StitchId}/logs"] = _ =>
-            {
-                // Get last N log messages from the stitch
-                return null;
-            };
+            //Get["/{StitchId}/logs"] = _ =>
+            //{
+            //    // Get last N log messages from the stitch
+            //    return null;
+            //};
 
-            Get["/{StitchId}/resources"] = _ =>
+            Get("/{StitchId}/resources", (Func<dynamic, StitchResourceUsage>) (_ => messageBus.RequestWait<StitchResourceUsageRequest, StitchResourceUsage>(new StitchResourceUsageRequest
             {
-                return messageBus.Request<StitchResourceUsageRequest, StitchResourceUsage>(new StitchResourceUsageRequest
-                {
-                    StitchInstanceId = _.StitchId.ToString()
-                });
-            };
+                StitchInstanceId = _.StitchId.ToString()
+            })));
 
             //Post["/{StitchId}/clone"] = _ =>
             //{
@@ -62,28 +54,22 @@ namespace CrossStitch.Http.NancyFx.Handlers
             //    });
             //};
 
-            Delete["/{StitchId}"] = _ =>
+            Delete("/{StitchId}", _ => messageBus.RequestWait<CommandRequest, CommandResponse>(new CommandRequest
             {
-                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
-                {
-                    Command = CommandType.RemoveStitchInstance,
-                    Target = _.StitchId.ToString()
-                });
-            };
+                Command = CommandType.RemoveStitchInstance,
+                Target = _.StitchId.ToString()
+            }));
 
-            Get["/{StitchId}/status"] = _ =>
+            Get<StitchHealthResponse>("/{StitchId}/status", _ => messageBus.RequestWait<StitchHealthRequest, StitchHealthResponse>(new StitchHealthRequest
             {
-                return messageBus.Request<StitchHealthRequest, StitchHealthResponse>(new StitchHealthRequest
-                {
-                    StitchId = _.StitchId.ToString()
-                });
-            };
+                StitchId = _.StitchId.ToString()
+            }));
 
-            Post["/{StitchId}/moveto/{NodeId}"] = _ =>
-            {
-                // TODO: Move the stitch instance to the specified node
-                return null;
-            };
+            //Post["/{StitchId}/moveto/{NodeId}"] = _ =>
+            //{
+            //    // TODO: Move the stitch instance to the specified node
+            //    return null;
+            //};
         }
     }
 }

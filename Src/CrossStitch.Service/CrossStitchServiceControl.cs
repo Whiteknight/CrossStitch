@@ -5,6 +5,7 @@ using CrossStitch.Core.Modules.Data.Folders;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Http.NancyFx;
+using Microsoft.Extensions.Logging;
 using Topshelf;
 
 namespace CrossStitch.Service
@@ -17,7 +18,8 @@ namespace CrossStitch.Service
         {
             var nodeConfiguration = NodeConfiguration.GetDefault();
             _core = new CrossStitchCore(nodeConfiguration);
-            _core.AddModule(new LoggingModule(_core, Common.Logging.LogManager.GetLogger("CrossStitch")));
+            var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+            _core.AddModule(new LoggingModule(_core, logger));
             _core.AddModule(new NancyHttpModule(_core.MessageBus));
             _core.AddModule(new DataModule(_core.MessageBus, new FolderDataStorage()));
             _core.AddModule(new StitchesModule(_core));

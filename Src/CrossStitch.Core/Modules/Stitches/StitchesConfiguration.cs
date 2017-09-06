@@ -10,6 +10,7 @@ namespace CrossStitch.Core.Modules.Stitches
             var config = ConfigurationLoader.TryGetConfiguration<StitchesConfiguration>("stitches.json");
             if (config == null)
             {
+                System.Console.WriteLine("COULD NOT FIND STITCHES CONFIG");
                 config = new StitchesConfiguration();
                 config.ValidateAndSetDefaults();
             }

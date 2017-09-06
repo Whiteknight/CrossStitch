@@ -13,7 +13,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
         public StitchGroupNancyModule(IMessageBus messageBus)
             : base("/stitchgroups")
         {
-            Post["/{GroupName}/upload"] = x =>
+            Post<PackageFileUploadResponse>("/{GroupName}/upload", x =>
             {
                 var file = Request.Files.Single();
                 var request = new PackageFileUploadRequest
@@ -24,55 +24,45 @@ namespace CrossStitch.Http.NancyFx.Handlers
                     LocalOnly = true
                 };
 
-                return messageBus.Request<PackageFileUploadRequest, PackageFileUploadResponse>(request);
-            };
+                return messageBus.RequestWait<PackageFileUploadRequest, PackageFileUploadResponse>(request);
+            });
 
-            Post["/{GroupName}/createinstance"] = x =>
+            Post<CreateInstanceResponse>("/{GroupName}/createinstance", x =>
             {
                 var request = this.Bind<CreateInstanceRequest>();
                 request.GroupName = new StitchGroupName(x.GroupName.ToString());
                 request.LocalOnly = true;
-                return messageBus.Request<CreateInstanceRequest, CreateInstanceResponse>(request);
-            };
+                return messageBus.RequestWait<CreateInstanceRequest, CreateInstanceResponse>(request);
+            });
 
             // TODO: The rest of these requests are local-only, so we need to tell the handler
             // (MasterModule) that these requests are local and the similar-looking ones from the
             // Cluster api are cluster-wide.
 
-            Get["/{GroupName}"] = _ =>
+            //Get("/{GroupName}", _ =>
+            //{
+            //    // TODO: Get all instances in the group, including status and home node
+            //    return null;
+            //});
+
+            Post<CommandResponse>("/{GroupName}/stopall", _ => messageBus.RequestWait<CommandRequest, CommandResponse>(new CommandRequest
             {
-                // TODO: Get all instances in the group, including status and home node
-                return null;
-            };
+                Command = CommandType.StopStitchGroup,
+                Target = _.GroupName.ToString()
+            }));
 
-            Post["/{GroupName}/stopall"] = _ =>
+            Post<CommandResponse>("/{GroupName}/startall", _ => messageBus.RequestWait<CommandRequest, CommandResponse>(new CommandRequest
             {
-                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
-                {
-                    Command = CommandType.StopStitchGroup,
-                    Target = _.GroupName.ToString()
-                });
-            };
+                Command = CommandType.StartStitchGroup,
+                Target = _.GroupName.ToString()
+            }));
 
-            Post["/{GroupName}/startall"] = _ =>
-            {
-                return messageBus.Request<CommandRequest, CommandResponse>(new CommandRequest
-                {
-                    Command = CommandType.StartStitchGroup,
-                    Target = _.GroupName.ToString()
-                });
-            };
-
-            Post["/{GroupName}/stopoldversions"] = _ =>
-            {
-                // TODO: Stop all instances in the version group which are older than the group
-                // specified
-                return null;
-            };
-
-
-
-
+            //Post("/{GroupName}/stopoldversions", _ =>
+            //{
+            //    // TODO: Stop all instances in the version group which are older than the group
+            //    // specified
+            //    return null;
+            //});
         }
     }
 }

@@ -4,6 +4,7 @@ using CrossStitch.Core;
 using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Master.Events;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace ClusterTest.Client
 {
@@ -22,7 +23,8 @@ namespace ClusterTest.Client
                     .Invoke(NodeRemoved));
 
                 core.AddModule(new BackplaneModule(core));
-                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
                 core.Start();
                 core.Log.LogInformation("Starting CLIENT node {0}", core.NodeId);

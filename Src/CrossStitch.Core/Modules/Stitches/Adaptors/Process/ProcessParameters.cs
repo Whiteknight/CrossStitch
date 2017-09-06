@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CrossStitch.Core.Models;
+using CrossStitch.Core.Utility;
 using CrossStitch.Stitch.Process;
 using CrossStitch.Stitch.Utility.Extensions;
 
@@ -34,6 +35,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             string executableFormat = "{DirectoryPath}\\{ExecutableName}";
             if (!string.IsNullOrEmpty(extConfig.ExecutableFormat))
                 executableFormat = extConfig.ExecutableFormat;
+            executableFormat = FileSystem.FixPath(executableFormat);
             ExecutableFormat = parameters.GetOrAdd(Parameters.ExecutableFormat, executableFormat);
 
             // Use the format from the StitchInstance if specified, otherwise the one configured
@@ -41,6 +43,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             string argsFormat = "{CoreArgs} -- {CustomArgs}";
             if (!string.IsNullOrEmpty(extConfig.ArgumentsFormat))
                 argsFormat = extConfig.ArgumentsFormat;
+            argsFormat = FileSystem.FixPath(argsFormat);
             ArgumentsFormat = parameters.GetOrAdd(Parameters.ArgumentsFormat, argsFormat);
 
             ChannelType = packageFile.Adaptor.Channel;

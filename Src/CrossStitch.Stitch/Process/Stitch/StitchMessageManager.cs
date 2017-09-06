@@ -14,7 +14,9 @@ namespace CrossStitch.Stitch.Process.Stitch
         private readonly IMessageSerializer _serializer;
         private readonly System.Diagnostics.Process _parentProcess;
         private readonly BlockingCollection<ToStitchMessage> _incomingMessages;
+        private readonly ConcurrentQueue<ToStitchMessage> _incomingMessageQueue;
         private readonly Thread _readerThread;
+        private volatile bool _shouldStop;
 
         public StitchMessageManager(string[] processArgs)
         {
@@ -27,15 +29,16 @@ namespace CrossStitch.Stitch.Process.Stitch
                 _parentProcess = System.Diagnostics.Process.GetProcessById(corePid);
 
             _incomingMessages = new BlockingCollection<ToStitchMessage>();
-
+            _incomingMessageQueue = new ConcurrentQueue<ToStitchMessage>();
             _messageChannel = new StitchMessageChannelFactory(CrossStitchParameters.CoreId, CrossStitchParameters.InstanceId).Create(CrossStitchParameters.MessageChannelType);
-
             _serializer = new MessageSerializerFactory().Create(CrossStitchParameters.MessageSerializerType);
 
             _readerThread = new Thread(ReaderThreadFunction)
             {
                 IsBackground = true
             };
+
+            _shouldStop = false;
         }
 
         public bool ReceiveHeartbeats { get; set; }
@@ -51,8 +54,7 @@ namespace CrossStitch.Stitch.Process.Stitch
 
         public void Stop()
         {
-            _readerThread?.Abort();
-            _readerThread?.Join();
+            _shouldStop = true;
         }
 
         public ToStitchMessage GetNextMessage()
@@ -97,6 +99,7 @@ namespace CrossStitch.Stitch.Process.Stitch
         private ToStitchMessage GetNextMessageInternal()
         {
             bool ok = _incomingMessages.TryTake(out ToStitchMessage message, MessageReadTimeoutMs);
+            //bool ok = _incomingMessageQueue.TryDequeue(out ToStitchMessage message);
             if (ok && message != null)
                 return message;
 
@@ -146,7 +149,7 @@ namespace CrossStitch.Stitch.Process.Stitch
 
         private void ReaderThreadFunction()
         {
-            while (true)
+            while (!_shouldStop)
             {
                 try
                 {
@@ -154,6 +157,7 @@ namespace CrossStitch.Stitch.Process.Stitch
                     if (string.IsNullOrEmpty(messageBuffer))
                         continue;
                     var message = _serializer.DeserializeToStitchMessage(messageBuffer);
+                    //_incomingMessageQueue.Enqueue(message);
                     _incomingMessages.Add(message);
                 }
                 catch (Exception e)

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PenPal.ServerA": {
+      "commandName": "Project",
+      "workingDirectory": "..\\A\\Debug\\netcoreapp2.0\\win7-x64"
+    }
+  }
+}

@@ -5,6 +5,7 @@ using CrossStitch.Core.Modules;
 using CrossStitch.Core.Modules.Core;
 using System;
 using System.Linq;
+using CrossStitch.Core.Utility;
 
 namespace CrossStitch.Core
 {
@@ -102,7 +103,7 @@ namespace CrossStitch.Core
                 return config.NodeId;
 
             const string nodeIdFile = "NODEID";
-            string nodeIdFilePath = System.IO.Path.Combine(config.StateFileFolder, nodeIdFile);
+            string nodeIdFilePath = FileSystem.Combine(config.StateFileFolder, nodeIdFile);
             if (System.IO.File.Exists(nodeIdFilePath))
             {
                 var text = System.IO.File.ReadAllLines(nodeIdFilePath).FirstOrDefault();
@@ -125,7 +126,7 @@ namespace CrossStitch.Core
                 return config.NodeName;
 
             const string fileName = "NODENAME";
-            string filePath = System.IO.Path.Combine(config.StateFileFolder, fileName);
+            string filePath = FileSystem.Combine(config.StateFileFolder, fileName);
             if (System.IO.File.Exists(filePath))
             {
                 var text = System.IO.File.ReadAllLines(filePath).FirstOrDefault();

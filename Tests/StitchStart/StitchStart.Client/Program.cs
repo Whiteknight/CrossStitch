@@ -25,7 +25,7 @@ namespace StitchStart.Client
                     if (msg.IsExitMessage())
                     {
                         //Log("Got EXIT message from manager");
-                        return;
+                        Environment.Exit(0);
                     }
                     if (msg.IsHeartbeatMessage())
                     {

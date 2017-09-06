@@ -10,17 +10,17 @@ namespace CrossStitch.Http.NancyFx.Handlers
         public ModulesNancyModule(IMessageBus messageBus)
             : base("/modules")
         {
-            Get["/"] = _ =>
+            Get("/", _ =>
             {
                 var request = new ModuleStatusRequest { ModuleName = ModuleNames.Core };
                 return messageBus.Request<ModuleStatusRequest, ModuleStatusResponse>(request);
-            };
+            });
 
-            Get["/{ModuleName}/status"] = _ =>
+            Get("/{ModuleName}/status", _ =>
             {
                 var request = new ModuleStatusRequest { ModuleName = _.ModuleName.ToString() };
                 return messageBus.Request<ModuleStatusRequest, ModuleStatusResponse>(request);
-            };
+            });
         }
     }
 }

@@ -75,7 +75,7 @@ namespace CrossStitch.Core.Modules.Stitches.Adaptors.Process
             }
             catch (Exception e)
             {
-                _log.LogError(e, "Could not create and start process");
+                _log.LogError(e, "Could not create or start process.");
                 _observer.StitchStateChanged(_stitchInstance.Id, false, false);
                 return false;
             }

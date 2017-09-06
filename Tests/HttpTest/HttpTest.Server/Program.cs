@@ -8,6 +8,8 @@ using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using CrossStitch.Http.NancyFx;
 using CrossStitch.Stitch.Process;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace HttpTest.Server
 {
@@ -16,6 +18,7 @@ namespace HttpTest.Server
         static void Main(string[] args)
         {
             var nodeConfig = NodeConfiguration.GetDefault();
+            
 
             using (var core = new CrossStitchCore(nodeConfig))
             {
@@ -42,7 +45,9 @@ namespace HttpTest.Server
                         Parameters = new Dictionary<string, string>
                         {
                             { Parameters.RunningDirectory, "." },
-                            { Parameters.ExecutableName, "HttpTest.Stitch.exe" }
+                            { Parameters.ExecutableName, "HttpTest.Stitch.exe" },
+                            //{ Parameters.ArgumentsFormat, "{ExecutableName} {CoreArgs} -- {CustomArgs}" },
+                            //{ Parameters.ExecutableFormat, "dotnet" },
                         }
                     },
                 };
@@ -56,8 +61,10 @@ namespace HttpTest.Server
                 };
                 dataStorage.Save(stitch, true);
 
-                core.AddModule(new LoggingModule(core, Common.Logging.LogManager.GetLogger("CrossStitch")));
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
+                core.Log.LogInformation("Started");
                 core.Start();
                 Console.ReadKey();
                 core.Stop();

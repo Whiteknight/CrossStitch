@@ -9,6 +9,10 @@ namespace CrossStitch.Core.Utility
         {
         }
 
+        public void LogDebugRaw(string msg)
+        {
+        }
+
         public void LogError(Exception exception, string fmt, params object[] args)
         {
         }

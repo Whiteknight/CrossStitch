@@ -7,6 +7,7 @@ using CrossStitch.Core.Modules.Stitches;
 using System;
 using System.Collections.Generic;
 using CrossStitch.Stitch.Process;
+using Microsoft.Extensions.Logging;
 
 namespace JsStitch.Core
 {
@@ -47,9 +48,8 @@ namespace JsStitch.Core
                 var stitches = new StitchesModule(core, stitchesConfiguration);
                 core.AddModule(stitches);
 
-                var log = Common.Logging.LogManager.GetLogger("CrossStitch");
-                var logging = new LoggingModule(core, log);
-                core.AddModule(logging);
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
                 core.Start();
                 Console.ReadKey();

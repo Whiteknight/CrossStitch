@@ -1,12 +1,12 @@
-﻿using Acquaintance;
-using CrossStitch.Http.NancyFx.Converters;
+﻿using System;
+using Acquaintance;
+using Nancy;
 using Nancy.Bootstrapper;
-using Nancy.Json;
 using Nancy.Responses.Negotiation;
 
 namespace CrossStitch.Http.NancyFx
 {
-    public class HttpModuleBootstrapper : Nancy.DefaultNancyBootstrapper
+    public class HttpModuleBootstrapper : DefaultNancyBootstrapper
     {
         private readonly IMessageBus _messageBus;
 
@@ -17,11 +17,10 @@ namespace CrossStitch.Http.NancyFx
 
         protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
         {
-            JsonSettings.PrimitiveConverters.Add(new JsonConvertEnum());
             container.Register(_messageBus);
         }
 
-        protected override NancyInternalConfiguration InternalConfiguration
+        protected override Func<ITypeCatalog, NancyInternalConfiguration> InternalConfiguration
         {
             get
             {

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossStitch.Core", "Src\Cro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{D3382E8E-25E0-43E1-BF41-9AE916E10A10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossStitch.Http.NancyFx", "src\CrossStitch.Http.Nancy\CrossStitch.Http.NancyFx.csproj", "{1ABDC1B3-7213-44A7-A4AE-0AB40606C827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossStitch.Http.NancyFx", "Src\CrossStitch.Http.Nancy\CrossStitch.Http.NancyFx.csproj", "{1ABDC1B3-7213-44A7-A4AE-0AB40606C827}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossStitch.Backplane.Zyre", "Src\CrossStitch.Backplane.Zyre\CrossStitch.Backplane.Zyre.csproj", "{4FCBE339-B357-4F32-937D-4AB1D1196B67}"
 EndProject
@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{90BBD862
 		Tests\README.md = Tests\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core.Tests", "src\CrossStitch.Core.Tests\CrossStitch.Core.Tests.csproj", "{B948FD42-51B2-4700-B785-FEBDED260848}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Core.Tests", "Src\CrossStitch.Core.Tests\CrossStitch.Core.Tests.csproj", "{B948FD42-51B2-4700-B785-FEBDED260848}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossStitch.Stitch.Tests", "Src\CrossStitch.Stitch.Tests\CrossStitch.Stitch.Tests.csproj", "{15B56932-9606-41D4-BF7A-8638FD40904B}"
 EndProject
@@ -40,7 +40,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StitchStart.Server", "Tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpTest", "HttpTest", "{700E4D25-B6BE-4011-9A48-6B9FF76D4694}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpTest.Server", "Tests\HttpTest\HttpTest.Server\HttpTest.Server.csproj", "{7CB85F13-7FC1-40BC-881F-5220DE6069EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpTest.Server", "Tests\HttpTest\HttpTest.Server\HttpTest.Server.csproj", "{7CB85F13-7FC1-40BC-881F-5220DE6069EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpTest.Stitch", "Tests\HttpTest\HttpTest.Stitch\HttpTest.Stitch.csproj", "{5E546ED6-1BB4-476F-9A51-AF26910C6AA2}"
 EndProject

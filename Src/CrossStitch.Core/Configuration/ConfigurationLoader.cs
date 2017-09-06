@@ -7,23 +7,20 @@ namespace CrossStitch.Core.Configuration
     public static class ConfigurationLoader
     {
         private static readonly string[] DefaultSearchPaths = {
-            @".\Configs\",
-            @".\Configuration\",
-            @".\"
+            @"Configs",
+            @"Configuration"
         };
 
         private static string FindConfigFile(string fileName)
         {
-            string basePath = ConfigurationManager.AppSettings["Configuration:BasePath"];
-            if (!string.IsNullOrEmpty(basePath))
-            {
-                string path = Path.Combine(basePath, fileName);
-                return File.Exists(path) ? path : null;
-            }
-
+            var herePath = Path.Combine(".", fileName);
+            System.Console.WriteLine($"Searching for {herePath} (CWD={System.IO.Directory.GetCurrentDirectory()})");
+            if (File.Exists(herePath))
+                return herePath;
             foreach (var searchPath in DefaultSearchPaths)
             {
-                string fullPath = Path.Combine(searchPath, fileName);
+                string fullPath = Path.Combine(".", searchPath, fileName);
+                System.Console.WriteLine($"Searching for {fullPath} (CWD={System.IO.Directory.GetCurrentDirectory()})");
                 if (File.Exists(fullPath))
                     return fullPath;
             }

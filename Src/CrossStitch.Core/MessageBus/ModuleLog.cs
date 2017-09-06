@@ -31,6 +31,11 @@ namespace CrossStitch.Core.MessageBus
             MessageBus.Publish(LogEvent.LevelDebug, new LogEvent(msg));
         }
 
+        public void LogDebugRaw(string msg)
+        {
+            MessageBus.Publish(LogEvent.LevelDebug, new LogEvent(msg));
+        }
+
         public void LogInformation(string fmt, params object[] args)
         {
             string msg = GetMessage(fmt, args);

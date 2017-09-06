@@ -13,7 +13,7 @@ namespace CrossStitch.Http.NancyFx.Handlers
         {
             var data = new DataHelperClient(messageBus);
 
-            Get["/{JobId}"] = _ => data.Get<CommandJob>(_.JobId.ToString());
+            Get("/{JobId}", _ => data.Get<CommandJob>(_.JobId.ToString()));
         }
     }
 }

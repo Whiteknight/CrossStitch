@@ -44,7 +44,7 @@ function handleLines(json) {
 
 function log(x) {
     // Put in whatever error logging you want, here.
-    //fs.appendFileSync("JsStitch.txt", x + "\n");
+    fs.appendFileSync("JsStitch.txt", x + "\n");
 }
 
 try {

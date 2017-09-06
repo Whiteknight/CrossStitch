@@ -1,0 +1,3 @@
+dotnet test Src/CrossStitch.Stitch.Tests/CrossStitch.Stitch.Tests.csproj
+dotnet test Src/CrossStitch.Core.Tests/CrossStitch.Core.Tests.csproj
+

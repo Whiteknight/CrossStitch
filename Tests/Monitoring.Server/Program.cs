@@ -9,6 +9,7 @@ using CrossStitch.Core.Modules.Logging;
 using CrossStitch.Core.Modules.Stitches;
 using Acquaintance;
 using CrossStitch.Core.Messages.StitchMonitor;
+using Microsoft.Extensions.Logging;
 
 namespace Monitoring.Server
 {
@@ -23,9 +24,8 @@ namespace Monitoring.Server
                 var stitches = new StitchesModule(core, stitchesConfiguration);
                 core.AddModule(stitches);
 
-                var log = Common.Logging.LogManager.GetLogger("CrossStitch");
-                var logging = new LoggingModule(core, log);
-                core.AddModule(logging);
+                var logger = new LoggerFactory().AddConsole(LogLevel.Debug).CreateLogger<Program>();
+                core.AddModule(new LoggingModule(core, logger));
 
                 core.MessageBus.Subscribe<StitchHealthEvent>(b => b
                     .WithTopic(StitchHealthEvent.TopicUnhealthy)
